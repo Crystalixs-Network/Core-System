@@ -30,7 +30,7 @@ tasks {
     }
 
     jar {
-        archiveBaseName.set("$artifact-${rootProject.version}-paper")
+        archiveBaseName.set("$artifact-paper-${rootProject.version}")
     }
 
     bukkitPluginYaml {
