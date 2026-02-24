@@ -7,8 +7,6 @@ tasks {
     val artifact = project.mavenArtifact()
 
     shadowJar {
-        from(sourceSets.main.get().output)
-
         // Dieses Mapping sorgt dafür, dass die Klassen des Dependencies-Pakets
         // in einen eigenen Namespace verschoben werden, wenn der Shadow-JAR gebaut wird.
         // So vermeiden wir Konflikte mit anderen Libraries, die dieselben Klassen enthalten.
@@ -23,8 +21,10 @@ tasks {
         val base = "$group.$artifact.common.libs"
         for ((pattern, name) in mapping) relocate(pattern, "$base.$name")
          */
+    }
 
-        archiveFileName = "$artifact-${rootProject.version}-common.jar"
+    jar {
+        archiveBaseName.set("$artifact-${rootProject.version}-common")
     }
 
     build {
