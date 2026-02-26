@@ -1,4 +1,4 @@
-package net.crystalixs.foo.velocity;
+package net.crystalixs.core.velocity;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
