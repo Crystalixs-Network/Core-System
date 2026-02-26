@@ -1,4 +1,4 @@
-rootProject.name = "java-multi-module-project-template"
+rootProject.name = "core"
 
 include("common")
 include("paper")
