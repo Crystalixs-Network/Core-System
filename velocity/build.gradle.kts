@@ -9,6 +9,7 @@ dependencies {
     annotationProcessor(libs.velocity)
 
     implementation(project(":common"))
+    implementation(libs.jackson)
 }
 
 tasks {
@@ -23,12 +24,10 @@ tasks {
 
         // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
 
-        /*
-        val mapping = mapOf("" to "")
+        val mapping = mapOf(libs.jackson.get().group to "jackson")
 
         val base = "$group.$artifact.velocity.libs"
         for ((pattern, name) in mapping) relocate(pattern, "$base.$name")
-         */
     }
 
     jar {

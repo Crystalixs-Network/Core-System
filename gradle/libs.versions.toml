@@ -5,6 +5,7 @@ run-server = "3.0.2"
 [libraries]
 paper = { group = "io.papermc.paper", name = "paper-api", version = "1.21.11-R0.1-SNAPSHOT" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version = "3.5.0-SNAPSHOT" }
+jackson = { group = "tools.jackson.core", name = "jackson-databind", version = "3.1.0" }
 
 [plugins]
 bukkitConvention = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resource-factory" }
