@@ -6,7 +6,7 @@ import jakarta.inject.Inject;
 
 import java.util.logging.Logger;
 
-public class FooPlugin {
+public class CorePlugin {
 
     @Inject
     private Logger logger;
