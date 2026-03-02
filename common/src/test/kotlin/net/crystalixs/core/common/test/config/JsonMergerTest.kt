@@ -216,4 +216,27 @@ class JsonMergerTest : FunSpec({
         val merged = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
         merged.get("nested").asInt() shouldBe 42
     }
+
+    test("Non-Object Default Fallback: user = null ⇒ merged = default") {
+        val defaultNode = JsonNodeFactory.instance.numberNode(5)
+        val merged = ConfigLoader.JsonMerger.merge(mapper, defaultNode, null)
+        merged shouldBe defaultNode
+    }
+
+    test("Null User Field Fallback: user(k) = null ⇒ merged(k) = default(k)") {
+        val defaults = mapper.createObjectNode().put("a", 1)
+        val user = mapper.createObjectNode().putNull("a")
+
+        val merged = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
+        merged.get("a").asInt() shouldBe 1
+    }
+
+    test("Non-Object User Root Fallback: user root non-object ⇒ merged = defaults over keys(defaults)") {
+        val defaults = mapper.createObjectNode().put("a", 1)
+        val user = JsonNodeFactory.instance.numberNode(42)
+
+        val merged = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
+        merged.get("a").asInt() shouldBe 1
+        merged.size() shouldBe 1
+    }
 })

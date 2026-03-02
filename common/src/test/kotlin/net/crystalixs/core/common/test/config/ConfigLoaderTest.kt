@@ -14,6 +14,39 @@ class ConfigLoaderTest : FunSpec({
 
     val mapper = ObjectMapperProvider.mapper()
 
+    test("Pre-Reload State: get() = null") {
+        data class TestConfig(val a: Int = 0)
+
+        val tempDir = Files.createTempDirectory("config-loader-pre-reload")
+        val configFile = tempDir.resolve("config.json")
+        val loader = ConfigLoader(configFile, "default-config.json", TestConfig::class.java)
+
+        loader.get() shouldBe null
+    }
+
+    test("Missing File Initialization: reload creates file and persists defaults") {
+        data class TestConfig(val a: Int = 0)
+
+        val defaultJson = """{"a":7}"""
+        val tempDir = Files.createTempDirectory("config-loader-create-file")
+        val configFile = tempDir.resolve("config.json")
+
+        val resourceLoader = object : ClassLoader(ConfigLoader::class.java.classLoader) {
+            override fun getResourceAsStream(name: String?): InputStream? {
+                return if (name == "default-config.json")
+                    ByteArrayInputStream(defaultJson.toByteArray(Charsets.UTF_8))
+                else null
+            }
+        }
+
+        val loader = ConfigLoader(configFile, "default-config.json", TestConfig::class.java, resourceLoader)
+        loader.reload()
+
+        Files.exists(configFile) shouldBe true
+        loader.get().a shouldBe 7
+        mapper.readTree(configFile.toFile()).get("a").asInt() shouldBe 7
+    }
+
     test("Reload Semantics: merged config persisted and in-memory state updated") {
         data class Nested(val x: Int = 0)
         data class TestConfig(val a: Int = 0, val nested: Nested = Nested())
