@@ -251,4 +251,22 @@ class JsonMergerTest : FunSpec({
         val merged = ConfigLoader.JsonMerger.merge(mapper, defaultNode, userNode)
         merged shouldBe defaultNode
     }
+
+    test("Non-Object Root Override: user ≠ null ∧ user ≠ missing ∧ user ≠ nullNode ⇒ merged = copy(user)") {
+        val defaultNode = JsonNodeFactory.instance.numberNode(5)
+        val userNode = mapper.createObjectNode().apply {
+            put("a", 1)
+            putObject("nested").put("x", 7)
+        }
+        val merged = ConfigLoader.JsonMerger.merge(mapper, defaultNode, userNode)
+
+        merged shouldBe userNode
+        (merged === userNode) shouldBe false
+
+        (merged as ObjectNode).put("a", 99)
+        (merged.get("nested") as ObjectNode).put("x", 42)
+
+        userNode.get("a").asInt() shouldBe 1
+        userNode.get("nested").get("x").asInt() shouldBe 7
+    }
 })
