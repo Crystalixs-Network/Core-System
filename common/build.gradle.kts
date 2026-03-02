@@ -2,6 +2,7 @@ plugins {
     `java-library`
     alias(libs.plugins.kotlin)
     alias(libs.plugins.kotest)
+    alias(libs.plugins.pitest)
     alias(libs.plugins.shadow)
 }
 
@@ -12,6 +13,8 @@ dependencies {
     testImplementation(libs.bundles.kotest)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform)
+
+    pitest(libs.pitest.junit5)
 }
 
 tasks {
@@ -43,11 +46,27 @@ tasks {
         useJUnitPlatform()
     }
 
+    check {
+        dependsOn(pitest)
+    }
+
     jar {
         archiveBaseName.set("$artifact-common-${rootProject.version}")
     }
 
     build {
         dependsOn(shadowJar)
+    }
+
+    pitest {
+        threads = 4
+        mutationThreshold = 80
+        coverageThreshold = 80
+        jvmArgs = listOf("-Xmx2G")
+        avoidCallsTo = listOf("java.util.logging.*")
+        outputFormats = listOf("HTML")
+        mutators = listOf("STRONGER")
+        targetClasses = listOf("net.crystalixs.core.common.config.*")
+        targetTests = listOf("**JsonMergerShrinkingTest")
     }
 }
