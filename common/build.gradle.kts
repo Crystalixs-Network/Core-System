@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     `java-library`
     `jvm-test-suite`
@@ -10,7 +12,7 @@ plugins {
 dependencies {
     implementation(libs.bundles.jackson)
 
-    testImplementation(libs.kotlin.stdlib)
+    testImplementation(libs.bundles.kotlinTest)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform)
 }
@@ -29,12 +31,24 @@ tasks {
 
         val mapping = mapOf(
             libs.jackson.databind to "jackson_databind",
-            libs.jackson.annotations to "jackson_annotations",
+            libs.jackson.kotlin to "jackson_kotlin",
             libs.jackson.bukkit to "jackson_bukkit",
         )
 
         val base = "$group.$artifact.common.libs"
         for ((dependency, name) in mapping) relocate(dependency.get().group, "$base.$name")
+    }
+
+    kotlin {
+        jvmToolchain(21)
+    }
+
+    compileKotlin {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
+    }
+
+    compileTestKotlin {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
     }
 
     test {
