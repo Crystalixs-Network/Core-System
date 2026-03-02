@@ -1,0 +1,7 @@
+{
+  "motd": {
+    "first_line": "Default First",
+    "second_line": "Default Second"
+  },
+  "maintenance": false
+}
