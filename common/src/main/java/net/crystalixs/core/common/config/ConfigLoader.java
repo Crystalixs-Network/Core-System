@@ -74,7 +74,7 @@ public class ConfigLoader<T> implements Config<T> {
                 node.set(field, child != null ? child : defaultChild);
         });
 
-        // Felder die nur in der verwendeten Config existieren hinzufügen
+        // Felder, die nur in der verwendeten Config existieren, hinzufügen
         if (userNode != null && userNode.isObject()) {
             ObjectNode obj = userNode.asObject();
 

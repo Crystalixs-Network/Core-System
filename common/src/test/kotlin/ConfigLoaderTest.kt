@@ -1,5 +1,3 @@
-import com.fasterxml.jackson.annotation.JsonCreator
-import com.fasterxml.jackson.annotation.JsonProperty
 import net.crystalixs.core.common.config.ConfigLoader
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
