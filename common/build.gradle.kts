@@ -67,6 +67,6 @@ tasks {
         outputFormats = listOf("HTML")
         mutators = listOf("STRONGER")
         targetClasses = listOf("net.crystalixs.core.common.config.*")
-        targetTests = listOf("**JsonMergerShrinkingTest")
+        targetTests = listOf("**JsonMergerTest")
     }
 }
