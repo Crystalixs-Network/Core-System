@@ -54,7 +54,7 @@ public class ConfigLoader<T> implements Config<T> {
 
         // User-Config laden, mergen und zurückschreiben
         JsonNode userNode = mapper.readTree(file.toFile());
-        JsonNode merged = merge(defaultNode, userNode);
+        JsonNode merged = JsonMerger.merge(mapper, defaultNode, userNode);
         mapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), merged);
 
         // Config (plattformspezifisch) aktualisieren
@@ -70,33 +70,35 @@ public class ConfigLoader<T> implements Config<T> {
      *     <li>Felder in der userNode, die in defaultNode nicht existieren, werden entfernt</li>
      * </ol>
      */
-    private JsonNode merge(@NotNull JsonNode defaultNode, JsonNode userNode) {
-        if (!defaultNode.isObject()) {
-            return userNode != null ? userNode : defaultNode;
-        }
-
-        ObjectNode defaultObject = defaultNode.asObject();
-        ObjectNode userObject = (userNode != null && userNode.isObject())
-                ? userNode.asObject()
-                : mapper.createObjectNode();
-
-        ObjectNode merged = mapper.createObjectNode();
-
-        // 1. Default Felder mergen / hinzufügen
-        for (String field : defaultObject.propertyNames()) {
-            JsonNode defaultChild = defaultObject.get(field);
-            JsonNode userChild = userObject.has(field)
-                    ? userObject.get(field)
-                    : null;
-
-            if (defaultChild.isObject()) {
-                merged.set(field, merge(defaultChild, userChild));
-            } else {
-                merged.set(field, userChild != null ? userChild : defaultChild);
+    static final class JsonMerger {
+        public static JsonNode merge(@NotNull ObjectMapper mapper, @NotNull JsonNode defaultNode, JsonNode userNode) {
+            if (!defaultNode.isObject()) {
+                return userNode != null ? userNode : defaultNode;
             }
-        }
 
-        // 2. User-Felder, die nicht in den Defaults existieren, werden gelöscht
-        return merged;
+            ObjectNode defaultObject = defaultNode.asObject();
+            ObjectNode userObject = (userNode != null && userNode.isObject())
+                    ? userNode.asObject()
+                    : mapper.createObjectNode();
+
+            ObjectNode merged = mapper.createObjectNode();
+
+            // 1. Default Felder mergen / hinzufügen
+            for (String field : defaultObject.propertyNames()) {
+                JsonNode defaultChild = defaultObject.get(field);
+                JsonNode userChild = userObject.has(field)
+                        ? userObject.get(field)
+                        : null;
+
+                if (defaultChild.isObject()) {
+                    merged.set(field, merge(mapper, defaultChild, userChild));
+                } else {
+                    merged.set(field, userChild != null ? userChild : defaultChild);
+                }
+            }
+
+            // 2. User-Felder, die nicht in den Defaults existieren, werden gelöscht
+            return merged;
+        }
     }
 }
