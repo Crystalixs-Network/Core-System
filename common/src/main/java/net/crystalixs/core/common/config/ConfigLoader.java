@@ -70,7 +70,7 @@ public class ConfigLoader<T> implements Config<T> {
      *     <li>Felder in der userNode, die in defaultNode nicht existieren, werden entfernt</li>
      * </ol>
      */
-    static final class JsonMerger {
+    public static final class JsonMerger {
         public static JsonNode merge(@NotNull ObjectMapper mapper, @NotNull JsonNode defaultNode, JsonNode userNode) {
             if (!defaultNode.isObject()) {
                 return userNode != null ? userNode : defaultNode;
