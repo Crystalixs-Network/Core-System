@@ -1,11 +1,7 @@
-@file:Suppress("UnstableApiUsage")
-
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
     `java-library`
-    `jvm-test-suite`
     alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotest)
     alias(libs.plugins.shadow)
 }
 
@@ -13,6 +9,7 @@ dependencies {
     implementation(libs.bundles.jackson)
 
     testImplementation(libs.bundles.kotlinTest)
+    testImplementation(libs.bundles.kotest)
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly(libs.junit.platform)
 }
@@ -42,20 +39,8 @@ tasks {
         jvmToolchain(21)
     }
 
-    compileKotlin {
-        compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
-    }
-
-    compileTestKotlin {
-        compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
-    }
-
     test {
         useJUnitPlatform()
-    }
-
-    check {
-        dependsOn(testing.suites.named("jvmTest"))
     }
 
     jar {
@@ -64,22 +49,5 @@ tasks {
 
     build {
         dependsOn(shadowJar)
-    }
-}
-
-testing {
-    suites {
-        val jvmTest by registering(JvmTestSuite::class) {
-            useJUnitJupiter()
-
-            targets {
-                all {
-                    testTask.configure {
-                        testLogging { events("passed", "skipped", "failed") }
-                        maxHeapSize = "512M"
-                    }
-                }
-            }
-        }
     }
 }
