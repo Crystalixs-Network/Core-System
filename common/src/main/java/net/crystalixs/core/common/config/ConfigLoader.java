@@ -1,11 +1,11 @@
 package net.crystalixs.core.common.config;
 
+import org.jetbrains.annotations.NotNull;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
@@ -18,7 +18,7 @@ public class ConfigLoader<T> implements Config<T> {
     private final String resource;
     private final Class<T> type;
 
-    public ConfigLoader(Path file, String resource, Class<T> type) {
+    public ConfigLoader(@NotNull Path file, @NotNull String resource, @NotNull Class<T> type) {
         this.file = file;
         this.resource = resource;
         this.type = type;
@@ -31,58 +31,63 @@ public class ConfigLoader<T> implements Config<T> {
 
     @Override
     public synchronized void reload() throws IOException {
+        // Defaults aus der Resource laden
         JsonNode defaultNode;
-
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resource)) {
-            if (inputStream == null) {
+        try (var stream = getClass().getClassLoader().getResourceAsStream(resource)) {
+            if (stream == null) {
                 throw new IOException("Resource not found: " + resource);
             }
-            defaultNode = mapper.readTree(inputStream);
+            defaultNode = mapper.readTree(stream);
         }
 
-        // Config erstellen sofern nicht vorhanden
+        // Config erstellen, wenn nicht vorhanden
         if (Files.notExists(file)) {
             Files.createDirectories(file.getParent());
             mapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), defaultNode);
         }
 
+        // User-Config laden, mergen und zurückschreiben
         JsonNode userNode = mapper.readTree(file.toFile());
         JsonNode merged = merge(defaultNode, userNode);
         mapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), merged);
 
-        // Umwandlung in plattformspezifische Implementierung
+        // Config (plattformspezifisch) aktualisieren
         T newConfig = mapper.treeToValue(merged, type);
         config.set(newConfig);
     }
 
-    private JsonNode merge(JsonNode defaultNode, JsonNode userNode) {
+    /**
+     * Mergen von defaultNode und userNode unterliegen den folgenden Regeln:
+     * <ol>
+     *     <li>Defaults, die in der userNode fehlen, werden dort hinzugefügt</li>
+     *     <li>Bestehende Felder in userNode werden beibehalten</li>
+     *     <li>Felder in der userNode, die in defaultNode nicht existieren, werden entfernt</li>
+     * </ol>
+     */
+    private JsonNode merge(@NotNull JsonNode defaultNode, JsonNode userNode) {
         if (!defaultNode.isObject()) {
             return userNode != null ? userNode : defaultNode;
         }
 
-        ObjectNode defaultObj = defaultNode.asObject();
-        ObjectNode node = mapper.createObjectNode();
+        ObjectNode defaultObject = defaultNode.asObject();
+        ObjectNode userObject = (userNode != null && userNode.isObject())
+                ? userNode.asObject()
+                : mapper.createObjectNode();
 
-        // Default Felder mergen
-        defaultObj.propertyNames().forEach(field -> {
-            JsonNode defaultChild = defaultObj.get(field);
-            JsonNode child = (userNode != null && userNode.has(field)) ? userNode.get(field) : null;
+        ObjectNode merged = mapper.createObjectNode();
 
-            if (defaultChild.isObject())
-                node.set(field, merge(defaultChild, child));
-            else
-                node.set(field, child != null ? child : defaultChild);
+        // 1. Default Felder mergen / hinzufügen
+        defaultObject.propertyStream().forEach(property -> {
+            final String key = property.getKey();
+            JsonNode defaultChild = property.getValue();
+            JsonNode userChild = userObject.has(key)
+                    ? userObject.get(key)
+                    : null;
+
+            merged.set(key, merge(defaultChild, userChild));
         });
 
-        // Felder, die nur in der verwendeten Config existieren, hinzufügen
-        if (userNode != null && userNode.isObject()) {
-            ObjectNode obj = userNode.asObject();
-
-            obj.propertyNames().forEach(field -> {
-                if (!defaultNode.has(field)) node.set(field, obj.get(field));
-            });
-        }
-
-        return node;
+        // 2. User-Felder, die nicht in den Defaults existieren, werden gelöscht
+        return merged;
     }
 }
