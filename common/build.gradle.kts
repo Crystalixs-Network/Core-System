@@ -59,6 +59,8 @@ tasks {
     }
 
     pitest {
+        verbose = true
+        timestampedReports = false
         threads = 4
         mutationThreshold = 80
         coverageThreshold = 80
@@ -66,7 +68,7 @@ tasks {
         avoidCallsTo = listOf("java.util.logging.*")
         outputFormats = listOf("HTML")
         mutators = listOf("STRONGER")
-        targetClasses = listOf("net.crystalixs.core.common.config.*")
-        targetTests = listOf("**JsonMergerTest")
+        targetClasses = listOf("net.crystalixs.core.common.config.ConfigLoader*")
+        targetTests = listOf("net.crystalixs.core.common.test.config*")
     }
 }
