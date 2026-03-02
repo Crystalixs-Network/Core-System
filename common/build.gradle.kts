@@ -42,10 +42,6 @@ tasks {
         jvmToolchain(21)
     }
 
-    test {
-        useJUnitPlatform()
-    }
-
     check {
         dependsOn(pitest)
     }
