@@ -26,7 +26,6 @@ tasks {
 
         val mapping = mapOf(
             libs.jackson.databind to "jackson_databind",
-            libs.jackson.annotations to "jackson_annotations",
             libs.jackson.bukkit to "jackson_bukkit",
         )
 
