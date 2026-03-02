@@ -72,32 +72,36 @@ public class ConfigLoader<T> implements Config<T> {
      */
     public static final class JsonMerger {
         public static JsonNode merge(@NotNull ObjectMapper mapper, @NotNull JsonNode defaultNode, JsonNode userNode) {
+
+            // Wenn Default kein Objekt ist: User gewinnt, sonst Default
             if (!defaultNode.isObject()) {
-                return userNode != null ? userNode : defaultNode;
+                if (userNode != null && !userNode.isMissingNode() && !userNode.isNull()) {
+                    return userNode.deepCopy();
+                }
+                return defaultNode.deepCopy();
             }
 
+            ObjectNode merged = mapper.createObjectNode();
             ObjectNode defaultObject = defaultNode.asObject();
             ObjectNode userObject = (userNode != null && userNode.isObject())
                     ? userNode.asObject()
                     : mapper.createObjectNode();
 
-            ObjectNode merged = mapper.createObjectNode();
-
-            // 1. Default Felder mergen / hinzufügen
+            // Nur über Default-Keys iterieren → User-Extrafelder fallen automatisch raus (Regel 3)
             for (String field : defaultObject.propertyNames()) {
                 JsonNode defaultChild = defaultObject.get(field);
-                JsonNode userChild = userObject.has(field)
-                        ? userObject.get(field)
-                        : null;
+                JsonNode userChild = userObject.get(field);
 
-                if (defaultChild.isObject()) {
-                    merged.set(field, merge(mapper, defaultChild, userChild));
-                } else {
-                    merged.set(field, userChild != null ? userChild : defaultChild);
-                }
+                JsonNode mergedChild;
+                if (userChild == null || userChild.isNull() || userChild.isMissingNode())
+                    mergedChild = defaultChild.deepCopy(); // Regel 1: fehlender User-Wert → Default
+                else if (defaultChild.isObject() && userChild.isObject())
+                    mergedChild = merge(mapper, defaultChild, userChild);  // Rekursiv nur bei Objekt/Objekt
+                else
+                    mergedChild = userChild.deepCopy(); // Regel 2: User-Wert behalten (auch wenn Typ unterschiedlich ist)
+
+                merged.set(field, mergedChild);
             }
-
-            // 2. User-Felder, die nicht in den Defaults existieren, werden gelöscht
             return merged;
         }
     }
