@@ -54,6 +54,11 @@ tasks {
         dependsOn(shadowJar)
     }
 
+    kotest {
+        customGradleTask = true
+        alwaysRerunTests = true
+    }
+
     pitest {
         verbose = true
         detectInlinedCode = true
