@@ -4,7 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import net.crystalixs.core.common.config.ConfigLoader
-import net.crystalixs.core.common.config.ObjectMapperProvider
+import net.crystalixs.core.common.config.ObjectMapperFactory
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -12,14 +12,14 @@ import java.nio.file.Files
 
 class ConfigLoaderTest : FunSpec({
 
-    val mapper = ObjectMapperProvider.mapper()
+    val mapper = ObjectMapperFactory.createDefault()
 
     test("Pre-Reload State: get() = null") {
         data class TestConfig(val a: Int = 0)
 
         val tempDir = Files.createTempDirectory("config-loader-pre-reload")
         val configFile = tempDir.resolve("config.json")
-        val loader = ConfigLoader(configFile, "default-config.json", TestConfig::class.java)
+        val loader = ConfigLoader(mapper, configFile, "default-config.json", TestConfig::class.java)
 
         loader.get() shouldBe null
     }
@@ -39,7 +39,7 @@ class ConfigLoaderTest : FunSpec({
             }
         }
 
-        val loader = ConfigLoader(configFile, "default-config.json", TestConfig::class.java, resourceLoader)
+        val loader = ConfigLoader(mapper, configFile, "default-config.json", TestConfig::class.java, resourceLoader)
         loader.reload()
 
         Files.exists(configFile) shouldBe true
@@ -66,7 +66,7 @@ class ConfigLoaderTest : FunSpec({
             }
         }
 
-        val loader = ConfigLoader(configFile, "default-config.json", TestConfig::class.java, resourceLoader)
+        val loader = ConfigLoader(mapper, configFile, "default-config.json", TestConfig::class.java, resourceLoader)
         loader.reload()
 
         loader.get().a shouldBe 42
@@ -86,7 +86,7 @@ class ConfigLoaderTest : FunSpec({
         val resourceLoader = object : ClassLoader(ConfigLoader::class.java.classLoader) {
             override fun getResourceAsStream(name: String?): InputStream? = null
         }
-        val loader = ConfigLoader(configFile, "missing-default.json", TestConfig::class.java, resourceLoader)
+        val loader = ConfigLoader(mapper, configFile, "missing-default.json", TestConfig::class.java, resourceLoader)
 
         shouldThrow<IOException> { loader.reload() }
     }

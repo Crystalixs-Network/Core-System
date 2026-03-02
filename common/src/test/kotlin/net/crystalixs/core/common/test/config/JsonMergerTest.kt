@@ -6,7 +6,7 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.*
 import io.kotest.property.checkAll
 import net.crystalixs.core.common.config.ConfigLoader
-import net.crystalixs.core.common.config.ObjectMapperProvider
+import net.crystalixs.core.common.config.ObjectMapperFactory
 import tools.jackson.databind.JsonNode
 import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.node.JsonNodeFactory
@@ -14,7 +14,7 @@ import tools.jackson.databind.node.ObjectNode
 
 class JsonMergerTest : FunSpec({
 
-    val mapper = ObjectMapperProvider.mapper()
+    val mapper = ObjectMapperFactory.createDefault()
 
     // =============================================================================================================
     // Primitives

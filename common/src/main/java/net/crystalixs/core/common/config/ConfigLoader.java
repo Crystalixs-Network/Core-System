@@ -12,18 +12,19 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ConfigLoader<T> implements Config<T> {
 
-    private final ObjectMapper mapper = ObjectMapperProvider.mapper();
     private final AtomicReference<T> config = new AtomicReference<>();
+    private final ObjectMapper mapper;
     private final Path file;
     private final String defaultResource;
     private final Class<T> type;
     private final ClassLoader resourceClassLoader;
 
-    public ConfigLoader(@NotNull Path file, @NotNull String defaultResource, @NotNull Class<T> type) {
-        this(file, defaultResource, type, ConfigLoader.class.getClassLoader());
+    public ConfigLoader(@NotNull ObjectMapper mapper, @NotNull Path file, @NotNull String defaultResource, @NotNull Class<T> type) {
+        this(mapper, file, defaultResource, type, ConfigLoader.class.getClassLoader());
     }
 
-    public ConfigLoader(@NotNull Path file, @NotNull String defaultResource, @NotNull Class<T> type, @NotNull ClassLoader resourceClassLoader) {
+    public ConfigLoader(@NotNull ObjectMapper mapper, @NotNull Path file, @NotNull String defaultResource, @NotNull Class<T> type, @NotNull ClassLoader resourceClassLoader) {
+        this.mapper = mapper;
         this.file = file;
         this.defaultResource = defaultResource;
         this.type = type;
