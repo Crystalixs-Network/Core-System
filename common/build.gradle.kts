@@ -1,10 +1,16 @@
 plugins {
     `java-library`
+    `jvm-test-suite`
+    alias(libs.plugins.kotlin)
     alias(libs.plugins.shadow)
 }
 
 dependencies {
     implementation(libs.bundles.jackson)
+
+    testImplementation(libs.kotlin.stdlib)
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform)
 }
 
 tasks {
@@ -29,11 +35,37 @@ tasks {
         for ((dependency, name) in mapping) relocate(dependency.get().group, "$base.$name")
     }
 
+    test {
+        useJUnitPlatform()
+    }
+
+    check {
+        dependsOn(testing.suites.named("jvmTest"))
+    }
+
     jar {
         archiveBaseName.set("$artifact-common-${rootProject.version}")
     }
 
     build {
         dependsOn(shadowJar)
+    }
+}
+
+@Suppress("UnstableApiUsage")
+testing {
+    suites {
+        val jvmTest by registering(JvmTestSuite::class) {
+            useJUnitJupiter()
+
+            targets {
+                all {
+                    testTask.configure {
+                        testLogging { events("passed", "skipped", "failed") }
+                        maxHeapSize = "512M"
+                    }
+                }
+            }
+        }
     }
 }
