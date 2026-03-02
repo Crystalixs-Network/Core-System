@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
     `java-library`
     `jvm-test-suite`
@@ -52,7 +54,6 @@ tasks {
     }
 }
 
-@Suppress("UnstableApiUsage")
 testing {
     suites {
         val jvmTest by registering(JvmTestSuite::class) {
