@@ -15,13 +15,19 @@ public class ConfigLoader<T> implements Config<T> {
     private final ObjectMapper mapper = ObjectMapperProvider.mapper();
     private final AtomicReference<T> config = new AtomicReference<>();
     private final Path file;
-    private final String resource;
+    private final String defaultResource;
     private final Class<T> type;
+    private final ClassLoader resourceClassLoader;
 
-    public ConfigLoader(@NotNull Path file, @NotNull String resource, @NotNull Class<T> type) {
+    public ConfigLoader(@NotNull Path file, @NotNull String defaultResource, @NotNull Class<T> type) {
+        this(file, defaultResource, type, ConfigLoader.class.getClassLoader());
+    }
+
+    public ConfigLoader(@NotNull Path file, @NotNull String defaultResource, @NotNull Class<T> type, @NotNull ClassLoader resourceClassLoader) {
         this.file = file;
-        this.resource = resource;
+        this.defaultResource = defaultResource;
         this.type = type;
+        this.resourceClassLoader = resourceClassLoader;
     }
 
     @Override
@@ -33,9 +39,9 @@ public class ConfigLoader<T> implements Config<T> {
     public synchronized void reload() throws IOException {
         // Defaults aus der Resource laden
         JsonNode defaultNode;
-        try (var stream = getClass().getClassLoader().getResourceAsStream(resource)) {
+        try (var stream = resourceClassLoader.getResourceAsStream(defaultResource)) {
             if (stream == null) {
-                throw new IOException("Resource not found: " + resource);
+                throw new IOException("Resource not found: " + defaultResource);
             }
             defaultNode = mapper.readTree(stream);
         }
@@ -77,15 +83,18 @@ public class ConfigLoader<T> implements Config<T> {
         ObjectNode merged = mapper.createObjectNode();
 
         // 1. Default Felder mergen / hinzufügen
-        defaultObject.propertyStream().forEach(property -> {
-            final String key = property.getKey();
-            JsonNode defaultChild = property.getValue();
-            JsonNode userChild = userObject.has(key)
-                    ? userObject.get(key)
+        for (String field : defaultObject.propertyNames()) {
+            JsonNode defaultChild = defaultObject.get(field);
+            JsonNode userChild = userObject.has(field)
+                    ? userObject.get(field)
                     : null;
 
-            merged.set(key, merge(defaultChild, userChild));
-        });
+            if (defaultChild.isObject()) {
+                merged.set(field, merge(defaultChild, userChild));
+            } else {
+                merged.set(field, userChild != null ? userChild : defaultChild);
+            }
+        }
 
         // 2. User-Felder, die nicht in den Defaults existieren, werden gelöscht
         return merged;
