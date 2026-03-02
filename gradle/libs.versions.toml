@@ -1,13 +1,14 @@
 [versions]
 resourceFactory = "1.3.1"
 runServer = "3.0.2"
+velocity = "3.5.0-SNAPSHOT"
 jackson = "3.1.0"
 kotlin = "2.3.20-RC"
 kotest = "6.1.4"
 
 [libraries]
 paper = { group = "io.papermc.paper", name = "paper-api", version = "1.21.11-R0.1-SNAPSHOT" }
-velocity = { group = "com.velocitypowered", name = "velocity-api", version = "3.5.0-SNAPSHOT" }
+velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 jackson-bukkit = { group = "de.eldoria.jacksonbukkit", name = "paper", version = "2.0.0" }
 jackson-databind = { group = "tools.jackson.core", name = "jackson-databind", version.ref = "jackson" }
 jackson-kotlin = { group = "tools.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson" }

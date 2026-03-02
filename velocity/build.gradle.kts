@@ -9,7 +9,7 @@ dependencies {
     annotationProcessor(libs.velocity)
 
     implementation(project(":common"))
-    implementation(libs.bundles.jackson)
+    implementation(libs.jackson.bukkit)
 }
 
 tasks {
@@ -25,7 +25,6 @@ tasks {
         // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
 
         val mapping = mapOf(
-            libs.jackson.databind to "jackson_databind",
             libs.jackson.bukkit to "jackson_bukkit",
         )
 
@@ -46,6 +45,6 @@ tasks {
     }
 
     runVelocity {
-        velocityVersion("3.5.0-SNAPSHOT")
+        velocityVersion(libs.versions.velocity.get())
     }
 }
