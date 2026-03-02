@@ -31,8 +31,7 @@ tasks {
 
         val mapping = mapOf(
             libs.jackson.databind to "jackson_databind",
-            libs.jackson.kotlin to "jackson_kotlin",
-            libs.jackson.bukkit to "jackson_bukkit",
+            libs.jackson.kotlin to "jackson_kotlin"
         )
 
         val base = "$group.$artifact.common.libs"
