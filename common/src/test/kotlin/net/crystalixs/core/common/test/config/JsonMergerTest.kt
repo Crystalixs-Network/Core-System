@@ -3,12 +3,7 @@ package net.crystalixs.core.common.test.config
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.choice
-import io.kotest.property.arbitrary.filter
-import io.kotest.property.arbitrary.int
-import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.string
+import io.kotest.property.arbitrary.*
 import io.kotest.property.checkAll
 import net.crystalixs.core.common.config.ConfigLoader
 import net.crystalixs.core.common.config.ObjectMapperProvider
@@ -23,10 +18,10 @@ class JsonMergerTest : FunSpec({
     // =============================================================================================================
     // Primitives
 
-    val primitiveArb: Arb<JsonNode> = Arb.Companion.choice(
-        Arb.Companion.string().map { JsonNodeFactory.instance.stringNode(it) },
-        Arb.Companion.int().map { JsonNodeFactory.instance.numberNode(it.toDouble()) },
-        Arb.Companion.boolean().map { JsonNodeFactory.instance.booleanNode(it) }
+    val primitiveArb: Arb<JsonNode> = Arb.choice(
+        Arb.string().map { JsonNodeFactory.instance.stringNode(it) },
+        Arb.int().map { JsonNodeFactory.instance.numberNode(it.toDouble()) },
+        Arb.boolean().map { JsonNodeFactory.instance.booleanNode(it) }
     )
 
     // =============================================================================================================
@@ -34,9 +29,9 @@ class JsonMergerTest : FunSpec({
 
     fun jsonNode(depth: Int = 3): Arb<JsonNode> {
         return if (depth <= 0) primitiveArb
-        else Arb.Companion.choice(
-            primitiveArb, Arb.Companion.map(
-                Arb.Companion.string(minSize = 1, maxSize = 3),
+        else Arb.choice(
+            primitiveArb, Arb.map(
+                Arb.string(minSize = 1, maxSize = 3),
                 jsonNode(depth - 1),
                 minSize = 0,
                 maxSize = 3
