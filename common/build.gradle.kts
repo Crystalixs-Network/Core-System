@@ -60,7 +60,8 @@ tasks {
 
     pitest {
         verbose = true
-        timestampedReports = false
+        detectInlinedCode = true
+        outputCharset = Charsets.UTF_8
         threads = 4
         mutationThreshold = 80
         coverageThreshold = 80
