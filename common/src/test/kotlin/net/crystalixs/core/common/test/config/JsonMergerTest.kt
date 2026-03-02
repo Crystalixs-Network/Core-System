@@ -8,6 +8,7 @@ import io.kotest.property.checkAll
 import net.crystalixs.core.common.config.ConfigLoader
 import net.crystalixs.core.common.config.ObjectMapperProvider
 import tools.jackson.databind.JsonNode
+import tools.jackson.databind.ObjectMapper
 import tools.jackson.databind.node.JsonNodeFactory
 import tools.jackson.databind.node.ObjectNode
 
@@ -48,25 +49,30 @@ class JsonMergerTest : FunSpec({
     // =============================================================================================================
     // Referenzmodell
 
-    fun referenceMerge(default: ObjectNode, user: ObjectNode?): ObjectNode {
-        val merged = mapper.createObjectNode()
-        user ?: return default.deepCopy()
-
-        default.propertyNames().forEach { key ->
-            val defaultChild = default.get(key)
-            val userChild = user.get(key)
-
-            if (defaultChild.isObject) {
-                merged.set(
-                    key,
-                    if (userChild?.isObject == true)
-                        referenceMerge(defaultChild as ObjectNode, userChild as ObjectNode)
-                    else defaultChild.deepCopy()
-                )
-
+    fun referenceMerge(mapper: ObjectMapper, defaultNode: JsonNode, userNode: JsonNode?): JsonNode {
+        if (!defaultNode.isObject) {
+            return if (userNode != null && !userNode.isNull && !userNode.isMissingNode) {
+                userNode.deepCopy()
             } else {
-                merged.set(key, userChild ?: defaultChild.deepCopy())
+                defaultNode.deepCopy()
             }
+        }
+
+        val merged = mapper.createObjectNode()
+        val defaultObj = defaultNode as ObjectNode
+        val userObj = if (userNode != null && userNode.isObject) userNode as ObjectNode else mapper.createObjectNode()
+
+        defaultObj.propertyNames().forEach { key ->
+            val defaultChild = defaultObj.get(key)
+            val userChild = userObj.get(key)
+
+            val mergedChild = when {
+                userChild == null || userChild.isNull || userChild.isMissingNode -> defaultChild.deepCopy()
+                defaultChild.isObject && userChild.isObject -> referenceMerge(mapper, defaultChild, userChild)
+                else -> userChild.deepCopy()
+            }
+
+            merged.set(key, mergedChild)
         }
 
         return merged
@@ -75,21 +81,21 @@ class JsonMergerTest : FunSpec({
     // =============================================================================================================
     // Property Tests
 
-    test("Key-Subset: merged.keys ⊆ default.keys") {
+    test("Key Set Inclusion: keys(merged) ⊆ keys(defaults)") {
         checkAll(200, jsonObject(), jsonObject()) { defaults, user ->
             val merged = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
             merged.propertyNames().forEach { key -> defaults.has(key) shouldBe true }
         }
     }
 
-    test("Default-Komplettheit") {
+    test("Default Key Preservation (Komplettheit): keys(defaults) ⊆ keys(merged)") {
         checkAll(200, jsonObject(), jsonObject()) { defaults, user ->
             val merged = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
             defaults.propertyNames().forEach { key -> merged.has(key) shouldBe true }
         }
     }
 
-    test("User-Priorität bei Nicht-Objekten") {
+    test("Non-Object Override: user(k) replaces default(k)") {
         checkAll(200, jsonObject(), jsonObject()) { defaults, user ->
             val merged = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
             defaults.propertyNames().forEach { key ->
@@ -99,7 +105,7 @@ class JsonMergerTest : FunSpec({
         }
     }
 
-    test("Idempotenz") {
+    test("Idempotence: merge(merge(d, u), u) = merge(d, u)") {
         checkAll(200, jsonObject(), jsonObject()) { defaults, user ->
             val once = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
             val twice = ConfigLoader.JsonMerger.merge(mapper, once, user)
@@ -107,7 +113,7 @@ class JsonMergerTest : FunSpec({
         }
     }
 
-    test("Determinismus") {
+    test("Determinism: merge(d, u) is deterministic") {
         checkAll(200, jsonObject(), jsonObject()) { defaults, user ->
             val a = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
             val b = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
@@ -115,7 +121,7 @@ class JsonMergerTest : FunSpec({
         }
     }
 
-    test("Keine Seiteneffekte") {
+    test("Immutability: merge does not mutate inputs") {
         checkAll(200, jsonObject(), jsonObject()) { defaults, user ->
             val defaultsCopy = defaults.deepCopy()
             val userCopy = user.deepCopy()
@@ -126,10 +132,10 @@ class JsonMergerTest : FunSpec({
         }
     }
 
-    test("Cross-Check Referenzmodell") {
+    test("Reference Equivalence: merge(d, u) = refMerge(d, u)") {
         checkAll(200, jsonObject(), jsonObject()) { defaults, user ->
             val mergedActual = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
-            val mergedRef = referenceMerge(defaults, user)
+            val mergedRef = referenceMerge(mapper, defaults, user)
             mergedActual shouldBe mergedRef
         }
     }
@@ -137,21 +143,21 @@ class JsonMergerTest : FunSpec({
     // =============================================================================================================
     // Fixed Tests für deterministische Coverage
 
-    test("Fixed Test: simple override") {
+    test("Primitive Override: user primitive overrides default primitive") {
         val defaults = mapper.createObjectNode().put("a", 1)
         val user = mapper.createObjectNode().put("a", 42)
         val merged = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
         merged.get("a").asInt() shouldBe 42
     }
 
-    test("Fixed Test: missing key in user") {
+    test("Missing User Key: merged(k) = default(k)") {
         val defaults = mapper.createObjectNode().put("a", 1)
         val user = mapper.createObjectNode()
         val merged = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
         merged.get("a").asInt() shouldBe 1
     }
 
-    test("Fixed Test: nested object merge") {
+    test("Recursive Object Merge: object fields merged recursively") {
         val defaults = mapper.createObjectNode().apply {
             putObject("nested").put("x", 1)
         }
@@ -163,7 +169,7 @@ class JsonMergerTest : FunSpec({
         merged.get("nested").get("x").asInt() shouldBe 2
     }
 
-    test("Fixed Test: nested object missing in user") {
+    test("Nested Missing Key Preservation: missing nested user key ⇒ default preserved") {
         val defaults = mapper.createObjectNode().apply {
             putObject("nested").put("x", 1)
         }
@@ -173,7 +179,7 @@ class JsonMergerTest : FunSpec({
         merged.get("nested").get("x").asInt() shouldBe 1
     }
 
-    test("Fixed Test: user extra field removed") {
+    test("Extra User Key Exclusion: keys(user) \\ keys(defaults) excluded") {
         val defaults = mapper.createObjectNode().put("a", 1)
         val user = mapper.createObjectNode().put("a", 42).put("b", 100)
         val merged = ConfigLoader.JsonMerger.merge(mapper, defaults, user)
@@ -181,7 +187,7 @@ class JsonMergerTest : FunSpec({
         merged.get("a").asInt() shouldBe 42
     }
 
-    test("Fixed Test: default object with multiple fields") {
+    test("Partial Override Preservation: non-overridden default fields preserved") {
         val defaults = mapper.createObjectNode().apply {
             put("x", 1)
             put("y", 2)
@@ -192,7 +198,7 @@ class JsonMergerTest : FunSpec({
         merged.get("y").asInt() shouldBe 2
     }
 
-    test("Fixed Test: deep nested merge with missing user keys") {
+    test("Deep Missing Key Preservation: missing deep user keys preserve defaults") {
         val defaults = mapper.createObjectNode().apply {
             putObject("level1").putObject("level2").put("k", 1)
         }
@@ -202,7 +208,7 @@ class JsonMergerTest : FunSpec({
         merged.get("level1").get("level2").get("k").asInt() shouldBe 1
     }
 
-    test("Fixed Test: nested object overridden with primitive") {
+    test("Object-to-Primitive Replacement: user primitive replaces default object") {
         val defaults = mapper.createObjectNode().apply {
             putObject("nested").put("x", 1)
         }

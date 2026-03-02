@@ -14,7 +14,7 @@ class ConfigLoaderTest : FunSpec({
 
     val mapper = ObjectMapperProvider.mapper()
 
-    test("ConfigLoader.reload: erstellt Datei, merged korrekt und setzt config") {
+    test("Reload Semantics: merged config persisted and in-memory state updated") {
         data class Nested(val x: Int = 0)
         data class TestConfig(val a: Int = 0, val nested: Nested = Nested())
 
@@ -45,7 +45,7 @@ class ConfigLoaderTest : FunSpec({
         persisted.has("extra") shouldBe false
     }
 
-    test("ConfigLoader.reload: wirft IOException wenn Default-Resource fehlt") {
+    test("Missing Default Resource: reload throws IOException") {
         data class TestConfig(val a: Int = 0)
 
         val tempDir = Files.createTempDirectory("config-loader-missing-resource")
