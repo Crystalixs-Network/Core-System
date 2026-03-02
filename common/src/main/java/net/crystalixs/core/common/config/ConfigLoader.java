@@ -85,23 +85,24 @@ public class ConfigLoader<T> implements Config<T> {
             ObjectNode defaultObject = defaultNode.asObject();
             ObjectNode userObject = (userNode != null && userNode.isObject())
                     ? userNode.asObject()
-                    : mapper.createObjectNode();
+                    : null;
 
-            // Nur über Default-Keys iterieren → User-Extrafelder fallen automatisch raus (Regel 3)
+            // Nur Default-Keys übernehmen -> Extra-User-Keys werden ausgeschlossen
             for (String field : defaultObject.propertyNames()) {
                 JsonNode defaultChild = defaultObject.get(field);
-                JsonNode userChild = userObject.get(field);
+                JsonNode userChild = (userObject != null) ? userObject.get(field) : null;
 
                 JsonNode mergedChild;
                 if (userChild == null || userChild.isNull() || userChild.isMissingNode())
-                    mergedChild = defaultChild.deepCopy(); // Regel 1: fehlender User-Wert → Default
+                    mergedChild = defaultChild.deepCopy(); // Fehlender/null User-Wert -> Default
                 else if (defaultChild.isObject() && userChild.isObject())
-                    mergedChild = merge(mapper, defaultChild, userChild);  // Rekursiv nur bei Objekt/Objekt
+                    mergedChild = merge(mapper, defaultChild, userChild); // Rekursiver Merge nur bei Objekt/Objekt
                 else
-                    mergedChild = userChild.deepCopy(); // Regel 2: User-Wert behalten (auch wenn Typ unterschiedlich ist)
+                    mergedChild = userChild.deepCopy(); // User-Wert gewinnt
 
                 merged.set(field, mergedChild);
             }
+
             return merged;
         }
     }
