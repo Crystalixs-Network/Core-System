@@ -3,6 +3,10 @@ plugins {
     alias(libs.plugins.shadow)
 }
 
+dependencies {
+    implementation(libs.bundles.jackson)
+}
+
 tasks {
     val artifact = project.mavenArtifact()
 
@@ -15,12 +19,14 @@ tasks {
 
         // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
 
-        /*
-        val mapping = mapOf("" to "")
+        val mapping = mapOf(
+            libs.jackson.databind to "jackson_databind",
+            libs.jackson.annotations to "jackson_annotations",
+            libs.jackson.bukkit to "jackson_bukkit",
+        )
 
         val base = "$group.$artifact.common.libs"
-        for ((pattern, name) in mapping) relocate(pattern, "$base.$name")
-         */
+        for ((dependency, name) in mapping) relocate(dependency.get().group, "$base.$name")
     }
 
     jar {
