@@ -10,22 +10,25 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
-import net.crystalixs.core.velocity.command.MaintenanceCommand;
-import net.crystalixs.core.velocity.command.cloud.VelocityCommandManagerTypeLiteral;
-import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
-import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
+import net.crystalixs.core.velocity.command.VelocityCommandManagerTypeLiteral;
+import net.crystalixs.core.velocity.command.VelocityCommandSource;
+import net.crystalixs.core.velocity.command.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfig;
 import net.crystalixs.core.velocity.config.VelocityConfigLoader;
 import net.crystalixs.core.velocity.config.jackson.JacksonVelocity;
+import net.crystalixs.core.velocity.config.translation.VelocityTranslationRegistry;
 import net.crystalixs.core.velocity.listener.MotdListener;
-import net.crystalixs.core.velocity.listener.PlayerConnectionListener;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.velocity.CloudInjectionModule;
 import org.incendo.cloud.velocity.VelocityCommandManager;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 public final class CorePlugin {
@@ -48,6 +51,7 @@ public final class CorePlugin {
     public void onProxyInitialization(ProxyInitializeEvent event) {
         createOrLoadConfig();
         registerCommands();
+        registerTranslations();
         registerListener(server);
 
         logger.info("Velocity core plugin has been enabled!");
@@ -90,6 +94,17 @@ public final class CorePlugin {
         loader.reload();
 
         config = loader.get();
+    }
+
+    private void registerTranslations() {
+        final MiniMessage miniMessage = MiniMessage.miniMessage();
+        final VelocityTranslationRegistry registry = new VelocityTranslationRegistry(dataDirectory.resolve("lang"), getClass().getClassLoader(), miniMessage);
+
+        try {
+            registry.registerBundle("messages", List.of(Locale.GERMAN));
+        } catch (IOException exception) {
+            logger.severe("There was an error while registering translations: " + exception.getMessage());
+        }
     }
 }
 
