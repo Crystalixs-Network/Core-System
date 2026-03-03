@@ -92,7 +92,7 @@ public final class VelocityTranslationRegistry {
 
         Properties user = load(file);
         Properties merged = merge(defaults, user);
-        store(file, merged, "Merged with defaults");
+        store(file, merged, "This config was updated based on the defaults. More information can be found in the changelog.");
     }
 
     private Properties load(Path file) throws IOException {
