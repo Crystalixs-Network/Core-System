@@ -27,7 +27,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
-final class CorePlugin {
+public final class CorePlugin {
 
     private final ProxyServer server;
     private final Path dataDirectory;

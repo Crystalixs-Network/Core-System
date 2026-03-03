@@ -2,10 +2,11 @@ package net.crystalixs.core.velocity.command.cloud;
 
 import com.velocitypowered.api.plugin.PluginContainer;
 import net.crystalixs.core.common.command.AbstractCommand;
+import net.crystalixs.core.velocity.CorePlugin;
 
-public abstract class VelocityCommand<I extends PluginContainer> extends AbstractCommand<VelocityCommandSource, I> {
+public abstract class VelocityCommand extends AbstractCommand<VelocityCommandSource, CorePlugin> {
 
-    public VelocityCommand(I plugin) {
+    public VelocityCommand(CorePlugin plugin) {
         super(plugin);
     }
 }
