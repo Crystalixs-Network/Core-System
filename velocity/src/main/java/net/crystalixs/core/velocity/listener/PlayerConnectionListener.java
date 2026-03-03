@@ -29,7 +29,7 @@ public class PlayerConnectionListener {
 
     private Component constructDeniedComponent() {
         Screen screen = config.maintenance().screen();
-        return join(JoinConfiguration.builder().separator(newline()).build(),
+        return join(JoinConfiguration.separator(newline()),
                 screen.header(), empty(), // Ein empty Component impliziert eine Leerzeile
                 screen.body(), empty(),
                 screen.footer(),

@@ -7,7 +7,9 @@ import net.crystalixs.core.velocity.config.Maintenance;
 import net.crystalixs.core.velocity.config.Motd;
 import net.crystalixs.core.velocity.config.VelocityConfig;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
 
+import static net.kyori.adventure.text.Component.join;
 import static net.kyori.adventure.text.Component.newline;
 
 public class MotdListener {
@@ -35,9 +37,9 @@ public class MotdListener {
 
     private Component descriptionComponent() {
         Motd motd = config.maintenance().enabled() ? config.maintenance().motd() : config.motd();
-        return motd.firstLine()
-                .append(newline())
-                .append(motd.secondLine());
+        return join(JoinConfiguration.separator(newline()),
+                motd.firstLine(),
+                motd.secondLine());
     }
 
 }
