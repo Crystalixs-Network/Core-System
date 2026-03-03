@@ -105,7 +105,7 @@ public final class VelocityTranslationRegistry {
      *     <li>Felder in der userNode, die in defaultNode nicht existieren, werden entfernt</li>
      * </ol>
      */
-    private Properties merge(Properties defaults, Properties user) {
+    public static Properties merge(Properties defaults, Properties user) {
         Properties merged = new OrderedProperties();
 
         for (String key : defaults.stringPropertyNames()) {
