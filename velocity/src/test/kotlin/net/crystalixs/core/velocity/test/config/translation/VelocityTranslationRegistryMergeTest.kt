@@ -4,7 +4,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
 import net.crystalixs.core.velocity.config.translation.VelocityTranslationRegistry
-import java.util.Properties
+import java.util.*
 
 class VelocityTranslationRegistryMergeTest : FunSpec({
 
