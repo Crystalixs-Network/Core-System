@@ -6,7 +6,10 @@ plugins {
 
 dependencies {
     compileOnly(libs.paper)
+    compileOnly(libs.brigadier)
+
     implementation(project(":common"))
+    implementation(libs.bundles.cloudPaper)
 }
 
 tasks {
@@ -21,12 +24,12 @@ tasks {
 
         // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
 
-        /*
-        val mapping = mapOf("" to "")
+        val mapping = mapOf(
+            libs.cloud.paper to "cloud"
+        )
 
         val base = "$group.$artifact.paper.libs"
-        for ((pattern, name) in mapping) relocate(pattern, "$base.$name")
-         */
+        for ((dependency, name) in mapping) relocate(dependency.get().group, "$base.$name")
     }
 
     jar {
