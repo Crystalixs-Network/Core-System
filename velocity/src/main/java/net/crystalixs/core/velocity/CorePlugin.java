@@ -6,10 +6,13 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
 import net.crystalixs.core.velocity.command.VelocityCommandManagerTypeLiteral;
+import net.crystalixs.core.velocity.command.VelocityCommandSource;
+import net.crystalixs.core.velocity.command.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfig;
 import net.crystalixs.core.velocity.config.VelocityConfigLoader;
 import net.crystalixs.core.velocity.config.jackson.JacksonVelocity;
@@ -54,18 +57,26 @@ final class CorePlugin {
 
     private void registerCommands() {
         final Injector injector = createInjector();
-        final Key<VelocityCommandManager<CommandSource>> key = Key.get(new VelocityCommandManagerTypeLiteral());
-        final VelocityCommandManager<CommandSource> commandManager = injector.getInstance(key);
+        final Key<VelocityCommandManager<VelocityCommandSource>> key = Key.get(new VelocityCommandManagerTypeLiteral());
+        final VelocityCommandManager<VelocityCommandSource> commandManager = injector.getInstance(key);
 
         // Hier commands registrieren
     }
 
     private Injector createInjector() {
         return injector.createChildInjector(new CloudInjectionModule<>(
-                CommandSource.class,
+                VelocityCommandSource.class,
                 ExecutionCoordinator.simpleCoordinator(),
-                SenderMapper.identity()
-        ));
+                senderMapper()));
+    }
+
+    private SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {
+        return SenderMapper.create(
+                source -> source instanceof Player player
+                        ? new VelocityPlayerCommandSource(player)
+                        : new VelocityCommandSource(source),
+
+                VelocityCommandSource::plattformSender);
     }
 
     private void createOrLoadConfig() {

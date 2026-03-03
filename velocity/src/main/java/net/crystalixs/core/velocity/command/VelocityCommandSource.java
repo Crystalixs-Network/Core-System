@@ -9,4 +9,8 @@ public class VelocityCommandSource extends AbstractCommandSource<CommandSource> 
     public VelocityCommandSource(CommandSource plattformSender) {
         super(plattformSender);
     }
+
+    public CommandSource plattformSender() {
+        return plattformSender;
+    }
 }
