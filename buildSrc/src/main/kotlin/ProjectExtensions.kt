@@ -4,7 +4,7 @@ fun Project.mavenArtifact(): String {
     val rawName = property("plugin-name") as String
     return rawName.trim()
         .lowercase()
-        .replace(Regex("[^a-z0-9\\-\\.]"), "-")
+        .replace(Regex("[^a-z0-9\\-.]"), "-")
         .replace(Regex("-+"), "-")
         .trim('-')
 }

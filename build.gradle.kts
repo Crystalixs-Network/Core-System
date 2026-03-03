@@ -31,5 +31,9 @@ subprojects {
             options.encoding = "UTF-8"
             options.release.set(21)
         }
+
+        withType<Test>().configureEach {
+            useJUnitPlatform()
+        }
     }
 }

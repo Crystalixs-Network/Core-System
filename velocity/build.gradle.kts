@@ -9,6 +9,8 @@ dependencies {
     annotationProcessor(libs.velocity)
 
     implementation(project(":common"))
+    implementation(libs.jackson.databind)
+    implementation(libs.gson)
 }
 
 tasks {
@@ -23,16 +25,16 @@ tasks {
 
         // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
 
-        /*
-        val mapping = mapOf("" to "")
+        val mapping = mapOf(
+            libs.gson to "gson",
+        )
 
         val base = "$group.$artifact.velocity.libs"
-        for ((pattern, name) in mapping) relocate(pattern, "$base.$name")
-         */
+        for ((dependency, name) in mapping) relocate(dependency.get().group, "$base.$name")
     }
 
     jar {
-        archiveBaseName.set("$artifact-velocity-${rootProject.version}")
+        archiveBaseName.set("$artifact-velocity")
     }
 
     velocityPluginJson {
@@ -44,6 +46,6 @@ tasks {
     }
 
     runVelocity {
-        velocityVersion("3.5.0-SNAPSHOT")
+        velocityVersion(libs.versions.velocity.get())
     }
 }
