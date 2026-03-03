@@ -1,4 +1,4 @@
-package net.crystalixs.core.velocity.command;
+package net.crystalixs.core.velocity.command.cloud;
 
 import com.google.inject.TypeLiteral;
 import org.incendo.cloud.velocity.VelocityCommandManager;

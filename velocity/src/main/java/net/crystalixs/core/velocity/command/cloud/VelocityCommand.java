@@ -1,4 +1,4 @@
-package net.crystalixs.core.velocity.command;
+package net.crystalixs.core.velocity.command.cloud;
 
 import com.velocitypowered.api.plugin.PluginContainer;
 import net.crystalixs.core.common.command.AbstractCommand;
