@@ -20,7 +20,9 @@ import net.crystalixs.core.velocity.config.jackson.JacksonVelocity;
 import net.crystalixs.core.velocity.config.translation.VelocityTranslationRegistry;
 import net.crystalixs.core.velocity.listener.MotdListener;
 import net.crystalixs.core.velocity.listener.PlayerConnectionListener;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.velocity.CloudInjectionModule;
@@ -99,8 +101,11 @@ public final class CorePlugin {
     }
 
     private void registerTranslations() {
-        final MiniMessage miniMessage = MiniMessage.miniMessage();
-        final VelocityTranslationRegistry registry = new VelocityTranslationRegistry(dataDirectory.resolve("lang"), getClass().getClassLoader(), miniMessage);
+        final MiniMessage miniMessage = MiniMessage.builder()
+                .editTags(builder -> builder.tag("prefix", Tag.inserting(Component.translatable("util.prefix"))))
+                .build();
+
+        final VelocityTranslationRegistry registry = new VelocityTranslationRegistry(dataDirectory.resolve("lang"), getClass().getClassLoader(), Locale.GERMAN, miniMessage);
 
         try {
             registry.registerBundle("messages", List.of(Locale.GERMAN));
