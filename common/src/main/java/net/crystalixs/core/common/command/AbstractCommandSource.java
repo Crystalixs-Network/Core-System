@@ -1,10 +1,10 @@
 package net.crystalixs.core.common.command;
 
-public abstract class CommandSource<C> {
+public abstract class AbstractCommandSource<C> {
 
     protected final C plattformSender;
 
-    public CommandSource(C plattformSender) {
+    public AbstractCommandSource(C plattformSender) {
         this.plattformSender = plattformSender;
     }
 

@@ -1,8 +1,8 @@
 package net.crystalixs.core.paper;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import net.crystalixs.core.paper.command.PaperCommandSource;
-import net.crystalixs.core.paper.command.PaperPlayerCommandSource;
+import net.crystalixs.core.paper.command.PaperAbstractCommandSource;
+import net.crystalixs.core.paper.command.PaperPlayerAbstractCommandSource;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,21 +25,21 @@ public class CorePlugin extends JavaPlugin {
     }
 
     private void registerCommands() {
-        PaperCommandManager<PaperCommandSource> commandManager = PaperCommandManager.builder(senderMapper())
-                .executionCoordinator(ExecutionCoordinator.<PaperCommandSource>builder().build())
+        PaperCommandManager<PaperAbstractCommandSource> commandManager = PaperCommandManager.builder(senderMapper())
+                .executionCoordinator(ExecutionCoordinator.<PaperAbstractCommandSource>builder().build())
                 .buildOnEnable(this);
 
         // Hier Commands registrieren
     }
 
-    private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
+    private @NotNull SenderMapper<CommandSourceStack, PaperAbstractCommandSource> senderMapper() {
         return SenderMapper.create(commandSourceStack -> {
             CommandSender sender = commandSourceStack.getSender();
             return sender instanceof Player player
-                    ? new PaperPlayerCommandSource(player, commandSourceStack)
-                    : new PaperCommandSource(sender, commandSourceStack);
+                    ? new PaperPlayerAbstractCommandSource(player, commandSourceStack)
+                    : new PaperAbstractCommandSource(sender, commandSourceStack);
 
-        }, PaperCommandSource::commandSourceStack);
+        }, PaperAbstractCommandSource::commandSourceStack);
     }
 
 }
