@@ -6,12 +6,12 @@ import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.ServerPing;
-import de.eldoria.jacksonbukkit.JacksonPaper;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
 import net.crystalixs.core.velocity.config.Motd;
 import net.crystalixs.core.velocity.config.VelocityConfig;
 import net.crystalixs.core.velocity.config.VelocityConfigLoader;
+import net.crystalixs.core.velocity.config.jackson.JacksonVelocity;
 import tools.jackson.databind.ObjectMapper;
 
 import java.nio.file.Path;
@@ -35,7 +35,10 @@ public class CorePlugin {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        ObjectMapper mapper = ObjectMapperFactory.create(builder -> builder.addModule(JacksonPaper.builder().build()));
+        ObjectMapper mapper = ObjectMapperFactory.create(builder ->
+                builder.addModule(JacksonVelocity.builder()
+                        .withMiniMessage()
+                        .build()));
         VelocityConfigLoader loader = new VelocityConfigLoader(mapper, logger, dataDirectory.resolve("config.json"));
         loader.reload();
 
