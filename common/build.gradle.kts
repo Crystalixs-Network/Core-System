@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     implementation(libs.bundles.jackson)
+    implementation(libs.cloud.core)
 
     testImplementation(libs.bundles.kotlinTest)
     testImplementation(libs.bundles.kotest)
@@ -31,7 +32,8 @@ tasks {
 
         val mapping = mapOf(
             libs.jackson.databind to "jackson_databind",
-            libs.jackson.kotlin to "jackson_kotlin"
+            libs.jackson.kotlin to "jackson_kotlin",
+            libs.cloud.core to "cloud"
         )
 
         val base = "$group.$artifact.common.libs"

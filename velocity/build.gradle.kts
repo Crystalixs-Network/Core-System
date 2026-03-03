@@ -5,10 +5,13 @@ plugins {
 }
 
 dependencies {
-    compileOnly(libs.velocity)
     annotationProcessor(libs.velocity)
 
+    compileOnly(libs.velocity)
+    compileOnly(libs.brigadier)
+
     implementation(project(":common"))
+    implementation(libs.bundles.cloudVelocity)
     implementation(libs.jackson.databind)
     implementation(libs.gson)
 }
@@ -27,6 +30,7 @@ tasks {
 
         val mapping = mapOf(
             libs.gson to "gson",
+            libs.cloud.velocity to "cloud"
         )
 
         val base = "$group.$artifact.velocity.libs"
