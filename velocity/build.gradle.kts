@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.velocityConvention)
     alias(libs.plugins.runVelocity)
     alias(libs.plugins.shadow)
+
+    alias(libs.plugins.kotlin)
+    alias(libs.plugins.kotest)
 }
 
 dependencies {
@@ -14,6 +17,11 @@ dependencies {
     implementation(libs.bundles.cloudVelocity)
     implementation(libs.jackson.databind)
     implementation(libs.gson)
+
+    testImplementation(libs.bundles.kotlinTest)
+    testImplementation(libs.bundles.kotest)
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.platform)
 }
 
 tasks {
@@ -35,6 +43,15 @@ tasks {
 
         val base = "$group.$artifact.velocity.libs"
         for ((dependency, name) in mapping) relocate(dependency.get().group, "$base.$name")
+    }
+
+    kotlin {
+        jvmToolchain(21)
+    }
+
+    kotest {
+        customGradleTask = true
+        alwaysRerunTests = true
     }
 
     jar {
