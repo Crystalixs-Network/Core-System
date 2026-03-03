@@ -10,6 +10,7 @@ import net.crystalixs.core.velocity.config.VelocityConfig;
 import net.crystalixs.core.velocity.config.VelocityConfigLoader;
 import net.crystalixs.core.velocity.config.jackson.JacksonVelocity;
 import net.crystalixs.core.velocity.listener.MotdListener;
+import net.crystalixs.core.velocity.listener.PlayerConnectionListener;
 import tools.jackson.databind.ObjectMapper;
 
 import java.nio.file.Path;
@@ -39,6 +40,7 @@ public class CorePlugin {
 
     private void registerListener(ProxyServer server) {
         server.getEventManager().register(this, new MotdListener(config));
+        server.getEventManager().register(this, new PlayerConnectionListener(config));
     }
 
     private void createOrLoadConfig() {
