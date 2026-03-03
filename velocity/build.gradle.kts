@@ -9,7 +9,8 @@ dependencies {
     annotationProcessor(libs.velocity)
 
     implementation(project(":common"))
-    implementation(libs.jackson.bukkit)
+    implementation(libs.jackson.databind)
+    implementation(libs.gson)
 }
 
 tasks {
@@ -25,7 +26,7 @@ tasks {
         // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
 
         val mapping = mapOf(
-            libs.jackson.bukkit to "jackson_bukkit",
+            libs.gson to "gson",
         )
 
         val base = "$group.$artifact.velocity.libs"
