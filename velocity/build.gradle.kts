@@ -34,7 +34,7 @@ tasks {
     }
 
     jar {
-        archiveBaseName.set("$artifact-velocity-${rootProject.version}")
+        archiveBaseName.set("$artifact-velocity")
     }
 
     velocityPluginJson {

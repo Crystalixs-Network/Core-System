@@ -47,7 +47,7 @@ tasks {
     }
 
     jar {
-        archiveBaseName.set("$artifact-common-${rootProject.version}")
+        archiveBaseName.set("$artifact-common")
     }
 
     build {
