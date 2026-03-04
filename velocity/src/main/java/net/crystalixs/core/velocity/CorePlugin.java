@@ -26,9 +26,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.minecraft.extras.AudienceProvider;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
-import org.incendo.cloud.minecraft.extras.MinecraftHelp;
 import org.incendo.cloud.velocity.VelocityCommandManager;
 import org.jetbrains.annotations.NotNull;
 import tools.jackson.databind.ObjectMapper;
@@ -37,7 +35,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.logging.Logger;
 
 import static net.kyori.adventure.text.Component.text;
@@ -87,12 +84,7 @@ public final class CorePlugin {
     }
 
     private void registerCommands() {
-        final VelocityCommandManager<VelocityCommandSource> commandManager = new VelocityCommandManager<>(pluginContainer, server, ExecutionCoordinator.simpleCoordinator(), senderMapper());
-        final MinecraftHelp<VelocityCommandSource> help = MinecraftHelp.<VelocityCommandSource>builder()
-                .commandManager(commandManager)
-                .audienceProvider(AudienceProvider.nativeAudience())
-                .commandPrefix("/help")
-                .build();
+        final VelocityCommandManager<VelocityCommandSource> commandManager = new VelocityCommandManager<>(pluginContainer, server, ExecutionCoordinator.<VelocityCommandSource>builder().build(), senderMapper());
 
         MinecraftExceptionHandler.<VelocityCommandSource>createNative()
                 .defaultHandlers()
@@ -102,7 +94,7 @@ public final class CorePlugin {
         // Hier commands registrieren
         new CoreCommand(this, loader).registerTo(commandManager);
         new MaintenanceCommand(this, config).registerTo(commandManager);
-        new HelpCommand(this, help).registerTo(commandManager);
+        new HelpCommand(this).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {
