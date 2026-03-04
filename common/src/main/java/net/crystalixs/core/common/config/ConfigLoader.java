@@ -38,15 +38,19 @@ public class ConfigLoader<T> implements Config<T> {
 
     @Override
     public synchronized void save() throws IOException {
-        T current = get();
-        if (current == null) {
+        if (config.get() == null) {
             throw new IllegalStateException("Config is not loaded, cannot save.");
         }
 
-        Files.createDirectories(file.getParent());
+        JsonNode currentNode = mapper.valueToTree(config.get());
+        JsonNode existingNode = Files.exists(file)
+                ? mapper.readTree(file.toFile())
+                : mapper.createObjectNode();
 
-        JsonNode node = mapper.valueToTree(current);
-        mapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), node);
+        JsonNode merged = JsonMerger.saveMerge(mapper, currentNode, existingNode);
+
+        Files.createDirectories(file.getParent());
+        mapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), merged);
     }
 
     @Override
@@ -115,6 +119,23 @@ public class ConfigLoader<T> implements Config<T> {
                     mergedChild = userChild.deepCopy(); // User-Wert gewinnt
 
                 merged.set(field, mergedChild);
+            }
+
+            return merged;
+        }
+
+        public static JsonNode saveMerge(@NotNull ObjectMapper mapper, @NotNull JsonNode current, JsonNode existing) {
+            if (!current.isObject() || !existing.isObject()) return current.deepCopy();
+
+            ObjectNode merged = existing.deepCopy().asObject();
+            for (String field : current.propertyNames()) {
+                JsonNode currentValue = current.get(field);
+                JsonNode existingValue = merged.get(field);
+
+                if (currentValue.isObject() && existingValue != null && existingValue.isObject())
+                    merged.set(field, saveMerge(mapper, currentValue, existingValue));
+                else
+                    merged.set(field, currentValue.deepCopy());
             }
 
             return merged;
