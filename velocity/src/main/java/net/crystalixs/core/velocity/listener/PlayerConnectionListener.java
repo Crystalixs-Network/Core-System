@@ -1,8 +1,10 @@
 package net.crystalixs.core.velocity.listener;
 
 import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.connection.PreLoginEvent.PreLoginComponentResult;
+import com.velocitypowered.api.proxy.Player;
 import net.crystalixs.core.velocity.config.Maintenance.Screen;
 import net.crystalixs.core.velocity.config.VelocityConfig;
 import net.kyori.adventure.text.Component;
@@ -19,12 +21,13 @@ public class PlayerConnectionListener {
     }
 
     @Subscribe
-    public void onLogin(PreLoginEvent event) {
-        if (!config.maintenance().isEnabled()) return;
+    public void onLogin(PostLoginEvent event) {
+        Player player = event.getPlayer();
 
-        Component deniedComponent = constructDeniedComponent();
-        PreLoginComponentResult result = PreLoginComponentResult.denied(deniedComponent);
-        event.setResult(result);
+        if (!config.maintenance().isEnabled()) return;
+        if (player.hasPermission("core.bypass.maintenance")) return;
+
+        player.disconnect(constructDeniedComponent());
     }
 
     private Component constructDeniedComponent() {
