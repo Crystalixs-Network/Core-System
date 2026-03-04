@@ -3,6 +3,7 @@ package net.crystalixs.core.velocity.command;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
+import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.help.result.CommandEntry;
@@ -30,6 +31,7 @@ public class HelpCommand extends VelocityCommand {
                 .build();
 
         commandManager.command(commandManager.commandBuilder("help", "?")
+                .senderType(VelocityPlayerCommandSource.class)
                 .optional("query", greedyStringParser(), DefaultValue.constant(""),
                         SuggestionProvider.blocking(((context, input) -> commandManager.createHelpHandler()
                                 .queryRootIndex(context.sender())
