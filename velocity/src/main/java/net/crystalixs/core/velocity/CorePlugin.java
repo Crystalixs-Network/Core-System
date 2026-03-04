@@ -11,6 +11,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
+import net.crystalixs.core.velocity.command.CoreCommand;
 import net.crystalixs.core.velocity.command.MaintenanceCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandManagerTypeLiteral;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
@@ -85,6 +86,7 @@ public final class CorePlugin {
         final VelocityCommandManager<VelocityCommandSource> commandManager = injector.getInstance(key);
 
         // Hier commands registrieren
+        new CoreCommand(this, loader).registerTo(commandManager);
         new MaintenanceCommand(this, config).registerTo(commandManager);
     }
 

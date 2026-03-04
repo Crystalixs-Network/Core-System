@@ -17,6 +17,11 @@ public class VelocityConfigLoader extends ConfigLoader<VelocityConfig> {
         this.logger = logger;
     }
 
+    public void saveAndReload() {
+        save();
+        reload();
+    }
+
     @Override
     public synchronized void save() {
         try {
