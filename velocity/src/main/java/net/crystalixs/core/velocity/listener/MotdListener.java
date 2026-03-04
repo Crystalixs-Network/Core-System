@@ -27,7 +27,7 @@ public class MotdListener {
 
     private ServerPing createPing(ServerPing.Builder builder) {
         Maintenance maintenance = config.maintenance();
-        if (maintenance.enabled()) {
+        if (maintenance.isEnabled()) {
             builder.version(new ServerPing.Version(-1, maintenance.version()));
         }
         builder.description(descriptionComponent());
@@ -36,7 +36,7 @@ public class MotdListener {
     }
 
     private Component descriptionComponent() {
-        Motd motd = config.maintenance().enabled() ? config.maintenance().motd() : config.motd();
+        Motd motd = config.maintenance().isEnabled() ? config.maintenance().motd() : config.motd();
         return join(JoinConfiguration.separator(newline()),
                 motd.firstLine(),
                 motd.secondLine());
