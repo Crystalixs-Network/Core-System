@@ -12,7 +12,12 @@ public final class Maintenance {
     private boolean isEnabled;
 
     @JsonCreator
-    public Maintenance(@JsonProperty("enabled") boolean isEnabled, String version, Motd motd, Screen screen) {
+    public Maintenance(
+            @JsonProperty("enabled") boolean isEnabled,
+            @JsonProperty("version") String version,
+            @JsonProperty("motd") Motd motd,
+            @JsonProperty("screen") Screen screen) {
+
         this.isEnabled = isEnabled;
         this.version = version;
         this.motd = motd;
@@ -35,9 +40,12 @@ public final class Maintenance {
         return isEnabled;
     }
 
-    public Maintenance enabled(boolean enabled) {
-        isEnabled = enabled;
-        return this;
+    public void enable() {
+        isEnabled = true;
+    }
+
+    public void disable() {
+        isEnabled = false;
     }
 
     public record Screen(Component header, Component body, Component footer, Component url) {
