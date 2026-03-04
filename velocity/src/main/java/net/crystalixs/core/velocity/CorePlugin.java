@@ -5,6 +5,7 @@ import com.google.inject.Key;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -40,6 +41,8 @@ public final class CorePlugin {
     private final ProxyServer server;
     private final Path dataDirectory;
     private final Logger logger;
+
+    private VelocityConfigLoader loader;
     private VelocityConfig config;
 
     @Inject private Injector injector;
@@ -59,6 +62,12 @@ public final class CorePlugin {
         registerListener(server);
 
         logger.info("Velocity core plugin has been enabled!");
+    }
+
+    @Subscribe
+    public void onProxyShutdown(ProxyShutdownEvent event) {
+        loader.save();
+        logger.info("Velocity core plugin has been disabled!");
     }
 
     private void registerListener(ProxyServer server) {
@@ -94,9 +103,9 @@ public final class CorePlugin {
     private void createOrLoadConfig() {
         JacksonVelocity jacksonVelocity = JacksonVelocity.builder().withMiniMessage().build();
         ObjectMapper mapper = ObjectMapperFactory.create(builder -> builder.addModule(jacksonVelocity));
-        VelocityConfigLoader loader = new VelocityConfigLoader(mapper, logger, dataDirectory.resolve("config.json"));
-        loader.reload();
 
+        loader = new VelocityConfigLoader(mapper, logger, dataDirectory.resolve("config.json"));
+        loader.reload();
         config = loader.get();
     }
 

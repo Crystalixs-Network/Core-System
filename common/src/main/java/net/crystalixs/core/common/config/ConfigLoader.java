@@ -37,6 +37,19 @@ public class ConfigLoader<T> implements Config<T> {
     }
 
     @Override
+    public synchronized void save() throws IOException {
+        T current = get();
+        if (current == null) {
+            throw new IllegalStateException("Config is not loaded, cannot save.");
+        }
+
+        Files.createDirectories(file.getParent());
+
+        JsonNode node = mapper.valueToTree(current);
+        mapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), node);
+    }
+
+    @Override
     public synchronized void reload() throws IOException {
         // Defaults aus der Resource laden
         JsonNode defaultNode;
