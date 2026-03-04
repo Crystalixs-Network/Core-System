@@ -7,6 +7,7 @@ import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.config.Maintenance;
 import net.crystalixs.core.velocity.config.VelocityConfig;
 import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.jspecify.annotations.NonNull;
 
 import static net.kyori.adventure.text.Component.translatable;
@@ -24,9 +25,10 @@ public class MaintenanceCommand extends VelocityCommand {
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
         commandManager.command(commandManager.commandBuilder("maintenance")
+                .commandDescription(RichDescription.translatable("command.maintenance.description"))
                 .senderType(VelocityCommandSource.class)
                 .permission("core.command.maintenance")
-                .required("state", booleanParser())
+                .required("state", booleanParser(), RichDescription.translatable("command.maintenance.description.state"))
                 .handler(context -> {
                     final CommandSource source = context.sender().plattformSender();
                     final Maintenance maintenance = config.maintenance();

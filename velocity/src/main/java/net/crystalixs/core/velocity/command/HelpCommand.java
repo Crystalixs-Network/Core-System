@@ -5,7 +5,6 @@ import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import org.incendo.cloud.CommandManager;
-import org.incendo.cloud.component.DefaultValue;
 import org.incendo.cloud.help.result.CommandEntry;
 import org.incendo.cloud.minecraft.extras.MinecraftHelp;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -14,6 +13,7 @@ import org.jspecify.annotations.NonNull;
 
 import java.util.stream.Collectors;
 
+import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public class HelpCommand extends VelocityCommand {
@@ -31,8 +31,9 @@ public class HelpCommand extends VelocityCommand {
                 .build();
 
         commandManager.command(commandManager.commandBuilder("help", "?")
+                .commandDescription(translatable("command.help.description"))
                 .senderType(VelocityPlayerCommandSource.class)
-                .optional("query", greedyStringParser(), DefaultValue.constant(""),
+                .optional("query", greedyStringParser(), translatable("command.help.description.query"),
                         SuggestionProvider.blocking(((context, input) -> commandManager.createHelpHandler()
                                 .queryRootIndex(context.sender())
                                 .entries()
@@ -40,6 +41,6 @@ public class HelpCommand extends VelocityCommand {
                                 .map(CommandEntry::syntax)
                                 .map(Suggestion::suggestion)
                                 .collect(Collectors.toList()))))
-                .handler(context -> help.queryCommands(context.get("query"), context.sender())));
+                .handler(context -> help.queryCommands(context.getOrDefault("query", ""), context.sender())));
     }
 }
