@@ -49,6 +49,7 @@ public final class CorePlugin {
             .editTags(builder -> builder.tag("prefix", Tag.inserting(Component.translatable("util.prefix"))))
             .build();
 
+    private final PluginContainer pluginContainer;
     private final ProxyServer server;
     private final Path dataDirectory;
     private final Logger logger;
@@ -57,7 +58,8 @@ public final class CorePlugin {
     private VelocityConfig config;
 
     @Inject
-    public CorePlugin(ProxyServer server, @DataDirectory Path dataDirectory, Logger logger) {
+    public CorePlugin(PluginContainer pluginContainer, ProxyServer server, @DataDirectory Path dataDirectory, Logger logger) {
+        this.pluginContainer = pluginContainer;
         this.server = server;
         this.dataDirectory = dataDirectory;
         this.logger = logger;
@@ -85,7 +87,7 @@ public final class CorePlugin {
     }
 
     private void registerCommands() {
-        final VelocityCommandManager<VelocityCommandSource> commandManager = createCommandManager();
+        final VelocityCommandManager<VelocityCommandSource> commandManager = new VelocityCommandManager<>(pluginContainer, server, ExecutionCoordinator.simpleCoordinator(), senderMapper());
         final MinecraftHelp<VelocityCommandSource> help = MinecraftHelp.<VelocityCommandSource>builder()
                 .commandManager(commandManager)
                 .audienceProvider(AudienceProvider.nativeAudience())
@@ -110,16 +112,6 @@ public final class CorePlugin {
                         : new VelocityCommandSource(source),
 
                 VelocityCommandSource::plattformSender);
-    }
-
-    private @NotNull VelocityCommandManager<VelocityCommandSource> createCommandManager() {
-        Optional<PluginContainer> optional = server.getPluginManager().getPlugin("core");
-        if (optional.isEmpty()) {
-            throw new RuntimeException("Could not find core plugin!");
-        }
-        final PluginContainer core = optional.get();
-
-        return new VelocityCommandManager<>(core, server, ExecutionCoordinator.simpleCoordinator(), senderMapper());
     }
 
     private void createOrLoadConfig() {
