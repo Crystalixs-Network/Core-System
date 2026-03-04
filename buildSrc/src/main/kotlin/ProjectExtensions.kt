@@ -72,7 +72,6 @@ fun Project.configureVelocityProxy() {
     val secretFile = DevEnvironment.ensureForwardingSecretFile(rootDir)
 
     val serverDir = layout.dir(provider { file("run") }).get().asFile
-    if (serverDir.exists()) serverDir.deleteRecursively()
     serverDir.mkdirs()
 
     val toml = serverDir.resolve("velocity.toml")
