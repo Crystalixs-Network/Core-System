@@ -72,7 +72,7 @@ public final class CorePlugin {
         final VelocityCommandManager<VelocityCommandSource> commandManager = injector.getInstance(key);
 
         // Hier commands registrieren
-        new MaintenanceCommand(this).registerTo(commandManager);
+        new MaintenanceCommand(this, config).registerTo(commandManager);
     }
 
     private Injector createInjector() {
