@@ -38,6 +38,10 @@ import java.util.logging.Logger;
 
 public final class CorePlugin {
 
+    private final MiniMessage miniMessage = MiniMessage.builder()
+            .editTags(builder -> builder.tag("prefix", Tag.inserting(Component.translatable("util.prefix"))))
+            .build();
+
     private final ProxyServer server;
     private final Path dataDirectory;
     private final Logger logger;
@@ -101,7 +105,7 @@ public final class CorePlugin {
     }
 
     private void createOrLoadConfig() {
-        JacksonVelocity jacksonVelocity = JacksonVelocity.builder().withMiniMessage().build();
+        JacksonVelocity jacksonVelocity = JacksonVelocity.builder().withMiniMessage(miniMessage).build();
         ObjectMapper mapper = ObjectMapperFactory.create(builder -> builder.addModule(jacksonVelocity));
 
         loader = new VelocityConfigLoader(mapper, logger, dataDirectory.resolve("config.json"));
@@ -110,10 +114,6 @@ public final class CorePlugin {
     }
 
     private void registerTranslations() {
-        final MiniMessage miniMessage = MiniMessage.builder()
-                .editTags(builder -> builder.tag("prefix", Tag.inserting(Component.translatable("util.prefix"))))
-                .build();
-
         final VelocityTranslationRegistry registry = new VelocityTranslationRegistry(dataDirectory.resolve("lang"), getClass().getClassLoader(), Locale.GERMAN, miniMessage);
 
         try {
