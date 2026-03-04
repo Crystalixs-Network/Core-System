@@ -13,6 +13,7 @@ import net.crystalixs.core.common.config.ObjectMapperFactory;
 import net.crystalixs.core.velocity.command.CoreCommand;
 import net.crystalixs.core.velocity.command.HelpCommand;
 import net.crystalixs.core.velocity.command.MaintenanceCommand;
+import net.crystalixs.core.velocity.command.ProxyStopCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfig;
@@ -95,6 +96,7 @@ public final class CorePlugin {
         new CoreCommand(this, loader).registerTo(commandManager);
         new MaintenanceCommand(this, config).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
+        new ProxyStopCommand(this, server).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {

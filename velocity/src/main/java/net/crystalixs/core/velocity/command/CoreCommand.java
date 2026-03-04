@@ -6,6 +6,7 @@ import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfigLoader;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
+import org.incendo.cloud.permission.Permission;
 import org.jspecify.annotations.NonNull;
 
 import static net.kyori.adventure.text.Component.translatable;
@@ -24,7 +25,7 @@ public class CoreCommand extends VelocityCommand {
         commandManager.command(commandManager.commandBuilder("core")
                 .commandDescription(RichDescription.translatable("command.core.description"))
                 .senderType(VelocityCommandSource.class)
-                .permission("core.command.core")
+                .permission(Permission.of("core.command.core"))
                 .literal("reload", RichDescription.translatable("command.core.description.reload"))
                 .handler(context -> {
                     loader.saveAndReload();
