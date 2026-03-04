@@ -17,6 +17,20 @@ public class VelocityConfigLoader extends ConfigLoader<VelocityConfig> {
         this.logger = logger;
     }
 
+    public void saveAndReload() {
+        save();
+        reload();
+    }
+
+    @Override
+    public synchronized void save() {
+        try {
+            super.save();
+        } catch (IOException exception) {
+            logger.severe("There was an error while saving the config: " + exception.getMessage());
+        }
+    }
+
     @Override
     public synchronized void reload() {
         try {

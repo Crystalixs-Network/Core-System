@@ -1,4 +1,4 @@
-package net.crystalixs.core.velocity.command;
+package net.crystalixs.core.velocity.command.cloud;
 
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;

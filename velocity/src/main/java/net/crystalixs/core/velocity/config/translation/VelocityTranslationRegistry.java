@@ -14,20 +14,25 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.logging.Logger;
 
 import static net.kyori.adventure.key.Key.key;
 
 public final class VelocityTranslationRegistry {
 
+    private final Logger logger = Logger.getLogger(VelocityTranslationRegistry.class.getSimpleName());
+
     private final Path langDirectory;
-    private final ClassLoader resourceClassLoader;
     private final MiniMessage miniMessage;
+    private final ClassLoader resourceClassLoader;
+    private final Locale defaultLocale;
 
     private MiniMessageTranslationStore activeStore;
 
-    public VelocityTranslationRegistry(Path langDirectory, ClassLoader resourceClassLoader, MiniMessage miniMessage) {
+    public VelocityTranslationRegistry(Path langDirectory, ClassLoader resourceClassLoader, Locale defaultLocale, MiniMessage miniMessage) {
         this.langDirectory = langDirectory;
         this.resourceClassLoader = resourceClassLoader;
+        this.defaultLocale = defaultLocale;
         this.miniMessage = miniMessage;
     }
 
@@ -37,6 +42,7 @@ public final class VelocityTranslationRegistry {
         }
 
         MiniMessageTranslationStore store = MiniMessageTranslationStore.create(key("crystalixs", bundleName), miniMessage);
+        store.defaultLocale(defaultLocale);
 
         for (Locale locale : locales) {
             String tag = normalize(locale);
@@ -86,7 +92,7 @@ public final class VelocityTranslationRegistry {
 
         Properties user = load(file);
         Properties merged = merge(defaults, user);
-        store(file, merged, "Merged with defaults");
+        store(file, merged, "This config was updated based on the defaults. More information can be found in the changelog.");
     }
 
     private Properties load(Path file) throws IOException {

@@ -2,5 +2,19 @@
   "motd": {
     "first_line": "<yellow>Crystalixs<gray>.<yellow>net <gray><bold>-</bold> <aqua>Crystalixs Network <gray><bold>-</bold> <white>[<light_purple>1.21.11<white>]",
     "second_line": "<bold><light_purple>ISLANDS <yellow>UPDATE <gray>+ <gold>CAVES <light_purple>RELEASE"
+  },
+  "maintenance": {
+    "enabled": false,
+    "version": "Wartungsarbeiten",
+    "motd": {
+      "first_line": "<yellow>Crystalixs<gray>.<yellow>net <gray><bold>- <dark_red>WARTUNGSARBEITEN",
+      "second_line": "<white>Wir sind <aqua>bald <white>wieder da!"
+    },
+    "screen": {
+      "header": "<bold><gray><-- <red>Wartungsarbeiten <gray>-->",
+      "body": "<gray>Das Netzwerk ist gerade in <red>Wartungsarbeiten",
+      "footer": "<gray>Weitere Informationen findest du auf unserem Discord",
+      "url": "<red>https://discord.gg/crystalixs"
+    }
   }
 }

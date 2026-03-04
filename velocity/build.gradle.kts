@@ -64,9 +64,16 @@ tasks {
         main = "$group.$artifact.velocity.$mainClass"
         name = rootProject.property("plugin-name") as String
         authors = project.pluginAuthors()
+        id = artifact
     }
 
     runVelocity {
         velocityVersion(libs.versions.velocity.get())
+        doFirst {
+            configureVelocityProxy()
+        }
+        downloadPlugins {
+            url("https://download.luckperms.net/1624/velocity/LuckPerms-Velocity-5.5.36.jar")
+        }
     }
 }
