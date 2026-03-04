@@ -37,6 +37,7 @@ umgangen werden und der Spieler kann trotz aktivem Wartungsmodus sich verbinden.
 
 Um trotz aktivem Wartungsmodus zum Proxy verbinden zu können, benötigt man die Permission `core.bypass.maintenance`. Andernfalls verliert er die Verbindung. Ein
 Screen wird anschließend gezeigt. Dieser folgt folgendem Muster:
+
 - `HEADER`
 - `LEERZEILE`
 - `BODY`
@@ -45,7 +46,7 @@ Screen wird anschließend gezeigt. Dieser folgt folgendem Muster:
 - `URL` (Link zu weiteren Informationen)
 
 > [!TIP]
-> `HEADER`, `BODY`, `FOOTER` und `URL` können in der `config.json` angepasst werden. Ihr Text unterstützt [MiniMessage](https://docs.papermc.io/adventure/minimessage/format/). Eine Vorschau kannst du dir [hier](https://webui.advntr.dev/) anzeigen 
+> `HEADER`, `BODY`, `FOOTER` und `URL` können in der `config.json` angepasst werden. Ihr Text unterstützt [MiniMessage](https://docs.papermc.io/adventure/minimessage/format/). Eine Vorschau kannst du dir [hier](https://webui.advntr.dev/) anzeigen
 > lassen.
 
 ---
@@ -61,6 +62,7 @@ einstellbarer Text angezeigt. <br>
 ---
 
 ## 3) Reloading
+
 Die Config-Datei kann mittels eines Befehls neu geladen werden.
 
 #### Befehl
@@ -73,4 +75,5 @@ Die Config-Datei kann mittels eines Befehls neu geladen werden.
 
 ✅ Wartungsmodus umschaltbar  
 ✅ Wartungsabhängige MOTD  
-✅ Wartungs-Login-Block mit Bypass
+✅ Wartungs-Login-Block mit Bypass  
+✅ Custom Help-System mit Pagination
