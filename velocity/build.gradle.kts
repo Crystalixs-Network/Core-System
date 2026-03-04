@@ -68,5 +68,11 @@ tasks {
 
     runVelocity {
         velocityVersion(libs.versions.velocity.get())
+        doFirst {
+            configureVelocityProxy()
+        }
+        downloadPlugins {
+            url("https://download.luckperms.net/1624/velocity/LuckPerms-Velocity-5.5.36.jar")
+        }
     }
 }

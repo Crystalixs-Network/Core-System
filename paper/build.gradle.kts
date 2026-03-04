@@ -42,9 +42,13 @@ tasks {
         main = "$group.$artifact.paper.$mainClass"
         name = rootProject.property("plugin-name") as String
         authors = project.pluginAuthors()
+        apiVersion = "1.21"
     }
 
     runServer {
         minecraftVersion("1.21.11")
+        doFirst {
+            configurePaperServer()
+        }
     }
 }

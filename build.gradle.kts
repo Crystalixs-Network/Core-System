@@ -38,3 +38,7 @@ subprojects {
         }
     }
 }
+
+tasks.register("runNetwork") {
+    dependsOn("velocity:runVelocity", "paper:runServer")
+}
