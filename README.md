@@ -60,6 +60,15 @@ einstellbarer Text angezeigt. <br>
 
 ---
 
+## 3) Reloading
+Die Config-Datei kann mittels eines Befehls neu geladen werden.
+
+#### Befehl
+
+- /core reload: Benötigt die Permission `core.command.core`
+
+---
+
 ## Derzeitiger Funktionsumfang (kurz)
 
 ✅ Wartungsmodus umschaltbar  
