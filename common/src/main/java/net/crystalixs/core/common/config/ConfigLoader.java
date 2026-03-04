@@ -47,7 +47,7 @@ public class ConfigLoader<T> implements Config<T> {
                 ? mapper.readTree(file.toFile())
                 : mapper.createObjectNode();
 
-        JsonNode merged = JsonMerger.saveMerge(mapper, currentNode, existingNode);
+        JsonNode merged = JsonMerger.saveMerge(currentNode, existingNode);
 
         Files.createDirectories(file.getParent());
         mapper.writerWithDefaultPrettyPrinter().writeValue(file.toFile(), merged);
@@ -124,7 +124,7 @@ public class ConfigLoader<T> implements Config<T> {
             return merged;
         }
 
-        public static JsonNode saveMerge(@NotNull ObjectMapper mapper, @NotNull JsonNode current, JsonNode existing) {
+        public static JsonNode saveMerge(@NotNull JsonNode current, JsonNode existing) {
             if (!current.isObject() || !existing.isObject()) return current.deepCopy();
 
             ObjectNode merged = existing.deepCopy().asObject();
@@ -133,7 +133,7 @@ public class ConfigLoader<T> implements Config<T> {
                 JsonNode existingValue = merged.get(field);
 
                 if (currentValue.isObject() && existingValue != null && existingValue.isObject())
-                    merged.set(field, saveMerge(mapper, currentValue, existingValue));
+                    merged.set(field, saveMerge(currentValue, existingValue));
                 else
                     merged.set(field, currentValue.deepCopy());
             }
