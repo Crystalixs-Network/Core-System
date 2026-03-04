@@ -71,9 +71,17 @@ Die Config-Datei kann mittels eines Befehls neu geladen werden.
 
 ---
 
+## Proxy Stopp
+
+Der Proxy kann mit einem Befehl gestoppt werden. Ohne externes Skript (bspw. Crone job) startet sich dieser nicht von alleine neu.
+
+#### Befehl
+- /proxy-stop: Benötigt die Permission `core.command.proxy-stop`
+
 ## Derzeitiger Funktionsumfang (kurz)
 
 ✅ Wartungsmodus umschaltbar  
 ✅ Wartungsabhängige MOTD  
 ✅ Wartungs-Login-Block mit Bypass  
-✅ Custom Help-System mit Pagination
+✅ Custom Help-System mit Pagination  
+✅ Stoppen des Proxyservers
