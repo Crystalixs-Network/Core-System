@@ -2,8 +2,6 @@ package net.crystalixs.core.velocity.listener;
 
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
-import com.velocitypowered.api.event.connection.PreLoginEvent;
-import com.velocitypowered.api.event.connection.PreLoginEvent.PreLoginComponentResult;
 import com.velocitypowered.api.proxy.Player;
 import net.crystalixs.core.velocity.config.Maintenance.Screen;
 import net.crystalixs.core.velocity.config.VelocityConfig;
