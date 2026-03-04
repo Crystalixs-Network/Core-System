@@ -20,7 +20,7 @@ public class PlayerConnectionListener {
 
     @Subscribe
     public void onLogin(PreLoginEvent event) {
-        if (!config.maintenance().enabled()) return;
+        if (!config.maintenance().isEnabled()) return;
 
         Component deniedComponent = constructDeniedComponent();
         PreLoginComponentResult result = PreLoginComponentResult.denied(deniedComponent);
