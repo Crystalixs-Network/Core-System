@@ -64,6 +64,7 @@ tasks {
         main = "$group.$artifact.velocity.$mainClass"
         name = rootProject.property("plugin-name") as String
         authors = project.pluginAuthors()
+        id = artifact
     }
 
     runVelocity {

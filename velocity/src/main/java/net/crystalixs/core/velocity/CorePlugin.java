@@ -1,19 +1,18 @@
 package net.crystalixs.core.velocity;
 
-import com.google.inject.Injector;
-import com.google.inject.Key;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
 import net.crystalixs.core.velocity.command.CoreCommand;
+import net.crystalixs.core.velocity.command.HelpCommand;
 import net.crystalixs.core.velocity.command.MaintenanceCommand;
-import net.crystalixs.core.velocity.command.cloud.VelocityCommandManagerTypeLiteral;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfig;
@@ -27,15 +26,22 @@ import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.velocity.CloudInjectionModule;
+import org.incendo.cloud.minecraft.extras.AudienceProvider;
+import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
+import org.incendo.cloud.minecraft.extras.MinecraftHelp;
 import org.incendo.cloud.velocity.VelocityCommandManager;
+import org.jetbrains.annotations.NotNull;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.logging.Logger;
+
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 
 public final class CorePlugin {
 
@@ -49,8 +55,6 @@ public final class CorePlugin {
 
     private VelocityConfigLoader loader;
     private VelocityConfig config;
-
-    @Inject private Injector injector;
 
     @Inject
     public CorePlugin(ProxyServer server, @DataDirectory Path dataDirectory, Logger logger) {
@@ -81,29 +85,41 @@ public final class CorePlugin {
     }
 
     private void registerCommands() {
-        final Injector injector = createInjector();
-        final Key<VelocityCommandManager<VelocityCommandSource>> key = Key.get(new VelocityCommandManagerTypeLiteral());
-        final VelocityCommandManager<VelocityCommandSource> commandManager = injector.getInstance(key);
+        final VelocityCommandManager<VelocityCommandSource> commandManager = createCommandManager();
+        final MinecraftHelp<VelocityCommandSource> help = MinecraftHelp.<VelocityCommandSource>builder()
+                .commandManager(commandManager)
+                .audienceProvider(AudienceProvider.nativeAudience())
+                .commandPrefix("/help")
+                .build();
+
+        MinecraftExceptionHandler.<VelocityCommandSource>createNative()
+                .defaultHandlers()
+                .decorator(component -> text().append(translatable("util.prefix")).append(component).build())
+                .registerTo(commandManager);
 
         // Hier commands registrieren
         new CoreCommand(this, loader).registerTo(commandManager);
         new MaintenanceCommand(this, config).registerTo(commandManager);
+        new HelpCommand(this, help).registerTo(commandManager);
     }
 
-    private Injector createInjector() {
-        return injector.createChildInjector(new CloudInjectionModule<>(
-                VelocityCommandSource.class,
-                ExecutionCoordinator.simpleCoordinator(),
-                senderMapper()));
-    }
-
-    private SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {
+    private @NotNull SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {
         return SenderMapper.create(
                 source -> source instanceof Player player
                         ? new VelocityPlayerCommandSource(player)
                         : new VelocityCommandSource(source),
 
                 VelocityCommandSource::plattformSender);
+    }
+
+    private @NotNull VelocityCommandManager<VelocityCommandSource> createCommandManager() {
+        Optional<PluginContainer> optional = server.getPluginManager().getPlugin("core");
+        if (optional.isEmpty()) {
+            throw new RuntimeException("Could not find core plugin!");
+        }
+        final PluginContainer core = optional.get();
+
+        return new VelocityCommandManager<>(core, server, ExecutionCoordinator.simpleCoordinator(), senderMapper());
     }
 
     private void createOrLoadConfig() {
