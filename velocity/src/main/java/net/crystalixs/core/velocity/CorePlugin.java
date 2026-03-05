@@ -91,12 +91,13 @@ public final class CorePlugin {
                 .registerTo(commandManager);
 
         // Hier commands registrieren
+        new ProxyStopCommand(this, server).registerTo(commandManager);
         new CoreCommand(this, loader).registerTo(commandManager);
         new MaintenanceCommand(this, config).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
-        new ProxyStopCommand(this, server).registerTo(commandManager);
         new GlobalFindCommand(this).registerTo(commandManager);
         new GlobalTeleportCommand(this).registerTo(commandManager);
+        new OnlineCommand(this).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {
