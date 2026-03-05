@@ -10,10 +10,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
-import net.crystalixs.core.velocity.command.CoreCommand;
-import net.crystalixs.core.velocity.command.HelpCommand;
-import net.crystalixs.core.velocity.command.MaintenanceCommand;
-import net.crystalixs.core.velocity.command.ProxyStopCommand;
+import net.crystalixs.core.velocity.command.*;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfig;
@@ -85,7 +82,8 @@ public final class CorePlugin {
     }
 
     private void registerCommands() {
-        final VelocityCommandManager<VelocityCommandSource> commandManager = new VelocityCommandManager<>(pluginContainer, server, ExecutionCoordinator.<VelocityCommandSource>builder().build(), senderMapper());
+        final VelocityCommandManager<VelocityCommandSource> commandManager = new VelocityCommandManager<>
+                (pluginContainer, server, ExecutionCoordinator.<VelocityCommandSource>builder().build(), senderMapper());
 
         MinecraftExceptionHandler.<VelocityCommandSource>createNative()
                 .defaultHandlers()
@@ -97,6 +95,7 @@ public final class CorePlugin {
         new MaintenanceCommand(this, config).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
         new ProxyStopCommand(this, server).registerTo(commandManager);
+        new GlobalFindCommand(this).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {
