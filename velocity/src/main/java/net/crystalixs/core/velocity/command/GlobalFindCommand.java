@@ -6,13 +6,15 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jspecify.annotations.NonNull;
 
-import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.Component.*;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static org.incendo.cloud.velocity.parser.PlayerParser.playerParser;
 
@@ -40,9 +42,19 @@ public class GlobalFindCommand extends VelocityCommand {
                     }
                     String serverName = currentServer.get().getServerInfo().getName();
 
+                    Component joinButton = translatable("command.global-find.teleport.button")
+                            .clickEvent(ClickEvent.runCommand("/global-teleport " + target.getUsername()))
+                            .hoverEvent(HoverEvent.showText(translatable("command.global-find.teleport.hover")));
+
+                    Component serverButton = text(serverName)
+                            .clickEvent(ClickEvent.runCommand("/global-teleport " + target.getUsername()))
+                            .hoverEvent(HoverEvent.showText(translatable("command.global-find.teleport.hover")));
+
                     source.sendMessage(translatable("command.global-find.success",
                             component("name", text(target.getUsername())),
-                            component("server", text(serverName))));
+                            component("server", serverButton),
+                            component("button", joinButton)
+                    ));
                 })
         );
     }
