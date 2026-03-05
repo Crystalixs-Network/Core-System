@@ -35,7 +35,7 @@ public class GlobalFindCommand extends VelocityCommand {
 
                     var currentServer = target.getCurrentServer().map(ServerConnection::getServer);
                     if (currentServer.isEmpty()) {
-                        source.sendMessage(translatable("command.global-find.error-not-connected"));
+                        source.sendMessage(translatable("command.global-find.error.not-connected"));
                         return;
                     }
                     String serverName = currentServer.get().getServerInfo().getName();
