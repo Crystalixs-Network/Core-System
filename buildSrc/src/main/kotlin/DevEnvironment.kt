@@ -2,6 +2,9 @@ import java.io.File
 
 object DevEnvironment {
 
+    const val LOBBY_PORT = "30066"
+    const val GAME_PORT = "30067"
+
     fun ensureForwardingSecretFile(rootDir: File): File {
         val secretsDirectory = rootDir.resolve("secrets")
         secretsDirectory.mkdirs()

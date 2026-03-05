@@ -1,3 +1,5 @@
+import xyz.jpenilla.runpaper.task.RunServer
+
 plugins {
     alias(libs.plugins.bukkitConvention)
     alias(libs.plugins.runPaper)
@@ -45,10 +47,19 @@ tasks {
         apiVersion = "1.21"
     }
 
-    runServer {
+    register<RunServer>("runLobby") {
         minecraftVersion("1.21.11")
+        runDirectory = file("run-lobby")
         doFirst {
-            configurePaperServer()
+            configurePaperServer("run-lobby", DevEnvironment.LOBBY_PORT)
+        }
+    }
+
+    register<RunServer>("runGame") {
+        minecraftVersion("1.21.11")
+        runDirectory = file("run-game")
+        doFirst {
+            configurePaperServer("run-game", DevEnvironment.GAME_PORT)
         }
     }
 }

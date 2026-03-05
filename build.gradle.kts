@@ -40,5 +40,5 @@ subprojects {
 }
 
 tasks.register("runNetwork") {
-    dependsOn("velocity:runVelocity", "paper:runServer")
+    dependsOn("velocity:runVelocity", "paper:runLobby", "paper:runGame")
 }
