@@ -1,8 +1,6 @@
 import org.gradle.api.Project
 import java.util.*
 
-const val paperPort = "30066"
-
 fun Project.mavenArtifact(): String {
     val rawName = property("plugin-name") as String
     return rawName.trim()
@@ -33,22 +31,22 @@ fun Project.pluginAuthors(defaultAuthors: List<String> = listOf("Unknown")): Lis
         .filter { it.isNotEmpty() && it.isNotBlank() }
 }
 
-fun Project.configurePaperServer() {
-    val serverDir = layout.dir(provider { file("run") }).get().asFile
+fun Project.configurePaperServer(runDirName: String, port: String) {
+    val serverDir = layout.dir(provider { file(runDirName) }).get().asFile
     serverDir.mkdirs()
 
     // Auto accept the eula
     val eulaFile = serverDir.resolve("eula.txt")
     eulaFile.writeText("eula=true")
 
-    // Set port of the paper backend server to 30066 and disable online mode
+    // Set port of the paper backend server and disable online mode
     val propertiesFile = serverDir.resolve("server.properties")
     val properties = Properties()
     if (propertiesFile.exists()) {
         properties.load(propertiesFile.inputStream())
     }
 
-    properties.setProperty("server-port", paperPort)
+    properties.setProperty("server-port", port)
     properties.setProperty("online-mode", "false")
     properties.store(propertiesFile.outputStream(), null)
 
@@ -68,7 +66,7 @@ fun Project.configurePaperServer() {
     )
 }
 
-fun Project.configureVelocityProxy() {
+fun Project.configureVelocityProxy(servers: Map<String, String>) {
     val secretFile = DevEnvironment.ensureForwardingSecretFile(rootDir)
 
     val serverDir = layout.dir(provider { file("run") }).get().asFile
@@ -76,6 +74,8 @@ fun Project.configureVelocityProxy() {
 
     val toml = serverDir.resolve("velocity.toml")
     if (toml.exists()) toml.delete()
+
+    val serverEntries = servers.entries.joinToString("\n") { "${it.key} = \"127.0.0.1:${it.value}\"" }
 
     toml.writeText(
         """
@@ -86,7 +86,7 @@ fun Project.configureVelocityProxy() {
             forwarding-secret-file = "${secretFile.absolutePath.replace("\\", "/")}"
             
             [servers]
-            lobby = "127.0.0.1:$paperPort"
+            $serverEntries
 
             try = [
               "lobby"
