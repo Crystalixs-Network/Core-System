@@ -53,11 +53,11 @@ public final class CorePlugin {
     private VelocityConfig config;
 
     @Inject
-    public CorePlugin(PluginContainer pluginContainer, ProxyServer server, @DataDirectory Path dataDirectory, Logger logger) {
+    public CorePlugin(PluginContainer pluginContainer, ProxyServer server, @DataDirectory Path dataDirectory) {
         this.pluginContainer = pluginContainer;
         this.server = server;
         this.dataDirectory = dataDirectory;
-        this.logger = logger;
+        this.logger = Logger.getLogger(getClass().getSimpleName());
     }
 
     @Subscribe
