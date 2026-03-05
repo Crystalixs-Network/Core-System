@@ -85,9 +85,9 @@ public final class CorePlugin {
         final VelocityCommandManager<VelocityCommandSource> commandManager = new VelocityCommandManager<>
                 (pluginContainer, server, ExecutionCoordinator.<VelocityCommandSource>builder().build(), senderMapper());
 
-        MinecraftExceptionHandler.<VelocityCommandSource>createNative()
-                .defaultHandlers()
+        MinecraftExceptionHandler.create(VelocityCommandSource::plattformSender)
                 .decorator(component -> text().append(translatable("util.prefix")).append(component).build())
+                .defaultHandlers()
                 .registerTo(commandManager);
 
         // Hier commands registrieren
