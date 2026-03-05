@@ -35,7 +35,12 @@ public class GlobalTeleportCommand extends VelocityCommand {
 
                     var connection = target.getCurrentServer().map(ServerConnection::getServer);
                     if (connection.isEmpty()) {
-                        source.sendMessage(translatable("command.global-teleport.error-not-connected"));
+                        source.sendMessage(translatable("command.global-teleport.error.not-connected"));
+                        return;
+                    }
+
+                    if (connection.equals(source.getCurrentServer())) {
+                        source.sendMessage(translatable("command.global-teleport.error.same-server"));
                         return;
                     }
 
