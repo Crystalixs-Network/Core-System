@@ -6,7 +6,6 @@ import com.velocitypowered.api.proxy.ServerConnection;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
-import net.kyori.adventure.text.Component;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
@@ -32,25 +31,18 @@ public class GlobalFindCommand extends VelocityCommand {
                 .required("player", playerParser(), RichDescription.translatable("command.global-find.player.description"))
                 .handler(context -> {
                     CommandSource source = context.sender().plattformSender();
-                    Player target = context.getOrDefault("player", null);
-
-                    Component nameComponent = text(target.getUsername());
-                    if (!target.isActive()) {
-                        source.sendMessage(translatable("command.global-find.error.not-online", component("name", nameComponent)));
-                        return;
-                    }
+                    Player target = context.get("player");
 
                     var currentServer = target.getCurrentServer().map(ServerConnection::getServer);
                     if (currentServer.isEmpty()) {
                         source.sendMessage(translatable("command.global-find.error-not-connected"));
                         return;
                     }
-
                     String serverName = currentServer.get().getServerInfo().getName();
-                    Component serverComponent = text(serverName);
+
                     source.sendMessage(translatable("command.global-find.success",
-                            component("name", nameComponent),
-                            component("server", serverComponent)));
+                            component("name", text(target.getUsername())),
+                            component("server", text(serverName))));
                 }));
     }
 }
