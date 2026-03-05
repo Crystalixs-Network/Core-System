@@ -47,19 +47,29 @@ tasks {
         apiVersion = "1.21"
     }
 
-    register<RunServer>("runLobby") {
-        minecraftVersion("1.21.11")
-        runDirectory = file("run-lobby")
+
+    registerBackendServer("runLobby", "run-lobby", DevEnvironment.LOBBY_PORT)
+    registerBackendServer("runGame", "run-game", DevEnvironment.GAME_PORT)
+}
+
+fun registerBackendServer(name: String, runDirName: String, port: String) {
+    val copyTask = tasks.register<CopyPlugin>("copy${name}Plugin") {
+        runDir.set(runDirName)
+
+        dependsOn("shadowJar")
+        from(tasks.named("shadowJar"))
+        into(layout.dir(provider { file("${runDir.get()}/plugins") }))
         doFirst {
-            configurePaperServer("run-lobby", DevEnvironment.LOBBY_PORT)
+            println("Copying plugin into ${runDir.get()}/plugins")
         }
     }
 
-    register<RunServer>("runGame") {
+    tasks.register<RunServer>(name) {
         minecraftVersion("1.21.11")
-        runDirectory = file("run-game")
+        runDirectory = file(runDirName)
+        dependsOn(copyTask)
         doFirst {
-            configurePaperServer("run-game", DevEnvironment.GAME_PORT)
+            configurePaperServer(runDirName, port)
         }
     }
 }
