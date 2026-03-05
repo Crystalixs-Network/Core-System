@@ -43,6 +43,7 @@ public class GlobalFindCommand extends VelocityCommand {
                     source.sendMessage(translatable("command.global-find.success",
                             component("name", text(target.getUsername())),
                             component("server", text(serverName))));
-                }));
+                })
+        );
     }
 }
