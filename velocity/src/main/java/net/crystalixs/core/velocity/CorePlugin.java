@@ -96,6 +96,7 @@ public final class CorePlugin {
         new HelpCommand(this).registerTo(commandManager);
         new ProxyStopCommand(this, server).registerTo(commandManager);
         new GlobalFindCommand(this).registerTo(commandManager);
+        new GlobalTeleportCommand(this).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {
