@@ -26,10 +26,10 @@ public class OnlineCommand extends VelocityCommand {
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
         commandManager.command(commandManager.commandBuilder("online")
-                .commandDescription(RichDescription.translatable(""))
+                .commandDescription(RichDescription.translatable("command.online.description"))
                 .senderType(VelocityPlayerCommandSource.class)
                 .permission(Permission.of("core.command.online"))
-                .required("server", serverParser(), RichDescription.translatable(""))
+                .required("server", serverParser(), RichDescription.translatable("command.online.description.server"))
                 .handler(context -> {
                     Player source = context.sender().player();
                     RegisteredServer requested = context.get("server");
