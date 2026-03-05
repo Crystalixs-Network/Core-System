@@ -2,6 +2,7 @@ package net.crystalixs.core.velocity.command;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import kotlin._Assertions;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
@@ -31,12 +32,14 @@ public class OnlineCommand extends VelocityCommand {
                     Player source = context.sender().player();
                     RegisteredServer requested = context.get("server");
 
-                    if (requested.ping().join() == null) {
-                        source.sendMessage(text("Server offline"));
-                        return;
-                    }
+                    requested.ping().whenComplete(((ping, throwable) -> {
+                        if (ping == null || throwable != null) {
+                            source.sendMessage(text("Server offline. exception"));
+                            return;
+                        }
 
-                    source.sendMessage(text("Server online"));
+                        source.sendMessage(text("Server online"));
+                    }));
                 })
         );
     }
