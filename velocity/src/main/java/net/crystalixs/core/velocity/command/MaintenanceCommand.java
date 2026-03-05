@@ -1,6 +1,8 @@
 package net.crystalixs.core.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
@@ -17,10 +19,12 @@ import static org.incendo.cloud.parser.standard.BooleanParser.booleanParser;
 public class MaintenanceCommand extends VelocityCommand {
 
     private final VelocityConfig config;
+    private final ProxyServer proxy;
 
-    public MaintenanceCommand(CorePlugin plugin, VelocityConfig config) {
+    public MaintenanceCommand(CorePlugin plugin, VelocityConfig config, ProxyServer proxy) {
         super(plugin);
         this.config = config;
+        this.proxy = proxy;
     }
 
     @Override
@@ -46,6 +50,7 @@ public class MaintenanceCommand extends VelocityCommand {
                     }
 
                     toggleMaintenance(source, state);
+                    kickUnauthorized();
                 })
         );
     }
@@ -59,5 +64,14 @@ public class MaintenanceCommand extends VelocityCommand {
 
         config.maintenance().disable();
         source.sendMessage(translatable("command.maintenance.disabled"));
+    }
+
+    private void kickUnauthorized() {
+        for (Player player : proxy.getAllPlayers()) {
+            if (player.hasPermission("core.bypass.maintenance"))
+                continue;
+
+            player.disconnect(config.maintenance().screen().construct());
+        }
     }
 }

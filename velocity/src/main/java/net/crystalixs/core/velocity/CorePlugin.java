@@ -93,7 +93,7 @@ public final class CorePlugin {
         // Hier commands registrieren
         new ProxyStopCommand(this, server).registerTo(commandManager);
         new CoreCommand(this, loader).registerTo(commandManager);
-        new MaintenanceCommand(this, config).registerTo(commandManager);
+        new MaintenanceCommand(this, config, server).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
         new GlobalFindCommand(this).registerTo(commandManager);
         new GlobalTeleportCommand(this).registerTo(commandManager);

@@ -3,6 +3,10 @@ package net.crystalixs.core.velocity.config;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
+
+import static net.kyori.adventure.text.Component.*;
+import static net.kyori.adventure.text.Component.empty;
 
 public final class Maintenance {
 
@@ -49,5 +53,13 @@ public final class Maintenance {
     }
 
     public record Screen(Component header, Component body, Component footer, Component url) {
+
+        public Component construct() {
+            return join(JoinConfiguration.separator(newline()),
+                    header(), empty(), // Ein empty Component impliziert eine Leerzeile
+                    body(), empty(),
+                    footer(),
+                    url());
+        }
     }
 }
