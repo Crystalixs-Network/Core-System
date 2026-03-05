@@ -87,8 +87,25 @@ Der Onlinestatus von Backend Servern kann mittels eines Befehls abgefragt werden
 
 #### Befehl
 
-- /online <server>: Benötigt die Permission `core.command.online`
-  - `server` Der zu prüfende registrierte Server
+- /online `<server>`: Benötigt die Permission `core.command.online`
+    - `server`: Der Name des zu prüfenden Servers
+
+---
+
+## Globale Spieler Befehle
+
+Der aktuelle Server eines Spielers kann mittels eines Befehls gefunden werden und ruch einen Weiteren betreten werden.
+
+#### Befehle
+
+- /global-find `<player>`: Findet den aktuellen Server eines Spielers. Benötigt die Permission `core.command.global-find`
+    - `player`: Der Spielername
+    - Alias: gfind
+- /global-teleport `<player>`: Teleportiert dich auf den Server des angegebenen Spielers. Benötigt die Permission `core.command.global-teleport`
+    - `player`: Der Spielername
+    - Alias: gtp
+
+---
 
 ## Derzeitiger Funktionsumfang (kurz)
 
@@ -96,4 +113,6 @@ Der Onlinestatus von Backend Servern kann mittels eines Befehls abgefragt werden
 ✅ Wartungsabhängige MOTD  
 ✅ Wartungs-Login-Block mit Bypass  
 ✅ Custom Help-System mit Pagination  
-✅ Stoppen des Proxyservers
+✅ Stoppen des Proxyservers  
+✅ Onlinestatus von Servern  
+✅ Globale Spielerbefehle
