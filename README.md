@@ -71,12 +71,24 @@ Die Config-Datei kann mittels eines Befehls neu geladen werden.
 
 ---
 
-## Proxy Stopp
+## 4) Proxy Stopp
 
 Der Proxy kann mit einem Befehl gestoppt werden. Ohne externes Skript (bspw. Crone job) startet sich dieser nicht von alleine neu.
 
 #### Befehl
+
 - /proxy-stop: Benötigt die Permission `core.command.proxy-stop`
+
+---
+
+## 5) Onlinestatus von Backend Servern
+
+Der Onlinestatus von Backend Servern kann mittels eines Befehls abgefragt werden. Es werden nur im Proxy registrierte Server unterstützt.
+
+#### Befehl
+
+- /online <server>: Benötigt die Permission `core.command.online`
+  - `server` Der zu prüfende registrierte Server
 
 ## Derzeitiger Funktionsumfang (kurz)
 
