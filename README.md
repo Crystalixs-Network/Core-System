@@ -18,7 +18,8 @@ Dieses Plugin stellt zentrale Proxy-Funktionen für Velocity bereit:
 ### 1) Wartungsmodus
 
 Der Wartungsmodus legt fest, ob Spieler sich mit dem Proxy verbinden können (analog zu einer Whitelist). Mit einer entsprechenden Berechtigung kann dieser Filter
-umgangen werden und der Spieler kann trotz aktivem Wartungsmodus sich verbinden. <br>
+umgangen werden und der Spieler kann trotz aktivem Wartungsmodus sich verbinden. Spieler ohne Berechtigung werden bei Aktivierung des Wartunsmodus vom Netzwerk 
+getrennt.<br>
 
 > [!CAUTION]
 > Der Wartungsmodus sollte **ausschließlich** über den entsprechenden Befehl getoggelt werden.
