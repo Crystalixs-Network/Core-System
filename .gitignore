@@ -4,7 +4,7 @@
 logs
 build/
 out/
-run
+run*
 secrets
 
 .jar
