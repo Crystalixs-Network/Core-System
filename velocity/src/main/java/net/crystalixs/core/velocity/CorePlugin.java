@@ -10,6 +10,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
+import net.crystalixs.core.common.translation.TranslationRegistry;
 import net.crystalixs.core.velocity.command.*;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
@@ -18,6 +19,8 @@ import net.crystalixs.core.velocity.config.VelocityConfigLoader;
 import net.crystalixs.core.velocity.config.jackson.JacksonVelocity;
 import net.crystalixs.core.velocity.listener.MotdListener;
 import net.crystalixs.core.velocity.listener.PlayerConnectionListener;
+import net.crystalixs.core.velocity.translation.VelocityTranslationBundleLoader;
+import net.crystalixs.core.velocity.translation.VelocityTranslationProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -28,7 +31,9 @@ import org.incendo.cloud.velocity.VelocityCommandManager;
 import org.jetbrains.annotations.NotNull;
 import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import static net.kyori.adventure.text.Component.text;
@@ -115,6 +120,14 @@ public final class CorePlugin {
     }
 
     private void registerTranslations() {
+        try {
+            VelocityTranslationBundleLoader translationLoader = new VelocityTranslationBundleLoader(dataDirectory);
+            VelocityTranslationProvider provider = new VelocityTranslationProvider(miniMessage, translationLoader);
+            provider.load("messages", Locale.GERMAN);
+
+        }catch (IOException exception) {
+            logger.warning("Unable to load resource bundle: " + exception.getMessage());
+        }
     }
 }
 
