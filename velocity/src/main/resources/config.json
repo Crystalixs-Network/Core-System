@@ -1,4 +1,5 @@
 {
+  "enable-hot-reloading": true,
   "motd": {
     "first_line": "<yellow>Crystalixs<gray>.<yellow>net <gray><bold>-</bold> <aqua>Crystalixs Network <gray><bold>-</bold> <white>[<light_purple>1.21.11<white>]",
     "second_line": "<bold><light_purple>ISLANDS <yellow>UPDATE <gray>+ <gold>CAVES <light_purple>RELEASE"
