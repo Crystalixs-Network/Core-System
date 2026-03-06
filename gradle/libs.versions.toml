@@ -6,6 +6,7 @@ jackson = "3.1.0"
 kotlin = "2.3.20-RC"
 kotest = "6.1.4"
 cloud = "2.0.0-beta.10"
+adventure = "4.26.1"
 
 [libraries]
 # Server software
@@ -36,7 +37,8 @@ kotest-property = { group = "io.kotest", name = "kotest-property", version.ref =
 kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
 
 # Utility
-adventure = { group = "net.kyori", name = "adventure-api", version = "4.26.1" }
+adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
 
 [plugins]
 bukkitConvention = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourceFactory" }
@@ -54,3 +56,4 @@ kotlinTest = ["kotlin-stdlib", "kotlin-test"]
 kotest = ["kotest-runner", "kotest-property", "kotest-assertions"]
 cloudPaper = ["cloud-paper", "cloud-minecraftExtras", ]
 cloudVelocity = ["cloud-velocity", "cloud-minecraftExtras"]
+adventure = ["adventure-api", "adventure-text-minimessage"]
