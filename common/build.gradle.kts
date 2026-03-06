@@ -9,6 +9,7 @@ plugins {
 dependencies {
     implementation(libs.bundles.jackson)
     implementation(libs.cloud.core)
+    implementation(libs.configurate)
     implementation(libs.adventure)
 
     testImplementation(libs.bundles.kotlinTest)
@@ -35,6 +36,7 @@ tasks {
             libs.jackson.databind to "jackson_databind",
             libs.jackson.kotlin to "jackson_kotlin",
             libs.cloud.core to "cloud",
+            libs.configurate to "configurate",
             libs.adventure to "adventure"
         )
 
