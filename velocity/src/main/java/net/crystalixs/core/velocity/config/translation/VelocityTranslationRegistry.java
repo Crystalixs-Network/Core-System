@@ -14,13 +14,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.logging.Logger;
 
 import static net.kyori.adventure.key.Key.key;
 
 public final class VelocityTranslationRegistry {
-
-    private final Logger logger = Logger.getLogger(VelocityTranslationRegistry.class.getSimpleName());
 
     private final Path langDirectory;
     private final MiniMessage miniMessage;
