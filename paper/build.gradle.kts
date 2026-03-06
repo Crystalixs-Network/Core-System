@@ -12,6 +12,7 @@ dependencies {
 
     implementation(project(":common"))
     implementation(libs.bundles.cloudPaper)
+    implementation(libs.configurate)
 }
 
 tasks {
@@ -27,7 +28,8 @@ tasks {
         // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
 
         val mapping = mapOf(
-            libs.cloud.paper to "cloud"
+            libs.cloud.paper to "cloud",
+            libs.configurate to "configurate",
         )
 
         val base = "$group.$artifact.paper.libs"
