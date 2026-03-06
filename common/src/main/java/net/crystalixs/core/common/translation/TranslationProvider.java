@@ -1,8 +1,9 @@
 package net.crystalixs.core.common.translation;
 
-import net.kyori.adventure.key.KeyPattern;
+import net.kyori.adventure.key.KeyPattern.Value;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.translation.MiniMessageTranslationStore;
+import net.kyori.adventure.translation.GlobalTranslator;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -14,7 +15,7 @@ public final class TranslationProvider {
     private final TranslationBundleLoader loader;
     private final TranslationRegistry registry;
 
-    private String bundleName;
+    private @Value String bundleName;
     private Locale[] locales;
 
     public TranslationProvider(MiniMessage miniMessage, TranslationBundleLoader loader, Locale defaultLocale) {
@@ -22,7 +23,7 @@ public final class TranslationProvider {
         this.registry = new TranslationRegistry(miniMessage, defaultLocale);
     }
 
-    public void load(@KeyPattern.Value String bundleName, Locale... locales)  {
+    public void load(@Value String bundleName, Locale... locales) {
         this.bundleName = bundleName;
         this.locales = locales;
 
@@ -33,6 +34,12 @@ public final class TranslationProvider {
     }
 
     public void reload() {
+        MiniMessageTranslationStore oldStore = registry.store();
+        if (oldStore != null) {
+            GlobalTranslator.translator().removeSource(oldStore);
+        }
+        registry.registerBundle(bundleName);
+
         MiniMessageTranslationStore store = registry.store();
         try {
             for (Locale locale : locales) {
