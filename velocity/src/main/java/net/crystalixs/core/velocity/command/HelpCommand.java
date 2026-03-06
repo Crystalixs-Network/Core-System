@@ -31,7 +31,7 @@ public class HelpCommand extends VelocityCommand {
                 .build();
 
         commandManager.command(commandManager.commandBuilder("help", "?")
-                .commandDescription(translatable("command.help.description"))
+                .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
                 .optional("query", greedyStringParser(), translatable("command.help.description.query"),
                         SuggestionProvider.blocking(((context, input) -> commandManager.createHelpHandler()

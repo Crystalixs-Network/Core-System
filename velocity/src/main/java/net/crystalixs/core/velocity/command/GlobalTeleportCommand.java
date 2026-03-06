@@ -25,10 +25,10 @@ public class GlobalTeleportCommand extends VelocityCommand {
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
         commandManager.command(commandManager.commandBuilder("global-teleport", "gtp")
-                .commandDescription(RichDescription.translatable("command.global-teleport.description"))
+                .commandDescription(RichDescription.translatable("command.global-teleport.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
                 .permission(Permission.of("core.command.global-teleport"))
-                .required("player", playerParser(), RichDescription.translatable("command.global-teleport.player.description"))
+                .required("player", playerParser(), RichDescription.translatable("command.global-teleport.description.player"))
                 .handler(context -> {
                     Player source = context.sender().player();
                     Player target = context.get("player");

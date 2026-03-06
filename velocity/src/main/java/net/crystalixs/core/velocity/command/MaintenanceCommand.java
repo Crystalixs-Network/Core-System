@@ -30,7 +30,7 @@ public class MaintenanceCommand extends VelocityCommand {
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
         commandManager.command(commandManager.commandBuilder("maintenance")
-                .commandDescription(RichDescription.translatable("command.maintenance.description"))
+                .commandDescription(RichDescription.translatable("command.maintenance.description.main"))
                 .senderType(VelocityCommandSource.class)
                 .permission(Permission.of("core.command.maintenance"))
                 .required("state", booleanParser(), RichDescription.translatable("command.maintenance.description.state"))

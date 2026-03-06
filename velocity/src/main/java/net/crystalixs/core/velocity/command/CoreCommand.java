@@ -23,7 +23,7 @@ public class CoreCommand extends VelocityCommand {
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
         commandManager.command(commandManager.commandBuilder("core")
-                .commandDescription(RichDescription.translatable("command.core.description"))
+                .commandDescription(RichDescription.translatable("command.core.description.main"))
                 .senderType(VelocityCommandSource.class)
                 .permission(Permission.of("core.command.core"))
                 .literal("reload", RichDescription.translatable("command.core.description.reload"))

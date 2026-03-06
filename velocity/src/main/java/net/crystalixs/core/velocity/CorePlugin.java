@@ -41,7 +41,7 @@ import static net.kyori.adventure.text.Component.translatable;
 public final class CorePlugin {
 
     private final MiniMessage miniMessage = MiniMessage.builder()
-            .editTags(builder -> builder.tag("prefix", Tag.inserting(Component.translatable("util.prefix"))))
+            .editTags(builder -> builder.tag("prefix", Tag.inserting(Component.translatable("prefix"))))
             .build();
 
     private final PluginContainer pluginContainer;
@@ -122,9 +122,9 @@ public final class CorePlugin {
         try {
             VelocityTranslationBundleLoader translationLoader = new VelocityTranslationBundleLoader(dataDirectory);
             VelocityTranslationProvider provider = new VelocityTranslationProvider(miniMessage, translationLoader);
-            provider.load("messages", Locale.GERMAN);
+            provider.load("messages", Locale.GERMANY);
 
-        }catch (IOException exception) {
+        } catch (IOException exception) {
             logger.warning("Unable to load resource bundle: " + exception.getMessage());
         }
     }

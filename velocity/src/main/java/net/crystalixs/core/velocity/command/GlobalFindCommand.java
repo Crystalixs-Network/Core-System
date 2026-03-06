@@ -27,10 +27,10 @@ public class GlobalFindCommand extends VelocityCommand {
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
         commandManager.command(commandManager.commandBuilder("global-find", "gfind")
-                .commandDescription(RichDescription.translatable("command.global-find.description"))
+                .commandDescription(RichDescription.translatable("command.global-find.description.main"))
                 .senderType(VelocityCommandSource.class)
                 .permission(Permission.of("core.command.global-find"))
-                .required("player", playerParser(), RichDescription.translatable("command.global-find.player.description"))
+                .required("player", playerParser(), RichDescription.translatable("command.global-find.description.player"))
                 .handler(context -> {
                     CommandSource source = context.sender().plattformSender();
                     Player target = context.get("player");
