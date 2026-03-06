@@ -26,7 +26,7 @@ public class OnlineCommand extends VelocityCommand {
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
         commandManager.command(commandManager.commandBuilder("online")
-                .commandDescription(RichDescription.translatable("command.online.description"))
+                .commandDescription(RichDescription.translatable("command.online.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
                 .permission(Permission.of("core.command.online"))
                 .required("server", serverParser(), RichDescription.translatable("command.online.description.server"))
@@ -34,7 +34,7 @@ public class OnlineCommand extends VelocityCommand {
                     Player source = context.sender().player();
                     RegisteredServer requested = context.get("server");
 
-                    requested.ping().whenComplete(((ping, throwable) -> source.sendMessage(translatable("command.online").arguments(
+                    requested.ping().whenComplete(((ping, throwable) -> source.sendMessage(translatable("command.online.status").arguments(
                             Argument.component("server", text(requested.getServerInfo().getName())),
                             Argument.tagResolver(Formatter.booleanChoice("status", throwable == null || ping != null))
                     ))));

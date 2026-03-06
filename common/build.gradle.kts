@@ -8,7 +8,9 @@ plugins {
 
 dependencies {
     implementation(libs.bundles.jackson)
+    implementation(libs.bundles.adventure)
     implementation(libs.cloud.core)
+    implementation(libs.configurate)
 
     testImplementation(libs.bundles.kotlinTest)
     testImplementation(libs.bundles.kotest)
@@ -31,9 +33,12 @@ tasks {
         // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
 
         val mapping = mapOf(
-            libs.jackson.databind to "jackson_databind",
-            libs.jackson.kotlin to "jackson_kotlin",
-            libs.cloud.core to "cloud"
+            libs.jackson.databind to "jackson.databind",
+            libs.jackson.kotlin to "jackson.kotlin",
+            libs.cloud.core to "cloud",
+            libs.configurate to "configurate",
+            libs.adventure.api to "adventure.api",
+            libs.adventure.text.minimessage to "adventure.text.minimessage",
         )
 
         val base = "$group.$artifact.common.libs"

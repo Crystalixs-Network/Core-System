@@ -6,29 +6,39 @@ jackson = "3.1.0"
 kotlin = "2.3.20-RC"
 kotest = "6.1.4"
 cloud = "2.0.0-beta.10"
+adventure = "4.26.1"
 
 [libraries]
+# Server software
 paper = { group = "io.papermc.paper", name = "paper-api", version = "1.21.11-R0.1-SNAPSHOT" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+
+# Configuration
 jackson-databind = { group = "tools.jackson.core", name = "jackson-databind", version.ref = "jackson" }
 jackson-kotlin = { group = "tools.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson" }
 gson = { group = "com.google.code.gson", name = "gson", version = "2.13.2" }
+configurate = { group = "org.spongepowered", name = "configurate-hocon", version = "4.2.0" }
+
+# Command
 cloud-core = { group = "org.incendo", name = "cloud-core", version = "2.0.0" }
 cloud-paper = { group = "org.incendo", name = "cloud-paper", version.ref = "cloud" }
 cloud-velocity = { group = "org.incendo", name = "cloud-velocity", version.ref = "cloud" }
 cloud-minecraftExtras = { group = "org.incendo", name = "cloud-minecraft-extras", version.ref = "cloud" }
 brigadier = { group = "com.mojang", name = "brigadier", version = "1.0.18" }
 
+# Testing
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version = "5.7.1" }
 junit-platform = { group = "org.junit.platform", name = "junit-platform-launcher" }
 pitest-junit5 = { group = "org.pitest", name = "pitest-junit5-plugin", version = "1.2.3" }
-
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
 kotlin-test = { group = "org.jetbrains.kotlin", name = "kotlin-test", version.ref = "kotlin" }
-
 kotest-runner = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
 kotest-property = { group = "io.kotest", name = "kotest-property", version.ref = "kotest" }
 kotest-assertions = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+
+# Utility
+adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
+adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
 
 [plugins]
 bukkitConvention = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourceFactory" }
@@ -46,3 +56,4 @@ kotlinTest = ["kotlin-stdlib", "kotlin-test"]
 kotest = ["kotest-runner", "kotest-property", "kotest-assertions"]
 cloudPaper = ["cloud-paper", "cloud-minecraftExtras", ]
 cloudVelocity = ["cloud-velocity", "cloud-minecraftExtras"]
+adventure = ["adventure-api", "adventure-text-minimessage"]
