@@ -10,6 +10,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
+import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.command.*;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
@@ -33,6 +34,8 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 
 import static net.kyori.adventure.text.Component.text;
@@ -40,6 +43,7 @@ import static net.kyori.adventure.text.Component.translatable;
 
 public final class CorePlugin {
 
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final MiniMessage miniMessage = MiniMessage.builder()
             .editTags(builder -> builder.tag("prefix", Tag.inserting(Component.translatable("prefix"))))
             .build();
@@ -72,6 +76,7 @@ public final class CorePlugin {
 
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
+        scheduler.shutdownNow();
         loader.save();
         logger.info("Velocity core plugin has been disabled!");
     }
@@ -124,9 +129,23 @@ public final class CorePlugin {
             TranslationProvider provider = new TranslationProvider(miniMessage, translationLoader, Locale.GERMANY);
             provider.load("messages", Locale.GERMANY);
 
+            if (!config.isHotReloadEnabled()) return;
+            enableHotReloading(provider);
+
         } catch (IOException exception) {
             logger.warning("Unable to load resource bundle: " + exception.getMessage());
         }
+    }
+
+    private void enableHotReloading(TranslationProvider provider) {
+        new HotReloadWatcher(scheduler, dataDirectory.resolve("lang"), 1000L, () -> {
+            try {
+                provider.reload();
+            } catch (IOException exception) {
+                logger.warning("Failed to reload translations: " + exception.getMessage());
+            }
+        }).start();
+
     }
 }
 
