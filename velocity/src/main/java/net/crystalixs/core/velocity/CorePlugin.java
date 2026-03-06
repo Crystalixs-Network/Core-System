@@ -91,7 +91,7 @@ public final class CorePlugin {
                 (pluginContainer, server, ExecutionCoordinator.<VelocityCommandSource>builder().build(), senderMapper());
 
         MinecraftExceptionHandler.create(VelocityCommandSource::plattformSender)
-                .decorator(component -> text().append(translatable("util.prefix")).append(component).build())
+                .decorator(component -> text().append(translatable("prefix")).append(component).build())
                 .defaultHandlers()
                 .registerTo(commandManager);
 
