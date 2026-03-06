@@ -1,5 +1,6 @@
 package net.crystalixs.core.velocity.command;
 
+import com.velocitypowered.api.command.CommandSource;
 import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
@@ -9,17 +10,13 @@ import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
-import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.jspecify.annotations.NonNull;
 
-import java.util.List;
+import java.util.EnumSet;
 
 import static net.kyori.adventure.text.Component.translatable;
-import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
 public class CoreCommand extends VelocityCommand {
-
-    private final List<String> reloadModes = List.of("ALL", "MESSAGES", "CONFIG");
 
     private final VelocityConfigLoader loader;
     private final TranslationProvider provider;
@@ -36,33 +33,71 @@ public class CoreCommand extends VelocityCommand {
                 .commandDescription(RichDescription.translatable("command.core.description.main"))
                 .senderType(VelocityCommandSource.class)
                 .permission(Permission.of("core.command.core"))
-                .literal("reload", RichDescription.translatable("command.core.description.reload.main"))
-                .optional("mode", stringParser(),
-                        RichDescription.translatable("command.core.description.reload.mode"),
-                        SuggestionProvider.suggestingStrings(reloadModes))
-                .handler(context -> {
-                    String mode = context.getOrDefault("mode", "all");
-
-                    switch (mode.toLowerCase()) {
-                        case "config" -> reloadConfig(context);
-                        case "messages" -> reloadMessages(context);
-                        default -> reloadAll(context);
-                    }
-                }));
+                .literal("reload", RichDescription.translatable("command.core.description.reload"))
+                .flag(commandManager.flagBuilder("all")
+                        .withAliases("a")
+                        .withDescription(RichDescription.translatable("command.core.description.flag.all")))
+                .flag(commandManager.flagBuilder("config")
+                        .withAliases("c")
+                        .withDescription(RichDescription.translatable("command.core.description.flag.config")))
+                .flag(commandManager.flagBuilder("messages")
+                        .withAliases("m")
+                        .withDescription(RichDescription.translatable("command.core.description.flag.messages")))
+                .handler(this::reload));
     }
 
-    private void reloadAll(CommandContext<VelocityCommandSource> context) {
-        reloadConfig(context);
-        reloadMessages(context);
+    private void reload(CommandContext<VelocityCommandSource> context) {
+        final CommandSource source = context.sender().plattformSender();
+        EnumSet<ReloadFlag> presentFlags = EnumSet.noneOf(ReloadFlag.class);
+
+        for (ReloadFlag flag : ReloadFlag.values()) {
+            if (context.flags().isPresent(flag.getName())) {
+                presentFlags.add(flag);
+            }
+        }
+
+        if (presentFlags.isEmpty()) {
+            source.sendMessage(translatable("command.core.reload.error.no-flag-present"));
+            return;
+        }
+
+        presentFlags.forEach(flag -> {
+            switch (flag) {
+                case CONFIG -> reloadConfig();
+                case MESSAGES -> reloadMessages();
+                default -> reloadAll();
+            }
+            source.sendMessage(translatable("command.core.reload." + flag.getName()));
+        });
     }
 
-    private void reloadMessages(CommandContext<VelocityCommandSource> context) {
+
+    private void reloadAll() {
+        reloadConfig();
+        reloadMessages();
+    }
+
+    private void reloadMessages() {
         provider.reload();
-        context.sender().plattformSender().sendMessage(translatable("command.core.reload.messages"));
     }
 
-    private void reloadConfig(CommandContext<VelocityCommandSource> context) {
+    private void reloadConfig() {
         loader.saveAndReload();
-        context.sender().plattformSender().sendMessage(translatable("command.core.reload.config"));
+    }
+
+    private enum ReloadFlag {
+        ALL("all"),
+        CONFIG("config"),
+        MESSAGES("messages");
+
+        private final String name;
+
+        ReloadFlag(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
     }
 }
