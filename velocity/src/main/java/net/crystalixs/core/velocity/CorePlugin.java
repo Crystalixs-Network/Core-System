@@ -16,7 +16,6 @@ import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfig;
 import net.crystalixs.core.velocity.config.VelocityConfigLoader;
 import net.crystalixs.core.velocity.config.jackson.JacksonVelocity;
-import net.crystalixs.core.velocity.config.translation.VelocityTranslationRegistry;
 import net.crystalixs.core.velocity.listener.MotdListener;
 import net.crystalixs.core.velocity.listener.PlayerConnectionListener;
 import net.kyori.adventure.text.Component;
@@ -29,10 +28,7 @@ import org.incendo.cloud.velocity.VelocityCommandManager;
 import org.jetbrains.annotations.NotNull;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import static net.kyori.adventure.text.Component.text;
@@ -119,13 +115,6 @@ public final class CorePlugin {
     }
 
     private void registerTranslations() {
-        final VelocityTranslationRegistry registry = new VelocityTranslationRegistry(dataDirectory.resolve("lang"), getClass().getClassLoader(), Locale.GERMAN, miniMessage);
-
-        try {
-            registry.registerBundle("messages", List.of(Locale.GERMAN));
-        } catch (IOException exception) {
-            logger.severe("There was an error while registering translations: " + exception.getMessage());
-        }
     }
 }
 
