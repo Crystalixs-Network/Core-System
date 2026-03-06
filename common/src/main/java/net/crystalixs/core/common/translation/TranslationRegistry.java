@@ -21,7 +21,7 @@ public final class TranslationRegistry {
         this.defaultLocale = defaultLocale;
     }
 
-    public void registerBundle(@Value String bundleName, Locale... locales) {
+    public void registerBundle(@Value String bundleName) {
         store = MiniMessageTranslationStore.create(key("crystalixs", bundleName), miniMessage);
         store.defaultLocale(defaultLocale);
 
