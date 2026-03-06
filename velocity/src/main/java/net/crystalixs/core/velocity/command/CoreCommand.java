@@ -58,11 +58,11 @@ public class CoreCommand extends VelocityCommand {
 
     private void reloadMessages(CommandContext<VelocityCommandSource> context) {
         provider.reload();
-        context.sender().plattformSender().sendMessage(translatable());
+        context.sender().plattformSender().sendMessage(translatable("command.core.reload.messages"));
     }
 
     private void reloadConfig(CommandContext<VelocityCommandSource> context) {
         loader.saveAndReload();
-        context.sender().plattformSender().sendMessage(translatable("command.core.reload"));
+        context.sender().plattformSender().sendMessage(translatable("command.core.reload.config"));
     }
 }
