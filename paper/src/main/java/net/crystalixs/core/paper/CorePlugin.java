@@ -25,6 +25,8 @@ public class CorePlugin extends JavaPlugin {
     private final MiniMessage miniMessage = MiniMessage.builder()
             .build();
 
+    private HotReloadWatcher watcher;
+
     @Override
     public void onEnable() {
         registerTranslations();
@@ -35,6 +37,9 @@ public class CorePlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        scheduler.shutdownNow();
+        watcher.stop();
+
         getLogger().info("Plugin disabled!");
     }
 
@@ -62,6 +67,7 @@ public class CorePlugin extends JavaPlugin {
         provider.load("messages", Locale.GERMANY);
 
         // Hier fehlt noch der Config check
-        new HotReloadWatcher(scheduler, getDataPath().resolve("lang"), 1000L, provider::reload).start();
+        watcher = new HotReloadWatcher(scheduler, getDataPath().resolve("lang"), 1000L, provider::reload);
+        watcher.start();
     }
 }

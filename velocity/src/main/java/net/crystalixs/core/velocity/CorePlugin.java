@@ -53,6 +53,7 @@ public final class CorePlugin {
     private final Logger logger;
 
     private TranslationProvider provider;
+    private HotReloadWatcher watcher;
     private VelocityConfigLoader loader;
     private VelocityConfig config;
 
@@ -77,7 +78,9 @@ public final class CorePlugin {
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         scheduler.shutdownNow();
+        watcher.stop();
         loader.save();
+
         logger.info("Velocity core plugin has been disabled!");
     }
 
@@ -129,7 +132,9 @@ public final class CorePlugin {
         provider.load("messages", Locale.GERMANY);
 
         if (!config.isHotReloadEnabled()) return;
-        new HotReloadWatcher(scheduler, dataDirectory.resolve("lang"), 1000L, provider::reload).start();
+
+        watcher = new HotReloadWatcher(scheduler, dataDirectory.resolve("lang"), 1000L, provider::reload);
+        watcher.start();
     }
 }
 
