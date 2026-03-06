@@ -1,10 +1,10 @@
 package net.crystalixs.core.paper;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.paper.command.PaperCommandSource;
 import net.crystalixs.core.paper.command.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.translation.PaperTranslationBundleLoader;
-import net.crystalixs.core.paper.translation.PaperTranslationProvider;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -56,8 +56,8 @@ public class CorePlugin extends JavaPlugin {
     private void registerTranslations() {
         try {
             PaperTranslationBundleLoader translationLoader = new PaperTranslationBundleLoader(this);
-            PaperTranslationProvider provider = new PaperTranslationProvider(miniMessage, translationLoader);
-            provider.load("messages", Locale.GERMAN);
+            TranslationProvider provider = new TranslationProvider(miniMessage, translationLoader, Locale.GERMANY);
+            provider.load("messages", Locale.GERMANY);
 
         } catch (IOException exception) {
             getLogger().warning("Unable to load ressource bundle: " + exception.getMessage());

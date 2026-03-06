@@ -10,6 +10,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
+import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.command.*;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
@@ -19,7 +20,6 @@ import net.crystalixs.core.velocity.config.jackson.JacksonVelocity;
 import net.crystalixs.core.velocity.listener.MotdListener;
 import net.crystalixs.core.velocity.listener.PlayerConnectionListener;
 import net.crystalixs.core.velocity.translation.VelocityTranslationBundleLoader;
-import net.crystalixs.core.velocity.translation.VelocityTranslationProvider;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
@@ -121,7 +121,7 @@ public final class CorePlugin {
     private void registerTranslations() {
         try {
             VelocityTranslationBundleLoader translationLoader = new VelocityTranslationBundleLoader(dataDirectory);
-            VelocityTranslationProvider provider = new VelocityTranslationProvider(miniMessage, translationLoader);
+            TranslationProvider provider = new TranslationProvider(miniMessage, translationLoader, Locale.GERMANY);
             provider.load("messages", Locale.GERMANY);
 
         } catch (IOException exception) {
