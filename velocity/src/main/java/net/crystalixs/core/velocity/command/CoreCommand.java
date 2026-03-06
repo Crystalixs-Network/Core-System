@@ -9,12 +9,17 @@ import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
+import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.jspecify.annotations.NonNull;
+
+import java.util.List;
 
 import static net.kyori.adventure.text.Component.translatable;
 import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
 public class CoreCommand extends VelocityCommand {
+
+    private final List<String> reloadModes = List.of("ALL", "MESSAGES", "CONFIG");
 
     private final VelocityConfigLoader loader;
     private final TranslationProvider provider;
@@ -32,7 +37,9 @@ public class CoreCommand extends VelocityCommand {
                 .senderType(VelocityCommandSource.class)
                 .permission(Permission.of("core.command.core"))
                 .literal("reload", RichDescription.translatable("command.core.description.reload.main"))
-                .optional("mode", stringParser(), RichDescription.translatable("command.core.description.reload.mode"))
+                .optional("mode", stringParser(),
+                        RichDescription.translatable("command.core.description.reload.mode"),
+                        SuggestionProvider.suggestingStrings(reloadModes))
                 .handler(context -> {
                     String mode = context.getOrDefault("mode", "all");
 
