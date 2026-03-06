@@ -31,7 +31,6 @@ import org.incendo.cloud.velocity.VelocityCommandManager;
 import org.jetbrains.annotations.NotNull;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -53,6 +52,7 @@ public final class CorePlugin {
     private final Path dataDirectory;
     private final Logger logger;
 
+    private TranslationProvider provider;
     private VelocityConfigLoader loader;
     private VelocityConfig config;
 
@@ -67,8 +67,8 @@ public final class CorePlugin {
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
         createOrLoadConfig();
-        registerCommands();
         registerTranslations();
+        registerCommands();
         registerListener(server);
 
         logger.info("Velocity core plugin has been enabled!");
@@ -97,7 +97,7 @@ public final class CorePlugin {
 
         // Hier commands registrieren
         new ProxyStopCommand(this, server).registerTo(commandManager);
-        new CoreCommand(this, loader).registerTo(commandManager);
+        new CoreCommand(this, loader, provider).registerTo(commandManager);
         new MaintenanceCommand(this, config, server).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
         new GlobalFindCommand(this).registerTo(commandManager);
@@ -124,28 +124,12 @@ public final class CorePlugin {
     }
 
     private void registerTranslations() {
-        try {
-            VelocityTranslationBundleLoader translationLoader = new VelocityTranslationBundleLoader(dataDirectory);
-            TranslationProvider provider = new TranslationProvider(miniMessage, translationLoader, Locale.GERMANY);
-            provider.load("messages", Locale.GERMANY);
+        VelocityTranslationBundleLoader translationLoader = new VelocityTranslationBundleLoader(dataDirectory);
+        provider = new TranslationProvider(miniMessage, translationLoader, Locale.GERMANY);
+        provider.load("messages", Locale.GERMANY);
 
-            if (!config.isHotReloadEnabled()) return;
-            enableHotReloading(provider);
-
-        } catch (IOException exception) {
-            logger.warning("Unable to load resource bundle: " + exception.getMessage());
-        }
-    }
-
-    private void enableHotReloading(TranslationProvider provider) {
-        new HotReloadWatcher(scheduler, dataDirectory.resolve("lang"), 1000L, () -> {
-            try {
-                provider.reload();
-            } catch (IOException exception) {
-                logger.warning("Failed to reload translations: " + exception.getMessage());
-            }
-        }).start();
-
+        if (!config.isHotReloadEnabled()) return;
+        new HotReloadWatcher(scheduler, dataDirectory.resolve("lang"), 1000L, provider::reload).start();
     }
 }
 

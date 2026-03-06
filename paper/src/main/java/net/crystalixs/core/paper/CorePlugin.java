@@ -15,7 +15,6 @@ import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.paper.PaperCommandManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -58,28 +57,11 @@ public class CorePlugin extends JavaPlugin {
     }
 
     private void registerTranslations() {
-        try {
-            PaperTranslationBundleLoader translationLoader = new PaperTranslationBundleLoader(this);
-            TranslationProvider provider = new TranslationProvider(miniMessage, translationLoader, Locale.GERMANY);
-            provider.load("messages", Locale.GERMANY);
+        PaperTranslationBundleLoader translationLoader = new PaperTranslationBundleLoader(this);
+        TranslationProvider provider = new TranslationProvider(miniMessage, translationLoader, Locale.GERMANY);
+        provider.load("messages", Locale.GERMANY);
 
-            // Hier fehlt noch der Config check
-            enableHotReloading(provider);
-
-        } catch (IOException exception) {
-            getLogger().warning("Unable to load ressource bundle: " + exception.getMessage());
-        }
+        // Hier fehlt noch der Config check
+        new HotReloadWatcher(scheduler, getDataPath().resolve("lang"), 1000L, provider::reload).start();
     }
-
-    private void enableHotReloading(TranslationProvider provider) {
-        new HotReloadWatcher(scheduler, getDataPath().resolve("lang"), 1000L, () -> {
-            try {
-                provider.reload();
-            } catch (IOException exception) {
-                getLogger().warning("Failed to reload translations: " + exception.getMessage());
-            }
-        }).start();
-
-    }
-
 }

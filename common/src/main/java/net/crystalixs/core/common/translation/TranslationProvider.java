@@ -6,9 +6,11 @@ import net.kyori.adventure.text.minimessage.translation.MiniMessageTranslationSt
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 public final class TranslationProvider {
 
+    private final Logger logger = Logger.getLogger(getClass().getSimpleName());
     private final TranslationBundleLoader loader;
     private final TranslationRegistry registry;
 
@@ -20,7 +22,7 @@ public final class TranslationProvider {
         this.registry = new TranslationRegistry(miniMessage, defaultLocale);
     }
 
-    public void load(@KeyPattern.Value String bundleName, Locale... locales) throws IOException {
+    public void load(@KeyPattern.Value String bundleName, Locale... locales)  {
         this.bundleName = bundleName;
         this.locales = locales;
 
@@ -30,12 +32,15 @@ public final class TranslationProvider {
         reload();
     }
 
-    public void reload() throws IOException {
+    public void reload() {
         MiniMessageTranslationStore store = registry.store();
-
-        for (Locale locale : locales) {
-            TranslationBundle bundle = loader.load(bundleName, locale);
-            bundle.entries().forEach((key, value) -> store.register(key, locale, value));
+        try {
+            for (Locale locale : locales) {
+                TranslationBundle bundle = loader.load(bundleName, locale);
+                bundle.entries().forEach((key, value) -> store.register(key, locale, value));
+            }
+        } catch (IOException exception) {
+            logger.warning("Failed to reload translations: " + exception.getMessage());
         }
     }
 
