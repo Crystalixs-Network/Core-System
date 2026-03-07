@@ -66,8 +66,8 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
         if (next == null) {
             throw new IllegalStateException("Could not update config, returned null.");
         }
+        write(next);
         current.set(next);
-        save();
     }
 
     @Override
@@ -97,10 +97,12 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
     }
 
     @Override
-    public void save() throws IOException {
-        T value = get();
-        createParentDirectories();
+    public synchronized void save() throws IOException {
+        write(get());
+    }
 
+    private void write(T value) throws IOException {
+        createParentDirectories();
         BasicConfigurationNode target = BasicConfigurationNode.root(options);
         try {
             mapper.save(value, target);
