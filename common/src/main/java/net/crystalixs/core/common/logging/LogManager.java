@@ -23,20 +23,19 @@ public final class LogManager implements LogFactory {
         this.output = output;
     }
 
-    public static LogManager createForJavaUtil(java.util.logging.Logger platformLogger, Path logDirectory, String filePrefix) {
+    public static LogManager createForJavaUtil(java.util.logging.Logger platformLogger, Path logDirectory) {
         return create(new ConsoleLogOutput(platformLogger::info, platformLogger::warning,
                         (message, throwable) -> platformLogger.log(WARNING, message, throwable),
                         platformLogger::severe,
                         (message, throwable) -> platformLogger.log(SEVERE, message, throwable)),
                 platformLogger::warning,
-                logDirectory,
-                filePrefix);
+                logDirectory);
     }
 
-    public static LogManager createForSlf4j(Logger platformLogger, Path logDirectory, String filePrefix) {
+    public static LogManager createForSlf4j(Logger platformLogger, Path logDirectory) {
         return create(new ConsoleLogOutput(platformLogger::info, platformLogger::warn, platformLogger::warn, platformLogger::error, platformLogger::error),
                 platformLogger::warn,
-                logDirectory, filePrefix);
+                logDirectory);
     }
 
     @Override
@@ -49,11 +48,11 @@ public final class LogManager implements LogFactory {
         output.close();
     }
 
-    private static LogManager create(LogOutput consoleLogOutput, Consumer<String> fallbackWarn, Path logDirectory, String filePrefix) {
+    private static LogManager create(LogOutput consoleLogOutput, Consumer<String> fallbackWarn, Path logDirectory) {
         List<LogOutput> sinks = new ArrayList<>();
         sinks.add(consoleLogOutput);
         try {
-            sinks.add(new RollingFileOutput(logDirectory, filePrefix, DEFAULT_MAX_FILE_SIZE, DEFAULT_MAX_FILES));
+            sinks.add(new RollingFileOutput(logDirectory, DEFAULT_MAX_FILE_SIZE, DEFAULT_MAX_FILES));
         } catch (IOException exception) {
             fallbackWarn.accept("Failed to initialize file logging in " + logDirectory + ": " + exception.getMessage());
         }

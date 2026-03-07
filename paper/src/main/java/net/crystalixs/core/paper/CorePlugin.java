@@ -35,7 +35,7 @@ public class CorePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        this.logging = LogManager.createForJavaUtil(getLogger(), getDataPath().resolve("logs"), "paper-core");
+        this.logging = LogManager.createForJavaUtil(getLogger(), getDataPath().resolve("logs"));
         this.logger = logging.logger("core");
         registerTranslations();
         registerCommands();

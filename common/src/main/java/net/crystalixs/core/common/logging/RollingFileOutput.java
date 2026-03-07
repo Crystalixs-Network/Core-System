@@ -14,13 +14,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public final class RollingFileOutput implements LogManager.LogOutput {
 
+    private static final String FILE_PREFIX = "log";
     private static final DateTimeFormatter FILE_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final String FILE_EXTENSION = ".log";
 
     private final ReentrantLock lock = new ReentrantLock();
     private final LogRenderer renderer = new LogRenderer();
     private final Path directory;
-    private final String filePrefix;
     private final long maxBytes;
     private final int maxFiles;
 
@@ -29,7 +29,7 @@ public final class RollingFileOutput implements LogManager.LogOutput {
     private int activeIndex;
     private Path activeFile;
 
-    public RollingFileOutput(Path directory, String filePrefix, long maxBytes, int maxFiles) throws IOException {
+    public RollingFileOutput(Path directory, long maxBytes, int maxFiles) throws IOException {
         if (maxBytes <= 0) {
             throw new IllegalArgumentException("maxBytes must be positive");
         }
@@ -37,7 +37,6 @@ public final class RollingFileOutput implements LogManager.LogOutput {
             throw new IllegalArgumentException("maxFiles must be positive");
         }
         this.directory = directory;
-        this.filePrefix = filePrefix;
         this.maxBytes = maxBytes;
         this.maxFiles = maxFiles;
 
@@ -122,7 +121,7 @@ public final class RollingFileOutput implements LogManager.LogOutput {
         try (var stream = Files.list(directory)) {
             List<Path> files = stream
                     .filter(Files::isRegularFile)
-                    .filter(path -> path.getFileName().toString().startsWith(filePrefix + '-'))
+                    .filter(path -> path.getFileName().toString().startsWith(FILE_PREFIX + "_"))
                     .filter(path -> path.getFileName().toString().endsWith(FILE_EXTENSION))
                     .sorted(Comparator.comparing(Path::getFileName).reversed())
                     .toList();
@@ -134,20 +133,20 @@ public final class RollingFileOutput implements LogManager.LogOutput {
     }
 
     private Path resolveFile(LocalDate date, int index) {
-        String fileName = baseName(date) + (index == 0 ? "" : "-" + index) + FILE_EXTENSION;
+        String fileName = baseName(date) + "_" + index + FILE_EXTENSION;
         return directory.resolve(fileName);
     }
 
     private String baseName(LocalDate date) {
-        return filePrefix + '-' + FILE_DATE.format(date);
+        return FILE_PREFIX + "_" + FILE_DATE.format(date);
     }
 
     private int extractIndex(String fileName) {
         int extensionIndex = fileName.lastIndexOf(FILE_EXTENSION);
         String withoutExtension = extensionIndex == -1 ? fileName : fileName.substring(0, extensionIndex);
-        int separator = withoutExtension.lastIndexOf('-');
-        if (separator <= filePrefix.length() + 10) {
-            return 0;
+        int separator = withoutExtension.lastIndexOf('_');
+        if (separator <= FILE_PREFIX.length() + 10) {
+            throw new IllegalStateException("Unexpected log file name: " + fileName);
         }
         return Integer.parseInt(withoutExtension.substring(separator + 1));
     }

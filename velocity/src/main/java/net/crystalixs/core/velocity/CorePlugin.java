@@ -69,7 +69,7 @@ public final class CorePlugin {
         this.pluginContainer = pluginContainer;
         this.server = server;
         this.dataDirectory = dataDirectory;
-        this.logging = LogManager.createForSlf4j(platformLogger, dataDirectory.resolve("logs"), "velocity-core");
+        this.logging = LogManager.createForSlf4j(platformLogger, dataDirectory.resolve("logs"));
         this.logger = logging.logger("core");
     }
 
