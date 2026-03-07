@@ -12,7 +12,6 @@ import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ConfigDefinition;
 import net.crystalixs.core.common.config.ConfigService;
 import net.crystalixs.core.common.config.ConfigServiceFactory;
-import net.crystalixs.core.common.config.ConfigUpdater;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;
@@ -132,7 +131,7 @@ public final class CorePlugin {
                     getClass().getClassLoader()
             ));
             configService.reload();
-            configUpdater = new VelocityConfigUpdater(configService, ConfigUpdater.create(configService), logger);
+            configUpdater = new VelocityConfigUpdater(configService, logger);
 
         } catch (Exception exception) {
             logger.severe("Could not load config: " + exception.getMessage());
