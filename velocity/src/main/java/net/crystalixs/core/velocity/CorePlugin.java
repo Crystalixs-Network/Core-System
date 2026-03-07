@@ -33,6 +33,7 @@ import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
 import org.incendo.cloud.velocity.VelocityCommandManager;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -68,7 +69,11 @@ public final class CorePlugin {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        createOrLoadConfig();
+        try {
+            createOrLoadConfig();
+        } catch (Exception exception) {
+            throw new IllegalStateException("Could not load config", exception);
+        }
         registerTranslations();
         registerCommands();
         registerListener(server);
@@ -82,7 +87,13 @@ public final class CorePlugin {
         if (watcher != null) {
             watcher.stop();
         }
-        configUpdater.save();
+        if (configUpdater != null) {
+            try {
+                configUpdater.save();
+            } catch (IOException exception) {
+                logger.severe("Could not save config: " + exception.getMessage());
+            }
+        }
 
         logger.info("Velocity core plugin has been disabled!");
     }
@@ -120,22 +131,17 @@ public final class CorePlugin {
                 VelocityCommandSource::plattformSender);
     }
 
-    private void createOrLoadConfig() {
-        try {
-            ConfigService<VelocityConfig> configService = ConfigServiceFactory.create(new ConfigDefinition<>(
-                    dataDirectory.resolve("config.json"),
-                    "config.json",
-                    VelocityConfig.class,
-                    logger,
-                    new VelocityConfigurationProvider(miniMessage),
-                    getClass().getClassLoader()
-            ));
-            configService.reload();
-            configUpdater = new VelocityConfigUpdater(configService, logger);
-
-        } catch (Exception exception) {
-            logger.severe("Could not load config: " + exception.getMessage());
-        }
+    private void createOrLoadConfig() throws Exception {
+        ConfigService<VelocityConfig> configService = ConfigServiceFactory.create(new ConfigDefinition<>(
+                dataDirectory.resolve("config.json"),
+                "config.json",
+                VelocityConfig.class,
+                logger,
+                new VelocityConfigurationProvider(miniMessage),
+                getClass().getClassLoader()
+        ));
+        configService.reload();
+        configUpdater = new VelocityConfigUpdater(configService);
     }
 
     private void registerTranslations() {

@@ -12,6 +12,7 @@ import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
 import java.util.EnumSet;
 
 import static net.kyori.adventure.text.Component.translatable;
@@ -62,27 +63,36 @@ public class CoreCommand extends VelocityCommand {
         }
 
         presentFlags.forEach(flag -> {
-            switch (flag) {
+            boolean success = switch (flag) {
                 case CONFIG -> reloadConfig();
                 case MESSAGES -> reloadMessages();
                 default -> reloadAll();
+            };
+            if (success) {
+                source.sendMessage(translatable("command.core.reload." + flag.getName()));
+            } else {
+                source.sendMessage(translatable("command.core.reload.error.io-exception"));
             }
-            source.sendMessage(translatable("command.core.reload." + flag.getName()));
         });
     }
 
 
-    private void reloadAll() {
-        reloadConfig();
-        reloadMessages();
+    private boolean reloadAll() {
+        return reloadConfig() && reloadMessages();
     }
 
-    private void reloadMessages() {
+    private boolean reloadMessages() {
         provider.reload();
+        return true;
     }
 
-    private void reloadConfig() {
-        updater.reload();
+    private boolean reloadConfig() {
+        try {
+            updater.reload();
+            return true;
+        } catch (IOException exception) {
+            return false;
+        }
     }
 
     private enum ReloadFlag {

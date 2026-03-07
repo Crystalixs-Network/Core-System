@@ -13,6 +13,8 @@ import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
+
 import static net.kyori.adventure.text.Component.translatable;
 import static org.incendo.cloud.parser.standard.BooleanParser.booleanParser;
 
@@ -49,15 +51,23 @@ public class MaintenanceCommand extends VelocityCommand {
                         return;
                     }
 
-                    toggleMaintenance(source, state);
+                    if (!toggleMaintenance(source, state)) {
+                        return;
+                    }
                     kickUnauthorized();
                 })
         );
     }
 
-    private void toggleMaintenance(CommandSource source, boolean state) {
-        updater.enableMaintenance(state);
+    private boolean toggleMaintenance(CommandSource source, boolean state) {
+        try {
+            updater.setMaintenance(state);
+        } catch (IOException exception) {
+            source.sendMessage(translatable("command.core.reload.error.io-exception"));
+            return false;
+        }
         source.sendMessage(translatable(state ? "command.maintenance.enabled" : "command.maintenance.disabled"));
+        return true;
     }
 
     private void kickUnauthorized() {
