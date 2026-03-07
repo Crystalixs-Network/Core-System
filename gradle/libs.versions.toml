@@ -19,6 +19,7 @@ jackson-databind = { group = "tools.jackson.core", name = "jackson-databind", ve
 jackson-kotlin = { group = "tools.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson" }
 gson = { group = "com.google.code.gson", name = "gson", version = "2.13.2" }
 configurate-hocon = { group = "org.spongepowered", name = "configurate-hocon", version.ref = "configurate" }
+configurate-jackson = { group = "org.spongepowered", name = "configurate-jackson", version.ref = "configurate" }
 
 # Command
 cloud-core = { group = "org.incendo", name = "cloud-core", version = "2.0.0" }
@@ -58,3 +59,4 @@ kotest = ["kotest-runner", "kotest-property", "kotest-assertions"]
 cloudPaper = ["cloud-paper", "cloud-minecraftExtras", ]
 cloudVelocity = ["cloud-velocity", "cloud-minecraftExtras"]
 adventure = ["adventure-api", "adventure-text-minimessage"]
+configurate = ["configurate-hocon", "configurate-jackson"]

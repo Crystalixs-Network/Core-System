@@ -9,8 +9,8 @@ plugins {
 dependencies {
     implementation(libs.bundles.jackson)
     implementation(libs.bundles.adventure)
+    implementation(libs.bundles.configurate)
     implementation(libs.cloud.core)
-    implementation(libs.configurate.hocon)
 
     testImplementation(libs.bundles.kotlinTest)
     testImplementation(libs.bundles.kotest)
@@ -37,6 +37,7 @@ tasks {
             libs.jackson.kotlin to "jackson.kotlin",
             libs.cloud.core to "cloud",
             libs.configurate.hocon to "configurate.hocon",
+            libs.configurate.jackson to "configurate.jackson",
             libs.adventure.api to "adventure.api",
             libs.adventure.text.minimessage to "adventure.text.minimessage",
         )
