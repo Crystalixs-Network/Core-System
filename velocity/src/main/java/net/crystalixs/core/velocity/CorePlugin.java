@@ -57,9 +57,7 @@ public final class CorePlugin {
     private final Logger logger;
 
     private ConfigService<VelocityConfig> configService;
-    private ConfigUpdater<VelocityConfig> configUpdater;
-    private VelocityConfigUpdater velocityConfigUpdater;
-    private VelocityConfig config;
+    private VelocityConfigUpdater configUpdater;
     private TranslationProvider provider;
     private HotReloadWatcher watcher;
 
@@ -113,7 +111,7 @@ public final class CorePlugin {
         // Hier commands registrieren
         new ProxyStopCommand(this, server).registerTo(commandManager);
         new CoreCommand(this, configService, provider).registerTo(commandManager);
-        new MaintenanceCommand(this, velocityConfigUpdater, server).registerTo(commandManager);
+        new MaintenanceCommand(this, configUpdater, server).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
         new GlobalFindCommand(this).registerTo(commandManager);
         new GlobalTeleportCommand(this).registerTo(commandManager);
@@ -140,9 +138,7 @@ public final class CorePlugin {
                     getClass().getClassLoader()
             ));
             configService.reload();
-            configUpdater = ConfigUpdater.create(configService);
-            velocityConfigUpdater = new VelocityConfigUpdater(configUpdater, logger);
-            config = configService.get();
+            configUpdater = new VelocityConfigUpdater(ConfigUpdater.create(configService), logger);
 
         } catch (Exception exception) {
             logger.severe("Could not load config: " + exception.getMessage());
@@ -164,7 +160,7 @@ public final class CorePlugin {
                 .language(Locale.GERMANY)
                 .build();
 
-        if (!config.isHotReloadingEnabled()) return;
+        if (!configUpdater.current().isHotReloadingEnabled()) return;
 
         watcher = new HotReloadWatcher(scheduler, dataDirectory.resolve("lang"), 1000L, provider::reload);
         watcher.start();
