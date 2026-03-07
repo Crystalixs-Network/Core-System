@@ -34,16 +34,9 @@ public class CoreCommand extends VelocityCommand {
                 .commandDescription(RichDescription.translatable("command.core.description.main"))
                 .senderType(VelocityCommandSource.class)
                 .permission(Permission.of("core.command.core"))
-                .literal("reload", RichDescription.translatable("command.core.description.reload"))
-                .flag(commandManager.flagBuilder("all")
-                        .withAliases("a")
-                        .withDescription(RichDescription.translatable("command.core.description.flag.all")))
-                .flag(commandManager.flagBuilder("config")
-                        .withAliases("c")
-                        .withDescription(RichDescription.translatable("command.core.description.flag.config")))
-                .flag(commandManager.flagBuilder("messages")
-                        .withAliases("m")
-                        .withDescription(RichDescription.translatable("command.core.description.flag.messages")))
+                .flag(commandManager.flagBuilder("all").withAliases("a"))
+                .flag(commandManager.flagBuilder("config").withAliases("c"))
+                .flag(commandManager.flagBuilder("messages").withAliases("m"))
                 .handler(this::reload));
     }
 
@@ -71,7 +64,7 @@ public class CoreCommand extends VelocityCommand {
             if (success) {
                 source.sendMessage(translatable("command.core.reload." + flag.getName()));
             } else {
-                source.sendMessage(translatable("command.core.reload.error.io-exception"));
+                source.sendMessage(translatable("command.core.reload.error.io"));
             }
         });
     }

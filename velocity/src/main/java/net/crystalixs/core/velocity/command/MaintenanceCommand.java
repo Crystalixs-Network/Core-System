@@ -67,7 +67,7 @@ public class MaintenanceCommand extends VelocityCommand {
             source.sendMessage(translatable("command.core.reload.error.external-change"));
             return false;
         } catch (IOException exception) {
-            source.sendMessage(translatable("command.core.reload.error.io-exception"));
+            source.sendMessage(translatable("command.core.reload.error.io"));
             return false;
         }
         source.sendMessage(translatable(state ? "command.maintenance.enabled" : "command.maintenance.disabled"));
