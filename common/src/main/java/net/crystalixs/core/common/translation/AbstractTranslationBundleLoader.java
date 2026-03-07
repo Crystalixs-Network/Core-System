@@ -1,7 +1,8 @@
 package net.crystalixs.core.common.translation;
 
-import net.crystalixs.core.common.logging.ChangeLogger;
+import net.crystalixs.core.common.logging.ChangeSetLogger;
 import net.crystalixs.core.common.logging.ChangeSet;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
@@ -14,26 +15,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.Map;
-import java.util.logging.Logger;
 
 public abstract class AbstractTranslationBundleLoader implements TranslationBundleLoader {
 
     private static final String CHANGE_SUBJECT = "translations";
 
-    private final ChangeLogger changeLogger;
+    private final ChangeSetLogger changeSetLogger;
     private final TranslationConfigMergeService mergeService;
     private final TranslationFlattener flattener;
 
     protected AbstractTranslationBundleLoader() {
-        this(new ChangeLogger(), new TranslationConfigMergeService(), new TranslationFlattener());
+        this(ChangeSetLogger.createDefault(), new TranslationConfigMergeService(), new TranslationFlattener());
     }
 
     protected AbstractTranslationBundleLoader(
-            ChangeLogger changeLogger,
+            ChangeSetLogger changeSetLogger,
             TranslationConfigMergeService mergeService,
             TranslationFlattener flattener
     ) {
-        this.changeLogger = changeLogger;
+        this.changeSetLogger = changeSetLogger;
         this.mergeService = mergeService;
         this.flattener = flattener;
     }
@@ -53,7 +53,7 @@ public abstract class AbstractTranslationBundleLoader implements TranslationBund
             CommentedConfigurationNode userNode = loadUserNode(userFile, defaultNode);
 
             ChangeSet changeSet = mergeService.merge(defaultNode, userNode);
-            changeLogger.log(logger(), CHANGE_SUBJECT, fileName, changeSet);
+            changeSetLogger.log(logger(), CHANGE_SUBJECT, fileName, changeSet);
             saveUserNode(userFile, userNode);
 
             Map<String, String> flattened = flattener.flattern(userNode);
@@ -98,5 +98,8 @@ public abstract class AbstractTranslationBundleLoader implements TranslationBund
 
     protected abstract InputStream openResource(String fileName);
 
-    protected abstract Logger logger();
+    protected abstract StructuredLogger logger();
 }
+
+
+
