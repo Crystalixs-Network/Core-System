@@ -5,14 +5,16 @@ import net.crystalixs.core.common.config.ConfigService;
 
 import java.io.IOException;
 
-public final class VelocityConfigUpdater extends ConfigFacade<VelocityConfig> {
+public final class VelocityConfigUpdater {
+
+    private final ConfigFacade<VelocityConfig> facade;
 
     public VelocityConfigUpdater(ConfigService<VelocityConfig> service) {
-        super(service);
+        this.facade = new ConfigFacade<>(service);
     }
 
     public void setMaintenance(boolean enabled) throws IOException {
-        update(config -> config.withMaintenance(enabled
+        facade.update(config -> config.withMaintenance(enabled
                 ? config.maintenance().enable()
                 : config.maintenance().disable()));
     }
