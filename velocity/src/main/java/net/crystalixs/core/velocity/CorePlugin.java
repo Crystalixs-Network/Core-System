@@ -78,10 +78,10 @@ public final class CorePlugin {
 
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
-        scheduler.shutdownNow();
         if (watcher != null) {
             watcher.stop();
         }
+        scheduler.shutdownNow();
         loader.save();
 
         logger.info("Velocity core plugin has been disabled!");
@@ -130,17 +130,17 @@ public final class CorePlugin {
     }
 
     private void registerTranslations() {
-        VelocityTranslationBundleLoader translationLoader = VelocityTranslationBundleLoader.builder()
-                .dataDirectory(dataDirectory)
-                .build();
-
         provider = TranslationProvider.builder()
                 .withMiniMessage(miniMessage)
-                .withLoader(translationLoader)
+                .withLoader(VelocityTranslationBundleLoader.builder()
+                        .dataDirectory(dataDirectory)
+                        .build()
+                )
                 .bundle(TranslationBundleMeta.builder()
                         .bundleName("messages")
                         .defaultLocale(Locale.GERMANY)
-                        .build())
+                        .build()
+                )
                 .language(Locale.GERMANY)
                 .build();
 
