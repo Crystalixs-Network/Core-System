@@ -3,6 +3,7 @@ package net.crystalixs.core.velocity.command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.crystalixs.core.common.config.ExternalConfigModificationException;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
@@ -62,6 +63,9 @@ public class MaintenanceCommand extends VelocityCommand {
     private boolean toggleMaintenance(CommandSource source, boolean state) {
         try {
             updater.setMaintenance(state);
+        } catch (ExternalConfigModificationException exception) {
+            source.sendMessage(translatable("command.core.reload.error.external-change"));
+            return false;
         } catch (IOException exception) {
             source.sendMessage(translatable("command.core.reload.error.io-exception"));
             return false;
