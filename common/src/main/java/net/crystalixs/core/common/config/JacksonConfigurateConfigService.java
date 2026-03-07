@@ -134,12 +134,11 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
     }
 
     private BufferedReader defaultReader() throws IOException {
-        try (InputStream stream = definition.resourceClassLoader().getResourceAsStream(definition.defaultResource())) {
-            if (stream == null) {
-                throw new IOException("Cannot find default resource: " + definition.defaultResource());
-            }
-            return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        InputStream stream = definition.resourceClassLoader().getResourceAsStream(definition.defaultResource());
+        if (stream == null) {
+            throw new IOException("Cannot find default resource: " + definition.defaultResource());
         }
+        return new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     }
 
     private void createParentDirectories() throws IOException {
