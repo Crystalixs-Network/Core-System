@@ -12,13 +12,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public final class RollingFileSink implements LogManager.Sink {
+public final class RollingFileOutput implements LogManager.LogOutput {
 
     private static final DateTimeFormatter FILE_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final String FILE_EXTENSION = ".log";
 
     private final ReentrantLock lock = new ReentrantLock();
-    private final LogRenderer formatter = new LogRenderer();
+    private final LogRenderer renderer = new LogRenderer();
     private final Path directory;
     private final String filePrefix;
     private final long maxBytes;
@@ -29,7 +29,7 @@ public final class RollingFileSink implements LogManager.Sink {
     private int activeIndex;
     private Path activeFile;
 
-    public RollingFileSink(Path directory, String filePrefix, long maxBytes, int maxFiles) throws IOException {
+    public RollingFileOutput(Path directory, String filePrefix, long maxBytes, int maxFiles) throws IOException {
         if (maxBytes <= 0) {
             throw new IllegalArgumentException("maxBytes must be positive");
         }
@@ -51,7 +51,7 @@ public final class RollingFileSink implements LogManager.Sink {
         lock.lock();
         try {
             rotateIfRequired(LocalDate.from(entry.timestamp().atZone(java.time.ZoneId.systemDefault())));
-            writer.write(formatter.format(entry));
+            writer.write(renderer.format(entry));
             writer.newLine();
             writer.flush();
         } catch (IOException exception) {
@@ -152,5 +152,3 @@ public final class RollingFileSink implements LogManager.Sink {
         return Integer.parseInt(withoutExtension.substring(separator + 1));
     }
 }
-
-
