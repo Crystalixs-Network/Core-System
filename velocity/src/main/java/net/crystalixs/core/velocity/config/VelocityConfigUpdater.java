@@ -4,6 +4,7 @@ import net.crystalixs.core.common.config.ConfigFacade;
 import net.crystalixs.core.common.config.ConfigService;
 
 import java.io.IOException;
+import java.util.function.UnaryOperator;
 
 public final class VelocityConfigUpdater {
 
@@ -25,8 +26,12 @@ public final class VelocityConfigUpdater {
         facade.reload();
     }
 
+    public void update(UnaryOperator<VelocityConfig> updater) throws IOException {
+        facade.update(updater);
+    }
+
     public void setMaintenance(boolean enabled) throws IOException {
-        facade.update(config -> config.withMaintenance(enabled
+        update(config -> config.withMaintenance(enabled
                 ? config.maintenance().enable()
                 : config.maintenance().disable()));
     }
