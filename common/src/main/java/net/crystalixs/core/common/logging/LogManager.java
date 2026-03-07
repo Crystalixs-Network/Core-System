@@ -24,18 +24,11 @@ public final class LogManager implements LogFactory {
     }
 
     public static LogManager createForJavaUtil(java.util.logging.Logger platformLogger, Path logDirectory) {
-        return create(new ConsoleLogOutput(platformLogger::info, platformLogger::warning,
-                        (message, throwable) -> platformLogger.log(WARNING, message, throwable),
-                        platformLogger::severe,
-                        (message, throwable) -> platformLogger.log(SEVERE, message, throwable)),
-                platformLogger::warning,
-                logDirectory);
+        return create(javaUtilOutput(platformLogger), platformLogger::warning, logDirectory);
     }
 
     public static LogManager createForSlf4j(Logger platformLogger, Path logDirectory) {
-        return create(new ConsoleLogOutput(platformLogger::info, platformLogger::warn, platformLogger::warn, platformLogger::error, platformLogger::error),
-                platformLogger::warn,
-                logDirectory);
+        return create(slf4jOutput(platformLogger), platformLogger::warn, logDirectory);
     }
 
     @Override
@@ -49,14 +42,28 @@ public final class LogManager implements LogFactory {
     }
 
     private static LogManager create(LogOutput consoleLogOutput, Consumer<String> fallbackWarn, Path logDirectory) {
-        List<LogOutput> sinks = new ArrayList<>();
-        sinks.add(consoleLogOutput);
+        List<LogOutput> outputs = new ArrayList<>();
+        outputs.add(consoleLogOutput);
         try {
-            sinks.add(new RollingFileOutput(logDirectory, DEFAULT_MAX_FILE_SIZE, DEFAULT_MAX_FILES));
+            outputs.add(new RollingFileOutput(logDirectory, DEFAULT_MAX_FILE_SIZE, DEFAULT_MAX_FILES));
         } catch (IOException exception) {
             fallbackWarn.accept("Failed to initialize file logging in " + logDirectory + ": " + exception.getMessage());
         }
-        return new LogManager(new CompositeLogOutput(sinks));
+        return new LogManager(new CompositeLogOutput(outputs));
+    }
+
+    private static LogOutput javaUtilOutput(java.util.logging.Logger platformLogger) {
+        return new ConsoleLogOutput(
+                platformLogger::info,
+                platformLogger::warning,
+                (message, throwable) -> platformLogger.log(WARNING, message, throwable),
+                platformLogger::severe,
+                (message, throwable) -> platformLogger.log(SEVERE, message, throwable)
+        );
+    }
+
+    private static LogOutput slf4jOutput(Logger platformLogger) {
+        return new ConsoleLogOutput(platformLogger::info, platformLogger::warn, platformLogger::warn, platformLogger::error, platformLogger::error);
     }
 
     public interface LogOutput extends AutoCloseable {
@@ -76,25 +83,14 @@ public final class LogManager implements LogFactory {
     }
 
     private record LoggerImpl(String name, LogOutput output) implements StructuredLogger {
-
         @Override
         public StructuredLogger child(String component) {
             return new LoggerImpl(name + "/" + component, output);
         }
 
         @Override
-        public void info(String event) {
-            info(event, LogMetadata.empty());
-        }
-
-        @Override
         public void info(String event, LogMetadata fields) {
             log(Level.INFO, event, fields, null);
-        }
-
-        @Override
-        public void warn(String event) {
-            warn(event, LogMetadata.empty());
         }
 
         @Override
