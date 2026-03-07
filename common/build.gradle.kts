@@ -10,7 +10,7 @@ dependencies {
     implementation(libs.bundles.jackson)
     implementation(libs.bundles.adventure)
     implementation(libs.cloud.core)
-    implementation(libs.configurate)
+    implementation(libs.configurate.hocon)
 
     testImplementation(libs.bundles.kotlinTest)
     testImplementation(libs.bundles.kotest)
@@ -36,7 +36,7 @@ tasks {
             libs.jackson.databind to "jackson.databind",
             libs.jackson.kotlin to "jackson.kotlin",
             libs.cloud.core to "cloud",
-            libs.configurate to "configurate",
+            libs.configurate.hocon to "configurate.hocon",
             libs.adventure.api to "adventure.api",
             libs.adventure.text.minimessage to "adventure.text.minimessage",
         )

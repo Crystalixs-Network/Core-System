@@ -19,7 +19,7 @@ dependencies {
     implementation(libs.bundles.cloudVelocity)
     implementation(libs.jackson.databind)
     implementation(libs.gson)
-    implementation(libs.configurate)
+    implementation(libs.configurate.hocon)
 
     testImplementation(libs.bundles.kotlinTest)
     testImplementation(libs.bundles.kotest)
@@ -42,7 +42,7 @@ tasks {
         val mapping = mapOf(
             libs.gson to "gson",
             libs.cloud.velocity to "cloud",
-            libs.configurate to "configurate"
+            libs.configurate.hocon to "configurate"
         )
 
         val base = "$group.$artifact.velocity.libs"

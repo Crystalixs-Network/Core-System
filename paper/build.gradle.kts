@@ -12,7 +12,7 @@ dependencies {
 
     implementation(project(":common"))
     implementation(libs.bundles.cloudPaper)
-    implementation(libs.configurate)
+    implementation(libs.configurate.hocon)
 }
 
 tasks {
@@ -29,7 +29,7 @@ tasks {
 
         val mapping = mapOf(
             libs.cloud.paper to "cloud",
-            libs.configurate to "configurate",
+            libs.configurate.hocon to "configurate",
         )
 
         val base = "$group.$artifact.paper.libs"
