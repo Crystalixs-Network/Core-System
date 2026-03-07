@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.UnaryOperator;
 
 public final class JacksonConfigurateConfigService<T> implements ConfigService<T> {
 
@@ -57,6 +58,16 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
             throw new IllegalStateException("Config has not been loaded yet.");
         }
         return value;
+    }
+
+    @Override
+    public synchronized void update(UnaryOperator<T> updater) throws IOException {
+        T next = updater.apply(get());
+        if (next == null) {
+            throw new IllegalStateException("Could not update config, returned null.");
+        }
+        current.set(next);
+        save();
     }
 
     @Override
