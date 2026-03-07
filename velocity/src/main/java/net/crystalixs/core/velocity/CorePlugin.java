@@ -97,7 +97,7 @@ public final class CorePlugin {
             try {
                 configUpdater.save();
             } catch (IOException exception) {
-                logger.error("Failed to save config during shutdown", LogMetadata
+                logger.error("config save failed during shutdown", LogMetadata
                         .event("config.save_failed")
                         .and(LogMetadata.Key.FILE, dataDirectory.resolve("config.json")), exception);
             }

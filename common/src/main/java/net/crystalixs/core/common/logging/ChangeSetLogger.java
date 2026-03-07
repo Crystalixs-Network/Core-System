@@ -17,7 +17,7 @@ public interface ChangeSetLogger {
             }
 
             StructuredLogger syncLogger = logger.child("sync");
-            syncLogger.info("synchronized changes", LogMetadata
+            syncLogger.info("synchronized changes applied", LogMetadata
                     .event("sync.applied")
                     .and(LogMetadata.Key.SUBJECT, subject)
                     .and(LogMetadata.Key.FILE, fileName)

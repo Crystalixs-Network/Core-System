@@ -87,7 +87,7 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
             createParentDirectories();
             effective = defaults.copy();
             saveAtomically(effective);
-            logger.info("Created default config file", LogMetadata.event("config.created").and(LogMetadata.Key.FILE, file()));
+            logger.info("default config created", LogMetadata.event("config.created").and(LogMetadata.Key.FILE, file()));
 
         } else {
             effective = loader.load();

@@ -40,9 +40,9 @@ public final class TranslationProvider {
 
         if (locales == null || locales.length == 0) {
             this.locales = new Locale[]{defaultLocale};
-            logger.warn("No locales configured. Falling back to default locale",
-                    LogMetadata.event("translations.locales.defaulted")
-                            .and(LogMetadata.Key.LOCALE, defaultLocale.toLanguageTag()));
+            logger.warn("default locale selected", LogMetadata
+                    .event("translations.locales.defaulted")
+                    .and(LogMetadata.Key.LOCALE, defaultLocale.toLanguageTag()));
         }
         if (registry.store() == null) {
             registry.registerBundle(bundleName);
@@ -63,12 +63,12 @@ public final class TranslationProvider {
                 TranslationBundle bundle = loader.load(bundleName, locale);
                 bundle.entries().forEach((key, value) -> store.register(key, locale, value));
             }
-            logger.info("Reloaded translation bundles", LogMetadata
+            logger.info("translation bundles reloaded", LogMetadata
                     .event("translations.reloaded")
                     .and(LogMetadata.Key.BUNDLE, bundleName)
                     .and(LogMetadata.Key.LOCALE_COUNT, locales.length));
         } catch (IOException exception) {
-            logger.warn("Failed to reload translations", LogMetadata
+            logger.warn("translation reload failed", LogMetadata
                     .event("translations.reload_failed")
                     .and(LogMetadata.Key.BUNDLE, bundleName), exception);
         }
@@ -119,7 +119,7 @@ public final class TranslationProvider {
                 throw new IllegalStateException("Default locale is required");
             }
             if (miniMessage == null) {
-                logger.warn("No MiniMessage instance was provided. Using default instance.", LogMetadata.event("translations.minimessage.defaulted"));
+                logger.warn("default minimessage selected", LogMetadata.event("translations.minimessage.defaulted"));
                 this.miniMessage = MiniMessage.miniMessage();
             }
 
