@@ -3,7 +3,7 @@ package net.crystalixs.core.common.config;
 import java.io.IOException;
 import java.util.function.UnaryOperator;
 
-public class ConfigFacade<T> {
+public final class ConfigFacade<T> {
 
     private final ConfigService<T> service;
 
