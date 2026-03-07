@@ -1,5 +1,6 @@
 package net.crystalixs.core.common.translation;
 
+import net.crystalixs.core.common.logging.ChangeSet;
 import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.ArrayDeque;
@@ -7,13 +8,13 @@ import java.util.Deque;
 
 public final class TranslationConfigMergeService {
 
-    public TranslationChangeSet merge(ConfigurationNode defaults, ConfigurationNode user) {
-        TranslationChangeSet changeSet = new TranslationChangeSet();
+    public ChangeSet merge(ConfigurationNode defaults, ConfigurationNode user) {
+        ChangeSet changeSet = new ChangeSet();
         merge(defaults, user, new ArrayDeque<>(), changeSet);
         return changeSet;
     }
 
-    private void merge(ConfigurationNode defaults, ConfigurationNode user, Deque<Object> path, TranslationChangeSet changes) {
+    private void merge(ConfigurationNode defaults, ConfigurationNode user, Deque<Object> path, ChangeSet changes) {
         if (defaults.isMap()) {
             if (!user.isMap() && !user.virtual()) {
                 replace(user, defaults);

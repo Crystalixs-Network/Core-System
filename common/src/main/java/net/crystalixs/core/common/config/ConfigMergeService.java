@@ -1,5 +1,6 @@
 package net.crystalixs.core.common.config;
 
+import net.crystalixs.core.common.logging.ChangeSet;
 import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.ArrayDeque;
@@ -7,14 +8,14 @@ import java.util.Deque;
 
 public final class ConfigMergeService {
 
-    public ConfigChangeSet merge(ConfigurationNode defaults, ConfigurationNode user) {
-        ConfigChangeSet changeSet = new ConfigChangeSet();
+    public ChangeSet merge(ConfigurationNode defaults, ConfigurationNode user) {
+        ChangeSet changeSet = new ChangeSet();
         merge(defaults, user, new ArrayDeque<>(), changeSet);
 
         return changeSet;
     }
 
-    private void merge(ConfigurationNode defaults, ConfigurationNode user, Deque<Object> path, ConfigChangeSet changes) {
+    private void merge(ConfigurationNode defaults, ConfigurationNode user, Deque<Object> path, ChangeSet changes) {
         if (defaults.isMap()) {
             if (!user.isMap() && !user.virtual()) {
                 replace(user, defaults);

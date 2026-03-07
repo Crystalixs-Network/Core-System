@@ -1,5 +1,7 @@
 package net.crystalixs.core.common.translation;
 
+import net.crystalixs.core.common.logging.ChangeLogger;
+import net.crystalixs.core.common.logging.ChangeSet;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
@@ -16,16 +18,18 @@ import java.util.logging.Logger;
 
 public abstract class AbstractTranslationBundleLoader implements TranslationBundleLoader {
 
-    private final TranslationChangeLogger changeLogger;
+    private static final String CHANGE_SUBJECT = "translations";
+
+    private final ChangeLogger changeLogger;
     private final TranslationConfigMergeService mergeService;
     private final TranslationFlattener flattener;
 
     protected AbstractTranslationBundleLoader() {
-        this(new TranslationChangeLogger(), new TranslationConfigMergeService(), new TranslationFlattener());
+        this(new ChangeLogger(), new TranslationConfigMergeService(), new TranslationFlattener());
     }
 
     protected AbstractTranslationBundleLoader(
-            TranslationChangeLogger changeLogger,
+            ChangeLogger changeLogger,
             TranslationConfigMergeService mergeService,
             TranslationFlattener flattener
     ) {
@@ -48,8 +52,8 @@ public abstract class AbstractTranslationBundleLoader implements TranslationBund
             CommentedConfigurationNode defaultNode = loadDefaults(stream);
             CommentedConfigurationNode userNode = loadUserNode(userFile, defaultNode);
 
-            TranslationChangeSet changeSet = mergeService.merge(defaultNode, userNode);
-            changeLogger.log(logger(), fileName, changeSet);
+            ChangeSet changeSet = mergeService.merge(defaultNode, userNode);
+            changeLogger.log(logger(), CHANGE_SUBJECT, fileName, changeSet);
             saveUserNode(userFile, userNode);
 
             Map<String, String> flattened = flattener.flattern(userNode);
