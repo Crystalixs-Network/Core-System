@@ -21,7 +21,7 @@ public final class ComponentSerializer extends ScalarSerializer<Component> {
     @Override
     public Component deserialize(@NonNull Type type, @NonNull Object obj) throws SerializationException {
         if (!(obj instanceof String input)) {
-            throw new SerializationException(type, "Expected a string for Adventure COmponent but got " + obj.getClass().getName() + " instead.");
+            throw new SerializationException(type, "Expected a string for Adventure Component but got " + obj.getClass().getName() + " instead.");
         }
         return miniMessage.deserialize(input);
     }
