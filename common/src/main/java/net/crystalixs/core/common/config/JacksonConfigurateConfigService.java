@@ -80,14 +80,14 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
         if (Files.notExists(file())) {
             createParentDirectories();
             effective = defaults.copy();
-            loader.save(effective);
+            saveAtomically(effective);
             definition.logger().info("Config file does not exist, creating new one. Wrote defaults to: " + file());
         } else {
             effective = loader.load();
             ConfigChangeSet changeSet = mergeService.merge(defaults, effective);
 
             if (changeSet.hasChanges()) {
-                loader.save(effective);
+                saveAtomically(effective);
                 changeLogger.log(definition.logger(), file().toString(), changeSet);
             }
         }
