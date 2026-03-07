@@ -149,6 +149,7 @@ public final class CorePlugin {
                 .withMiniMessage(miniMessage)
                 .withLoader(VelocityTranslationBundleLoader.builder()
                         .dataDirectory(dataDirectory)
+                        .logger(logger)
                         .build()
                 )
                 .bundle(TranslationBundleMeta.builder()

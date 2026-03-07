@@ -1,5 +1,7 @@
 package net.crystalixs.core.common.config;
 
+import net.crystalixs.core.common.logging.ChangeLogger;
+import net.crystalixs.core.common.logging.ChangeSet;
 import org.spongepowered.configurate.BasicConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.jackson.JacksonConfigurationLoader;
@@ -25,13 +27,13 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
 
     private final ConfigDefinition<T> definition;
     private final ConfigMergeService mergeService;
-    private final ConfigChangeLogger changeLogger;
+    private final ChangeLogger changeLogger;
 
     private final ObjectMapper<T> mapper;
     private final ConfigurationOptions options;
     private final JacksonConfigurationLoader loader;
 
-    JacksonConfigurateConfigService(ConfigDefinition<T> definition, ConfigMergeService mergeService, ConfigChangeLogger changeLogger) throws SerializationException {
+    JacksonConfigurateConfigService(ConfigDefinition<T> definition, ConfigMergeService mergeService, ChangeLogger changeLogger) throws SerializationException {
         this.definition = definition;
         this.mergeService = mergeService;
         this.changeLogger = changeLogger;
@@ -84,11 +86,11 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
             definition.logger().info("Config file does not exist, creating new one. Wrote defaults to: " + file());
         } else {
             effective = loader.load();
-            ConfigChangeSet changeSet = mergeService.merge(defaults, effective);
+            ChangeSet changeSet = mergeService.merge(defaults, effective);
 
             if (changeSet.hasChanges()) {
                 saveAtomically(effective);
-                changeLogger.log(definition.logger(), file().toString(), changeSet);
+                changeLogger.log(definition.logger(), "config", file().toString(), changeSet);
             }
         }
         try {
@@ -113,11 +115,11 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
         }
 
         BasicConfigurationNode defaults = defaults();
-        ConfigChangeSet changeSet = mergeService.merge(defaults, target);
+        ChangeSet changeSet = mergeService.merge(defaults, target);
         saveAtomically(target);
 
         if (changeSet.hasChanges()) {
-            changeLogger.log(definition.logger(), file().toString(), changeSet);
+            changeLogger.log(definition.logger(), "config", file().toString(), changeSet);
         }
     }
 

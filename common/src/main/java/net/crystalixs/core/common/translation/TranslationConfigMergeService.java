@@ -1,34 +1,40 @@
 package net.crystalixs.core.common.translation;
 
+import net.crystalixs.core.common.sync.AbstractNodeMergeService;
+import net.crystalixs.core.common.logging.ChangeSet;
 import org.spongepowered.configurate.ConfigurationNode;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Deque;
 
-public final class TranslationConfigMergeService {
+public final class TranslationConfigMergeService extends AbstractNodeMergeService {
 
-    public void merge(ConfigurationNode defaults, ConfigurationNode user) {
-        // Add missing defaults
-        for (var entry : defaults.childrenMap().entrySet()) {
-            Object key = entry.getKey();
-            ConfigurationNode defaultChild = entry.getValue();
-            ConfigurationNode userChild = user.node(key);
-
-            if (userChild.virtual()) {
-                userChild.from(defaultChild);
-            } else {
-                merge(defaultChild, userChild);
+    @Override
+    protected void mergeNonMap(ConfigurationNode defaults, ConfigurationNode user, Deque<Object> path, ChangeSet changes) {
+        if (defaults.isList()) {
+            if (user.virtual()) {
+                replace(user, defaults);
+                changes.added(path);
+                return;
             }
+            if (user.isList()) {
+                replace(user, defaults);
+                changes.replaced(path);
+                return;
+            }
+
+            replace(user, defaults);
+            changes.replaced(path);
+            return;
         }
 
-        // Remove old keys that don't exist in defaults
-        Set<Object> toRemove = new HashSet<>();
-        for (Object key : user.childrenMap().keySet()) {
-            if (!defaults.childrenMap().containsKey(key)) {
-                toRemove.add(key);
-            }
+        if (user.virtual()) {
+            replace(user, defaults);
+            changes.added(path);
+            return;
         }
-        toRemove.forEach(object -> user.node(object).raw(null));
+        if (user.isMap() || user.isList()) {
+            replace(user, defaults);
+            changes.replaced(path);
+        }
     }
-
 }

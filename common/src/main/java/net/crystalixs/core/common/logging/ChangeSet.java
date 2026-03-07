@@ -1,10 +1,10 @@
-package net.crystalixs.core.common.config;
+package net.crystalixs.core.common.logging;
 
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-public final class ConfigChangeSet {
+public final class ChangeSet {
 
     private final List<String> entries = new ArrayList<>();
 
@@ -33,10 +33,10 @@ public final class ConfigChangeSet {
 
         boolean isFirst = true;
         StringBuilder builder = new StringBuilder();
-
         for (Object element : path) {
-            if (!isFirst) builder.append(".");
-
+            if (!isFirst) {
+                builder.append(".");
+            }
             builder.append(element);
             isFirst = false;
         }
