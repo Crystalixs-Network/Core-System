@@ -163,6 +163,7 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
             try {
                 Files.move(tempFile, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
             } catch (AtomicMoveNotSupportedException exception) {
+                // Some filesystems do not support atomic replacement; preserve correctness with a normal replace.
                 Files.move(tempFile, file, StandardCopyOption.REPLACE_EXISTING);
             }
         } finally {
