@@ -88,7 +88,6 @@ public class CoreCommand extends VelocityCommand {
     private void reloadConfig() {
         try {
             service.reload();
-            plugin.updateConfig(service.get());
         } catch (IOException exception) {
             logger.severe("Could not reload config: " + exception.getMessage());
         }
