@@ -34,6 +34,7 @@ public class CoreCommand extends VelocityCommand {
                 .commandDescription(RichDescription.translatable("command.core.description.main"))
                 .senderType(VelocityCommandSource.class)
                 .permission(Permission.of("core.command.core"))
+                .literal("reload", RichDescription.translatable("command.core.description.reload"))
                 .flag(commandManager.flagBuilder("all").withAliases("a"))
                 .flag(commandManager.flagBuilder("config").withAliases("c"))
                 .flag(commandManager.flagBuilder("messages").withAliases("m"))
