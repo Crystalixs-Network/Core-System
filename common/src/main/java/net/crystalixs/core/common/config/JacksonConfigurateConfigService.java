@@ -36,7 +36,7 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
         this.mergeService = mergeService;
         this.changeLogger = changeLogger;
 
-        TypeSerializerCollection.Builder serializerBuilder = TypeSerializerCollection.builder();
+        TypeSerializerCollection.Builder serializerBuilder = TypeSerializerCollection.defaults().childBuilder();
         definition.extensionProvider().configureSerializers(serializerBuilder);
 
         ObjectMapper.Factory.Builder builder = ObjectMapper.factoryBuilder();
