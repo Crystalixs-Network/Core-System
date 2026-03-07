@@ -9,7 +9,7 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
-import net.crystalixs.core.common.config.ObjectMapperFactory;
+import net.crystalixs.core.common.config.legacy.ObjectMapperFactory;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;

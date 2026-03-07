@@ -1,4 +1,4 @@
-package net.crystalixs.core.common.config;
+package net.crystalixs.core.common.config.legacy;
 
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import static tools.jackson.databind.PropertyNamingStrategies.SNAKE_CASE;
 import static tools.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 
+@Deprecated(forRemoval = true)
 public final class ObjectMapperFactory {
 
     private ObjectMapperFactory() {

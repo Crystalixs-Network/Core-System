@@ -1,6 +1,6 @@
 package net.crystalixs.core.velocity.config;
 
-import net.crystalixs.core.common.config.ConfigLoader;
+import net.crystalixs.core.common.config.legacy.ConfigLoader;
 import org.jspecify.annotations.NonNull;
 import tools.jackson.databind.ObjectMapper;
 

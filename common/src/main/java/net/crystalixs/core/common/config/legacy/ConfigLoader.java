@@ -1,4 +1,4 @@
-package net.crystalixs.core.common.config;
+package net.crystalixs.core.common.config.legacy;
 
 import org.jetbrains.annotations.NotNull;
 import tools.jackson.databind.JsonNode;
@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Deprecated(forRemoval = true)
 public class ConfigLoader<T> implements Config<T> {
 
     private final AtomicReference<T> config = new AtomicReference<>();

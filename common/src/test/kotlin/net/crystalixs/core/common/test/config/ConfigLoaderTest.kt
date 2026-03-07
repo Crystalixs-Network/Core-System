@@ -3,8 +3,8 @@ package net.crystalixs.core.common.test.config
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import net.crystalixs.core.common.config.ConfigLoader
-import net.crystalixs.core.common.config.ObjectMapperFactory
+import net.crystalixs.core.common.config.legacy.ConfigLoader
+import net.crystalixs.core.common.config.legacy.ObjectMapperFactory
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
