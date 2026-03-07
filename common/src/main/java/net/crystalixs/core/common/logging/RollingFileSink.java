@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Stream;
 
 public final class RollingFileSink implements LogManager.Sink {
 
