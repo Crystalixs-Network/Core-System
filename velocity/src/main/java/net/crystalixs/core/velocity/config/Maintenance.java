@@ -18,6 +18,7 @@ public record Maintenance(@Setting("enabled") boolean isEnabled, String version,
         return new Maintenance(false, version, motd, screen);
     }
 
+    @ConfigSerializable
     public record Screen(Component header, Component body, Component footer, Component url) {
 
         public Component construct() {
