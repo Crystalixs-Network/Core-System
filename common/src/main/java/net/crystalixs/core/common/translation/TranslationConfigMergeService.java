@@ -5,7 +5,7 @@ import org.spongepowered.configurate.ConfigurationNode;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class ConfigMergeService {
+public final class TranslationConfigMergeService {
 
     public void merge(ConfigurationNode defaults, ConfigurationNode user) {
         // Add missing defaults

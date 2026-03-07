@@ -5,25 +5,26 @@ import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
-import net.crystalixs.core.velocity.config.VelocityConfigLoader;
+import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
 import java.util.EnumSet;
 
 import static net.kyori.adventure.text.Component.translatable;
 
 public class CoreCommand extends VelocityCommand {
 
-    private final VelocityConfigLoader loader;
+    private final VelocityConfigUpdater updater;
     private final TranslationProvider provider;
 
-    public CoreCommand(CorePlugin plugin, VelocityConfigLoader loader, TranslationProvider provider) {
+    public CoreCommand(CorePlugin plugin, VelocityConfigUpdater updater, TranslationProvider provider) {
         super(plugin);
-        this.loader = loader;
+        this.updater = updater;
         this.provider = provider;
     }
 
@@ -34,15 +35,9 @@ public class CoreCommand extends VelocityCommand {
                 .senderType(VelocityCommandSource.class)
                 .permission(Permission.of("core.command.core"))
                 .literal("reload", RichDescription.translatable("command.core.description.reload"))
-                .flag(commandManager.flagBuilder("all")
-                        .withAliases("a")
-                        .withDescription(RichDescription.translatable("command.core.description.flag.all")))
-                .flag(commandManager.flagBuilder("config")
-                        .withAliases("c")
-                        .withDescription(RichDescription.translatable("command.core.description.flag.config")))
-                .flag(commandManager.flagBuilder("messages")
-                        .withAliases("m")
-                        .withDescription(RichDescription.translatable("command.core.description.flag.messages")))
+                .flag(commandManager.flagBuilder("all").withAliases("a"))
+                .flag(commandManager.flagBuilder("config").withAliases("c"))
+                .flag(commandManager.flagBuilder("messages").withAliases("m"))
                 .handler(this::reload));
     }
 
@@ -62,27 +57,36 @@ public class CoreCommand extends VelocityCommand {
         }
 
         presentFlags.forEach(flag -> {
-            switch (flag) {
+            boolean success = switch (flag) {
                 case CONFIG -> reloadConfig();
                 case MESSAGES -> reloadMessages();
                 default -> reloadAll();
+            };
+            if (success) {
+                source.sendMessage(translatable("command.core.reload." + flag.getName()));
+            } else {
+                source.sendMessage(translatable("command.core.reload.error.io"));
             }
-            source.sendMessage(translatable("command.core.reload." + flag.getName()));
         });
     }
 
 
-    private void reloadAll() {
-        reloadConfig();
-        reloadMessages();
+    private boolean reloadAll() {
+        return reloadConfig() && reloadMessages();
     }
 
-    private void reloadMessages() {
+    private boolean reloadMessages() {
         provider.reload();
+        return true;
     }
 
-    private void reloadConfig() {
-        loader.saveAndReload();
+    private boolean reloadConfig() {
+        try {
+            updater.reload();
+            return true;
+        } catch (IOException exception) {
+            return false;
+        }
     }
 
     private enum ReloadFlag {

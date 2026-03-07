@@ -12,24 +12,14 @@ dependencies {
 
     implementation(project(":common"))
     implementation(libs.bundles.cloudPaper)
-    implementation(libs.configurate)
 }
 
 tasks {
     val artifact = project.mavenArtifact()
 
     shadowJar {
-        // Dieses Mapping sorgt dafür, dass die Klassen des Dependencies-Pakets
-        // in einen eigenen Namespace verschoben werden, wenn der Shadow-JAR gebaut wird.
-        // So vermeiden wir Konflikte mit anderen Libraries, die dieselben Klassen enthalten.
-        // Format: originalPackage → relocatedPackage
-        // Beispiel: io.github.foo → foo
-
-        // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
-
         val mapping = mapOf(
             libs.cloud.paper to "cloud",
-            libs.configurate to "configurate",
         )
 
         val base = "$group.$artifact.paper.libs"

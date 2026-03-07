@@ -1,6 +1,6 @@
 package net.crystalixs.core.velocity.translation;
 
-import net.crystalixs.core.common.translation.ConfigMergeService;
+import net.crystalixs.core.common.translation.TranslationConfigMergeService;
 import net.crystalixs.core.common.translation.TranslationBundle;
 import net.crystalixs.core.common.translation.TranslationBundleLoader;
 import net.crystalixs.core.common.translation.TranslationFlattener;
@@ -18,11 +18,11 @@ import java.util.Map;
 
 public final class VelocityTranslationBundleLoader implements TranslationBundleLoader {
 
-    private final ConfigMergeService service;
+    private final TranslationConfigMergeService service;
     private final TranslationFlattener flattener;
     private final Path dataDirectory;
 
-    private VelocityTranslationBundleLoader(Path dataDirectory, ConfigMergeService service, TranslationFlattener flattener) {
+    private VelocityTranslationBundleLoader(Path dataDirectory, TranslationConfigMergeService service, TranslationFlattener flattener) {
         this.dataDirectory = dataDirectory;
         this.service = service;
         this.flattener = flattener;
@@ -82,7 +82,7 @@ public final class VelocityTranslationBundleLoader implements TranslationBundleL
         }
 
         public VelocityTranslationBundleLoader build() {
-            return new VelocityTranslationBundleLoader(dataDirectory, new ConfigMergeService(), new TranslationFlattener());
+            return new VelocityTranslationBundleLoader(dataDirectory, new TranslationConfigMergeService(), new TranslationFlattener());
         }
     }
 }

@@ -1,6 +1,6 @@
 package net.crystalixs.core.paper.translation;
 
-import net.crystalixs.core.common.translation.ConfigMergeService;
+import net.crystalixs.core.common.translation.TranslationConfigMergeService;
 import net.crystalixs.core.common.translation.TranslationBundle;
 import net.crystalixs.core.common.translation.TranslationBundleLoader;
 import net.crystalixs.core.common.translation.TranslationFlattener;
@@ -19,7 +19,7 @@ import java.util.Map;
 
 public final class PaperTranslationBundleLoader implements TranslationBundleLoader {
 
-    private final ConfigMergeService service = new ConfigMergeService();
+    private final TranslationConfigMergeService service = new TranslationConfigMergeService();
     private final TranslationFlattener flattener = new TranslationFlattener();
     private final JavaPlugin plugin;
 

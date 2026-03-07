@@ -3,28 +3,34 @@ package net.crystalixs.core.velocity.command;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.crystalixs.core.common.config.ExternalConfigModificationException;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.config.Maintenance;
-import net.crystalixs.core.velocity.config.VelocityConfig;
+import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jspecify.annotations.NonNull;
+
+import java.io.IOException;
 
 import static net.kyori.adventure.text.Component.translatable;
 import static org.incendo.cloud.parser.standard.BooleanParser.booleanParser;
 
 public class MaintenanceCommand extends VelocityCommand {
 
-    private final VelocityConfig config;
+    private final VelocityConfigUpdater updater;
     private final ProxyServer proxy;
+    private final MiniMessage miniMessage;
 
-    public MaintenanceCommand(CorePlugin plugin, VelocityConfig config, ProxyServer proxy) {
+    public MaintenanceCommand(CorePlugin plugin, VelocityConfigUpdater updater, ProxyServer proxy, MiniMessage miniMessage) {
         super(plugin);
-        this.config = config;
+        this.updater = updater;
         this.proxy = proxy;
+        this.miniMessage = miniMessage;
     }
 
     @Override
@@ -36,7 +42,7 @@ public class MaintenanceCommand extends VelocityCommand {
                 .required("state", booleanParser(), RichDescription.translatable("command.maintenance.description.state"))
                 .handler(context -> {
                     final CommandSource source = context.sender().plattformSender();
-                    final Maintenance maintenance = config.maintenance();
+                    final Maintenance maintenance = updater.current().maintenance();
 
                     boolean state = context.get("state");
 
@@ -49,21 +55,26 @@ public class MaintenanceCommand extends VelocityCommand {
                         return;
                     }
 
-                    toggleMaintenance(source, state);
+                    if (!toggleMaintenance(source, state)) {
+                        return;
+                    }
                     kickUnauthorized();
                 })
         );
     }
 
-    private void toggleMaintenance(CommandSource source, boolean newState) {
-        if (newState) {
-            config.maintenance().enable();
-            source.sendMessage(translatable("command.maintenance.enabled"));
-            return;
+    private boolean toggleMaintenance(CommandSource source, boolean state) {
+        try {
+            updater.setMaintenance(state);
+        } catch (ExternalConfigModificationException exception) {
+            source.sendMessage(translatable("command.core.reload.error.external-change"));
+            return false;
+        } catch (IOException exception) {
+            source.sendMessage(translatable("command.core.reload.error.io"));
+            return false;
         }
-
-        config.maintenance().disable();
-        source.sendMessage(translatable("command.maintenance.disabled"));
+        source.sendMessage(translatable(state ? "command.maintenance.enabled" : "command.maintenance.disabled"));
+        return true;
     }
 
     private void kickUnauthorized() {
@@ -71,7 +82,7 @@ public class MaintenanceCommand extends VelocityCommand {
             if (player.hasPermission("core.bypass.maintenance"))
                 continue;
 
-            player.disconnect(config.maintenance().screen().construct());
+            player.disconnect(updater.current().maintenance().screen().construct(miniMessage));
         }
     }
 }

@@ -1,65 +1,37 @@
 package net.crystalixs.core.velocity.config;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import org.spongepowered.configurate.objectmapping.ConfigSerializable;
+import org.spongepowered.configurate.objectmapping.meta.Setting;
 
 import static net.kyori.adventure.text.Component.*;
-import static net.kyori.adventure.text.Component.empty;
 
-public final class Maintenance {
+@ConfigSerializable
+public record Maintenance(@Setting("enabled") boolean isEnabled, String version, Motd motd, Screen screen) {
 
-    private final String version;
-    private final Motd motd;
-    private final Screen screen;
-    private boolean isEnabled;
-
-    @JsonCreator
-    public Maintenance(
-            @JsonProperty("enabled") boolean isEnabled,
-            @JsonProperty("version") String version,
-            @JsonProperty("motd") Motd motd,
-            @JsonProperty("screen") Screen screen) {
-
-        this.isEnabled = isEnabled;
-        this.version = version;
-        this.motd = motd;
-        this.screen = screen;
+    public Maintenance enable() {
+        return new Maintenance(true, version, motd, screen);
     }
 
-    public String version() {
-        return version;
+    public Maintenance disable() {
+        return new Maintenance(false, version, motd, screen);
     }
 
-    public Motd motd() {
-        return motd;
-    }
+    @ConfigSerializable
+    public record Screen(String header, String body, String footer, String url) {
 
-    public Screen screen() {
-        return screen;
-    }
-
-    public boolean isEnabled() {
-        return isEnabled;
-    }
-
-    public void enable() {
-        isEnabled = true;
-    }
-
-    public void disable() {
-        isEnabled = false;
-    }
-
-    public record Screen(Component header, Component body, Component footer, Component url) {
-
-        public Component construct() {
+        public Component construct(MiniMessage miniMessage) {
             return join(JoinConfiguration.separator(newline()),
-                    header(), empty(), // Ein empty Component impliziert eine Leerzeile
-                    body(), empty(),
-                    footer(),
-                    url());
+                    deserialize(miniMessage, header()), empty(), // Ein empty Component impliziert eine Leerzeile
+                    deserialize(miniMessage, body()), empty(),
+                    deserialize(miniMessage, footer()),
+                    deserialize(miniMessage, url()));
+        }
+
+        private static Component deserialize(MiniMessage miniMessage, String input) {
+            return input == null ? empty() : miniMessage.deserialize(input);
         }
     }
 }

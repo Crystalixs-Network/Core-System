@@ -9,7 +9,9 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
-import net.crystalixs.core.common.config.ObjectMapperFactory;
+import net.crystalixs.core.common.config.ConfigDefinition;
+import net.crystalixs.core.common.config.ConfigService;
+import net.crystalixs.core.common.config.ConfigServiceFactory;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;
@@ -17,8 +19,8 @@ import net.crystalixs.core.velocity.command.*;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfig;
-import net.crystalixs.core.velocity.config.VelocityConfigLoader;
-import net.crystalixs.core.velocity.config.jackson.JacksonVelocity;
+import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
+import net.crystalixs.core.velocity.config.VelocityConfigurationProvider;
 import net.crystalixs.core.velocity.listener.MotdListener;
 import net.crystalixs.core.velocity.listener.PlayerConnectionListener;
 import net.crystalixs.core.velocity.translation.VelocityTranslationBundleLoader;
@@ -30,8 +32,8 @@ import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
 import org.incendo.cloud.velocity.VelocityCommandManager;
 import org.jetbrains.annotations.NotNull;
-import tools.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -53,10 +55,9 @@ public final class CorePlugin {
     private final Path dataDirectory;
     private final Logger logger;
 
+    private VelocityConfigUpdater configUpdater;
     private TranslationProvider provider;
     private HotReloadWatcher watcher;
-    private VelocityConfigLoader loader;
-    private VelocityConfig config;
 
     @Inject
     public CorePlugin(PluginContainer pluginContainer, ProxyServer server, @DataDirectory Path dataDirectory) {
@@ -68,7 +69,11 @@ public final class CorePlugin {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
-        createOrLoadConfig();
+        try {
+            createOrLoadConfig();
+        } catch (Exception exception) {
+            throw new IllegalStateException("Could not load config", exception);
+        }
         registerTranslations();
         registerCommands();
         registerListener(server);
@@ -78,18 +83,24 @@ public final class CorePlugin {
 
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
+        scheduler.shutdownNow();
         if (watcher != null) {
             watcher.stop();
         }
-        scheduler.shutdownNow();
-        loader.save();
+        if (configUpdater != null) {
+            try {
+                configUpdater.save();
+            } catch (IOException exception) {
+                logger.severe("Could not save config: " + exception.getMessage());
+            }
+        }
 
         logger.info("Velocity core plugin has been disabled!");
     }
 
     private void registerListener(ProxyServer server) {
-        server.getEventManager().register(this, new MotdListener(config));
-        server.getEventManager().register(this, new PlayerConnectionListener(config));
+        server.getEventManager().register(this, new MotdListener(configUpdater, miniMessage));
+        server.getEventManager().register(this, new PlayerConnectionListener(configUpdater, miniMessage));
     }
 
     private void registerCommands() {
@@ -103,8 +114,8 @@ public final class CorePlugin {
 
         // Hier commands registrieren
         new ProxyStopCommand(this, server).registerTo(commandManager);
-        new CoreCommand(this, loader, provider).registerTo(commandManager);
-        new MaintenanceCommand(this, config, server).registerTo(commandManager);
+        new CoreCommand(this, configUpdater, provider).registerTo(commandManager);
+        new MaintenanceCommand(this, configUpdater, server, miniMessage).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
         new GlobalFindCommand(this).registerTo(commandManager);
         new GlobalTeleportCommand(this).registerTo(commandManager);
@@ -120,13 +131,17 @@ public final class CorePlugin {
                 VelocityCommandSource::plattformSender);
     }
 
-    private void createOrLoadConfig() {
-        JacksonVelocity jacksonVelocity = JacksonVelocity.builder().withMiniMessage(miniMessage).build();
-        ObjectMapper mapper = ObjectMapperFactory.create(builder -> builder.addModule(jacksonVelocity));
-
-        loader = new VelocityConfigLoader(mapper, logger, dataDirectory.resolve("config.json"));
-        loader.reload();
-        config = loader.get();
+    private void createOrLoadConfig() throws Exception {
+        ConfigService<VelocityConfig> configService = ConfigServiceFactory.create(new ConfigDefinition<>(
+                dataDirectory.resolve("config.json"),
+                "config.json",
+                VelocityConfig.class,
+                logger,
+                new VelocityConfigurationProvider(miniMessage),
+                getClass().getClassLoader()
+        ));
+        configService.reload();
+        configUpdater = new VelocityConfigUpdater(configService);
     }
 
     private void registerTranslations() {
@@ -144,7 +159,7 @@ public final class CorePlugin {
                 .language(Locale.GERMANY)
                 .build();
 
-        if (!config.isHotReloadEnabled()) return;
+        if (!configUpdater.current().isHotReloadingEnabled()) return;
 
         watcher = new HotReloadWatcher(scheduler, dataDirectory.resolve("lang"), 1000L, provider::reload);
         watcher.start();
