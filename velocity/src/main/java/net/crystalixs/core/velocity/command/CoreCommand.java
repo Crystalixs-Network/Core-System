@@ -1,29 +1,33 @@
 package net.crystalixs.core.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
+import net.crystalixs.core.common.config.ConfigService;
 import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
-import net.crystalixs.core.velocity.config.VelocityConfigLoader;
+import net.crystalixs.core.velocity.config.VelocityConfig;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jspecify.annotations.NonNull;
 
+import java.io.IOException;
 import java.util.EnumSet;
+import java.util.logging.Logger;
 
 import static net.kyori.adventure.text.Component.translatable;
 
 public class CoreCommand extends VelocityCommand {
 
-    private final VelocityConfigLoader loader;
+    private final Logger logger = Logger.getLogger(getClass().getSimpleName());
+    private final ConfigService<VelocityConfig> service;
     private final TranslationProvider provider;
 
-    public CoreCommand(CorePlugin plugin, VelocityConfigLoader loader, TranslationProvider provider) {
+    public CoreCommand(CorePlugin plugin, ConfigService<VelocityConfig> service, TranslationProvider provider) {
         super(plugin);
-        this.loader = loader;
+        this.service = service;
         this.provider = provider;
     }
 
@@ -82,7 +86,12 @@ public class CoreCommand extends VelocityCommand {
     }
 
     private void reloadConfig() {
-        loader.saveAndReload();
+        try {
+            service.reload();
+            plugin.updateConfig(service.get());
+        } catch (IOException exception) {
+            logger.severe("Could not reload config: " + exception.getMessage());
+        }
     }
 
     private enum ReloadFlag {
