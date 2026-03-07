@@ -12,6 +12,7 @@ import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ConfigDefinition;
 import net.crystalixs.core.common.config.ConfigService;
 import net.crystalixs.core.common.config.ConfigServiceFactory;
+import net.crystalixs.core.common.config.ConfigUpdater;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;
@@ -19,6 +20,7 @@ import net.crystalixs.core.velocity.command.*;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfig;
+import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
 import net.crystalixs.core.velocity.config.VelocityConfigurationProvider;
 import net.crystalixs.core.velocity.listener.MotdListener;
 import net.crystalixs.core.velocity.listener.PlayerConnectionListener;
@@ -55,6 +57,8 @@ public final class CorePlugin {
     private final Logger logger;
 
     private ConfigService<VelocityConfig> configService;
+    private ConfigUpdater<VelocityConfig> configUpdater;
+    private VelocityConfigUpdater velocityConfigUpdater;
     private VelocityConfig config;
     private TranslationProvider provider;
     private HotReloadWatcher watcher;
@@ -92,13 +96,9 @@ public final class CorePlugin {
         logger.info("Velocity core plugin has been disabled!");
     }
 
-    public void updateConfig(VelocityConfig config) {
-        this.config = config;
-    }
-
     private void registerListener(ProxyServer server) {
-        server.getEventManager().register(this, new MotdListener(config));
-        server.getEventManager().register(this, new PlayerConnectionListener(config));
+        server.getEventManager().register(this, new MotdListener(configService));
+        server.getEventManager().register(this, new PlayerConnectionListener(configService));
     }
 
     private void registerCommands() {
@@ -113,7 +113,7 @@ public final class CorePlugin {
         // Hier commands registrieren
         new ProxyStopCommand(this, server).registerTo(commandManager);
         new CoreCommand(this, configService, provider).registerTo(commandManager);
-        new MaintenanceCommand(this, config, server).registerTo(commandManager);
+        new MaintenanceCommand(this, velocityConfigUpdater, server).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
         new GlobalFindCommand(this).registerTo(commandManager);
         new GlobalTeleportCommand(this).registerTo(commandManager);
@@ -140,6 +140,8 @@ public final class CorePlugin {
                     getClass().getClassLoader()
             ));
             configService.reload();
+            configUpdater = ConfigUpdater.create(configService);
+            velocityConfigUpdater = new VelocityConfigUpdater(configUpdater, logger);
             config = configService.get();
 
         } catch (Exception exception) {

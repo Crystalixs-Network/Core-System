@@ -9,4 +9,8 @@ public record VelocityConfig(
         Motd motd,
         Maintenance maintenance
 ) {
+
+    public VelocityConfig withMaintenance(Maintenance maintenance) {
+        return new VelocityConfig(isHotReloadingEnabled, motd, maintenance);
+    }
 }
