@@ -10,7 +10,7 @@ public final class VelocityConfigUpdater {
 
     private final ConfigFacade<VelocityConfig> facade;
 
-    public VelocityConfigUpdater(ConfigService<VelocityConfig> service) {
+    public VelocityConfigUpdater(ConfigService<VelocityConfig> service) throws IOException {
         this.facade = new ConfigFacade<>(service);
     }
 
