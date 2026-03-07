@@ -7,6 +7,7 @@ dependencies {
     implementation(libs.bundles.adventure)
     implementation(libs.bundles.configurate)
     implementation(libs.cloud.core)
+    implementation(libs.slf4j.api)
 }
 
 tasks {
