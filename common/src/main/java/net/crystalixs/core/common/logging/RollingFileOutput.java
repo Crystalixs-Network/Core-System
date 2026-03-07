@@ -2,24 +2,30 @@ package net.crystalixs.core.common.logging;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.locks.ReentrantLock;
 
 public final class RollingFileOutput implements LogManager.LogOutput {
 
     private static final String FILE_PREFIX = "log";
     private static final DateTimeFormatter FILE_DATE = DateTimeFormatter.ISO_LOCAL_DATE;
+    private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter
+            .ofPattern("dd.MM.yyyy HH:mm:ss,SSS", Locale.GERMANY)
+            .withZone(ZoneId.systemDefault());
     private static final String FILE_EXTENSION = ".log";
 
     private final ReentrantLock lock = new ReentrantLock();
-    private final LogRenderer renderer = new LogRenderer();
     private final Path directory;
     private final long maxBytes;
     private final int maxFiles;
@@ -50,7 +56,7 @@ public final class RollingFileOutput implements LogManager.LogOutput {
         lock.lock();
         try {
             rotateIfRequired(LocalDate.from(entry.timestamp().atZone(java.time.ZoneId.systemDefault())));
-            writer.write(renderer.format(entry));
+            writer.write(render(entry));
             writer.newLine();
             writer.flush();
         } catch (IOException exception) {
@@ -149,5 +155,40 @@ public final class RollingFileOutput implements LogManager.LogOutput {
             throw new IllegalStateException("Unexpected log file name: " + fileName);
         }
         return Integer.parseInt(withoutExtension.substring(separator + 1));
+    }
+
+    private String render(LogManager.Entry entry) {
+        StringBuilder builder = new StringBuilder()
+                .append(TIMESTAMP_FORMAT.format(entry.timestamp()))
+                .append(" | ")
+                .append(padLevel(entry.level()))
+                .append(" | ")
+                .append(entry.loggerName())
+                .append(" | ")
+                .append(entry.message());
+
+        String fields = entry.fields().renderInline();
+        if (!fields.isEmpty()) {
+            builder.append(" | ").append(fields);
+        }
+
+        if (entry.throwable() != null) {
+            builder.append(System.lineSeparator()).append(stackTrace(entry.throwable()));
+        }
+        return builder.toString();
+    }
+
+    private String padLevel(LogManager.Level level) {
+        return switch (level) {
+            case INFO -> "INFO ";
+            case WARN -> "WARN ";
+            case ERROR -> "ERROR";
+        };
+    }
+
+    private String stackTrace(Throwable throwable) {
+        StringWriter stringWriter = new StringWriter();
+        throwable.printStackTrace(new PrintWriter(stringWriter));
+        return stringWriter.toString().stripTrailing();
     }
 }
