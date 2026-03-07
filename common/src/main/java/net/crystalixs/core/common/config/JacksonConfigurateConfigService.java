@@ -12,7 +12,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.nio.file.Path;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.UnaryOperator;
@@ -112,7 +114,7 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
 
         BasicConfigurationNode defaults = defaults();
         ConfigChangeSet changeSet = mergeService.merge(defaults, target);
-        loader.save(target);
+        saveAtomically(target);
 
         if (changeSet.hasChanges()) {
             changeLogger.log(definition.logger(), file().toString(), changeSet);
@@ -143,6 +145,28 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
     private void createParentDirectories() throws IOException {
         if (file().getParent() != null) {
             Files.createDirectories(file().getParent());
+        }
+    }
+
+    private void saveAtomically(BasicConfigurationNode target) throws IOException {
+        Path file = file();
+        Path parent = file.getParent();
+        Path tempFile = Files.createTempFile(parent, file.getFileName().toString(), ".tmp");
+
+        try {
+            JacksonConfigurationLoader.builder()
+                    .path(tempFile)
+                    .defaultOptions(options)
+                    .build()
+                    .save(target);
+
+            try {
+                Files.move(tempFile, file, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            } catch (AtomicMoveNotSupportedException exception) {
+                Files.move(tempFile, file, StandardCopyOption.REPLACE_EXISTING);
+            }
+        } finally {
+            Files.deleteIfExists(tempFile);
         }
     }
 }
