@@ -3,10 +3,10 @@ package net.crystalixs.core.velocity.listener;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.server.ServerPing;
-import net.crystalixs.core.common.config.ConfigService;
 import net.crystalixs.core.velocity.config.Maintenance;
 import net.crystalixs.core.velocity.config.Motd;
 import net.crystalixs.core.velocity.config.VelocityConfig;
+import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 
@@ -15,10 +15,10 @@ import static net.kyori.adventure.text.Component.newline;
 
 public class MotdListener {
 
-    private final ConfigService<VelocityConfig> configService;
+    private final VelocityConfigUpdater updater;
 
-    public MotdListener(ConfigService<VelocityConfig> configService) {
-        this.configService = configService;
+    public MotdListener(VelocityConfigUpdater updater) {
+        this.updater = updater;
     }
 
     @Subscribe
@@ -27,8 +27,7 @@ public class MotdListener {
     }
 
     private ServerPing createPing(ServerPing.Builder builder) {
-        VelocityConfig config = configService.get();
-        Maintenance maintenance = config.maintenance();
+        Maintenance maintenance = updater.current().maintenance();
         if (maintenance.isEnabled()) {
             builder.version(new ServerPing.Version(-1, maintenance.version()));
         }
@@ -38,7 +37,7 @@ public class MotdListener {
     }
 
     private Component descriptionComponent() {
-        VelocityConfig config = configService.get();
+        VelocityConfig config = updater.current();
         Motd motd = config.maintenance().isEnabled() ? config.maintenance().motd() : config.motd();
         return join(JoinConfiguration.separator(newline()),
                 motd.firstLine(),

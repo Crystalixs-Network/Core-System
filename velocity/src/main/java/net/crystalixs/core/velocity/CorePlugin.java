@@ -34,7 +34,6 @@ import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
 import org.incendo.cloud.velocity.VelocityCommandManager;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.Executors;
@@ -56,7 +55,6 @@ public final class CorePlugin {
     private final Path dataDirectory;
     private final Logger logger;
 
-    private ConfigService<VelocityConfig> configService;
     private VelocityConfigUpdater configUpdater;
     private TranslationProvider provider;
     private HotReloadWatcher watcher;
@@ -85,18 +83,14 @@ public final class CorePlugin {
         if (watcher != null) {
             watcher.stop();
         }
-        try {
-            configService.save();
-        } catch (IOException exception) {
-            logger.severe("Could not save config: " + exception.getMessage());
-        }
+        configUpdater.save();
 
         logger.info("Velocity core plugin has been disabled!");
     }
 
     private void registerListener(ProxyServer server) {
-        server.getEventManager().register(this, new MotdListener(configService));
-        server.getEventManager().register(this, new PlayerConnectionListener(configService));
+        server.getEventManager().register(this, new MotdListener(configUpdater));
+        server.getEventManager().register(this, new PlayerConnectionListener(configUpdater));
     }
 
     private void registerCommands() {
@@ -110,7 +104,7 @@ public final class CorePlugin {
 
         // Hier commands registrieren
         new ProxyStopCommand(this, server).registerTo(commandManager);
-        new CoreCommand(this, configService, provider).registerTo(commandManager);
+        new CoreCommand(this, configUpdater, provider).registerTo(commandManager);
         new MaintenanceCommand(this, configUpdater, server).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
         new GlobalFindCommand(this).registerTo(commandManager);
@@ -129,7 +123,7 @@ public final class CorePlugin {
 
     private void createOrLoadConfig() {
         try {
-            configService = ConfigServiceFactory.create(new ConfigDefinition<>(
+            ConfigService<VelocityConfig> configService = ConfigServiceFactory.create(new ConfigDefinition<>(
                     dataDirectory.resolve("config.json"),
                     "config.json",
                     VelocityConfig.class,
@@ -138,7 +132,7 @@ public final class CorePlugin {
                     getClass().getClassLoader()
             ));
             configService.reload();
-            configUpdater = new VelocityConfigUpdater(ConfigUpdater.create(configService), logger);
+            configUpdater = new VelocityConfigUpdater(configService, ConfigUpdater.create(configService), logger);
 
         } catch (Exception exception) {
             logger.severe("Could not load config: " + exception.getMessage());
