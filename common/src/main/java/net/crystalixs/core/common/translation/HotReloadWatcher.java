@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
-public final class HotReloadWatcher implements Runnable {
+public final class HotReloadWatcher implements Runnable, AutoCloseable {
 
     private final StructuredLogger logger;
     private final ScheduledExecutorService scheduler;
@@ -46,6 +46,11 @@ public final class HotReloadWatcher implements Runnable {
         } catch (IOException exception) {
             logger.warn("Failed to close WatchService", LogMetadata.of("directory", directory), exception);
         }
+    }
+
+    @Override
+    public void close() {
+        stop();
     }
 
     @Override

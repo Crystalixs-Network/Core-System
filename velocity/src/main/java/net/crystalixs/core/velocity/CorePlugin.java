@@ -91,7 +91,7 @@ public final class CorePlugin {
     public void onProxyShutdown(ProxyShutdownEvent event) {
         scheduler.shutdownNow();
         if (watcher != null) {
-            watcher.stop();
+            watcher.close();
         }
         if (configUpdater != null) {
             try {

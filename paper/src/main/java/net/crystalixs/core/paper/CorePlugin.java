@@ -47,7 +47,7 @@ public class CorePlugin extends JavaPlugin {
     public void onDisable() {
         scheduler.shutdownNow();
         if (watcher != null) {
-            watcher.stop();
+            watcher.close();
         }
         if (logger != null) {
             logger.info("plugin disabled");
