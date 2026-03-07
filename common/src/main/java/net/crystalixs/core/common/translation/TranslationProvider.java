@@ -41,7 +41,8 @@ public final class TranslationProvider {
         if (locales == null || locales.length == 0) {
             this.locales = new Locale[]{defaultLocale};
             logger.warn("No locales configured. Falling back to default locale",
-                    LogMetadata.of("locale", defaultLocale.toLanguageTag()));
+                    LogMetadata.event("translations.locales.defaulted")
+                            .and(LogMetadata.Key.LOCALE, defaultLocale.toLanguageTag()));
         }
         if (registry.store() == null) {
             registry.registerBundle(bundleName);
@@ -62,10 +63,14 @@ public final class TranslationProvider {
                 TranslationBundle bundle = loader.load(bundleName, locale);
                 bundle.entries().forEach((key, value) -> store.register(key, locale, value));
             }
-            logger.info("Reloaded translation bundles",
-                    LogMetadata.of("bundle", bundleName).and("locales", locales.length));
+            logger.info("Reloaded translation bundles", LogMetadata
+                    .event("translations.reloaded")
+                    .and(LogMetadata.Key.BUNDLE, bundleName)
+                    .and(LogMetadata.Key.LOCALE_COUNT, locales.length));
         } catch (IOException exception) {
-            logger.warn("Failed to reload translations", LogMetadata.of("bundle", bundleName), exception);
+            logger.warn("Failed to reload translations", LogMetadata
+                    .event("translations.reload_failed")
+                    .and(LogMetadata.Key.BUNDLE, bundleName), exception);
         }
     }
 
@@ -114,7 +119,7 @@ public final class TranslationProvider {
                 throw new IllegalStateException("Default locale is required");
             }
             if (miniMessage == null) {
-                logger.warn("No MiniMessage instance was provided. Using default instance.");
+                logger.warn("No MiniMessage instance was provided. Using default instance.", LogMetadata.event("translations.minimessage.defaulted"));
                 this.miniMessage = MiniMessage.miniMessage();
             }
 

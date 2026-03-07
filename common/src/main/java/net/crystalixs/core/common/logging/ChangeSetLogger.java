@@ -17,12 +17,14 @@ public interface ChangeSetLogger {
             }
 
             StructuredLogger syncLogger = logger.child("sync");
-            syncLogger.info("synchronized changes", LogMetadata.of("subject", subject)
-                    .and("file", fileName)
-                    .and("entries", changeSet.size()));
+            syncLogger.info("synchronized changes", LogMetadata
+                    .event("sync.applied")
+                    .and(LogMetadata.Key.SUBJECT, subject)
+                    .and(LogMetadata.Key.FILE, fileName)
+                    .and(LogMetadata.Key.ENTRIES, changeSet.size()));
 
             for (ChangeSet.Entry entry : changeSet.getEntries()) {
-                syncLogger.info(entry.render());
+                syncLogger.info(entry.render(), LogMetadata.event("sync.entry"));
             }
         }
     }

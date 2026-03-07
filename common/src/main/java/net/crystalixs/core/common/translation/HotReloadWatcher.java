@@ -36,7 +36,10 @@ public final class HotReloadWatcher implements Runnable, AutoCloseable {
 
     public void start() {
         scheduler.scheduleWithFixedDelay(this, 0, 500, TimeUnit.MILLISECONDS);
-        logger.info("Started translation hot reload watcher", LogMetadata.of("directory", directory).and("debounceMs", debounce));
+        logger.info("Started translation hot reload watcher", LogMetadata
+                .event("translations.watch.started")
+                .and(LogMetadata.Key.DIRECTORY, directory)
+                .and(LogMetadata.Key.DEBOUNCE_MS, debounce));
     }
 
     public void stop() {
@@ -44,7 +47,9 @@ public final class HotReloadWatcher implements Runnable, AutoCloseable {
         try {
             if (watchService != null) watchService.close();
         } catch (IOException exception) {
-            logger.warn("Failed to close WatchService", LogMetadata.of("directory", directory), exception);
+            logger.warn("Failed to close WatchService", LogMetadata
+                    .event("translations.watch.close_failed")
+                    .and(LogMetadata.Key.DIRECTORY, directory), exception);
         }
     }
 
@@ -71,7 +76,11 @@ public final class HotReloadWatcher implements Runnable, AutoCloseable {
 
                     long now = System.currentTimeMillis();
                     if (now - lastReload > debounce) {
-                        logger.info("Detected translation change", LogMetadata.of("file", changed).and("directory", directory));
+                        logger.info("Detected translation change", LogMetadata
+                                .event("translations.watch.changed")
+                                .and(LogMetadata.Key.FILE, changed)
+                                .and(LogMetadata.Key.DIRECTORY, directory));
+
                         callback.run();
                         lastReload = now;
                     }
@@ -79,7 +88,9 @@ public final class HotReloadWatcher implements Runnable, AutoCloseable {
                 key.reset();
             }
         } catch (IOException exception) {
-            logger.error("Failed while observing translation directory", LogMetadata.of("directory", directory), exception);
+            logger.error("Failed while observing translation directory", LogMetadata
+                    .event("translations.watch.failed")
+                    .and(LogMetadata.Key.DIRECTORY, directory), exception);
         }
     }
 }

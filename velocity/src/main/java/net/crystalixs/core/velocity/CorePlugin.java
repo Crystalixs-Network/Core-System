@@ -84,7 +84,7 @@ public final class CorePlugin {
         registerCommands();
         registerListener(server);
 
-        logger.info("plugin enabled");
+        logger.info("plugin enabled", LogMetadata.event("plugin.enabled"));
     }
 
     @Subscribe
@@ -97,11 +97,13 @@ public final class CorePlugin {
             try {
                 configUpdater.save();
             } catch (IOException exception) {
-                logger.error("Failed to save config during shutdown", LogMetadata.of("file", dataDirectory.resolve("config.json")), exception);
+                logger.error("Failed to save config during shutdown", LogMetadata
+                        .event("config.save_failed")
+                        .and(LogMetadata.Key.FILE, dataDirectory.resolve("config.json")), exception);
             }
         }
 
-        logger.info("plugin disabled");
+        logger.info("plugin disabled", LogMetadata.event("plugin.disabled"));
         logging.close();
     }
 

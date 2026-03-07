@@ -3,6 +3,7 @@ package net.crystalixs.core.paper;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.crystalixs.core.common.logging.LogFactory;
 import net.crystalixs.core.common.logging.LogManager;
+import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationBundleMeta;
@@ -40,7 +41,7 @@ public class CorePlugin extends JavaPlugin {
         registerTranslations();
         registerCommands();
 
-        logger.info("plugin enabled");
+        logger.info("plugin enabled", LogMetadata.event("plugin.enabled"));
     }
 
     @Override
@@ -50,7 +51,7 @@ public class CorePlugin extends JavaPlugin {
             watcher.close();
         }
         if (logger != null) {
-            logger.info("plugin disabled");
+            logger.info("plugin disabled", LogMetadata.event("plugin.disabled"));
         }
         if (logging != null) {
             logging.close();
