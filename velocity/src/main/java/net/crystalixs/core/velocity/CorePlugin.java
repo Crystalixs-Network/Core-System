@@ -11,6 +11,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ObjectMapperFactory;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
+import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.command.*;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
@@ -78,7 +79,9 @@ public final class CorePlugin {
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         scheduler.shutdownNow();
-        watcher.stop();
+        if (watcher != null) {
+            watcher.stop();
+        }
         loader.save();
 
         logger.info("Velocity core plugin has been disabled!");
@@ -127,9 +130,19 @@ public final class CorePlugin {
     }
 
     private void registerTranslations() {
-        VelocityTranslationBundleLoader translationLoader = new VelocityTranslationBundleLoader(dataDirectory);
-        provider = new TranslationProvider(miniMessage, translationLoader, Locale.GERMANY);
-        provider.load("messages", Locale.GERMANY);
+        VelocityTranslationBundleLoader translationLoader = VelocityTranslationBundleLoader.builder()
+                .dataDirectory(dataDirectory)
+                .build();
+
+        provider = TranslationProvider.builder()
+                .withMiniMessage(miniMessage)
+                .withLoader(translationLoader)
+                .bundle(TranslationBundleMeta.builder()
+                        .bundleName("messages")
+                        .defaultLocale(Locale.GERMANY)
+                        .build())
+                .language(Locale.GERMANY)
+                .build();
 
         if (!config.isHotReloadEnabled()) return;
 
@@ -137,4 +150,3 @@ public final class CorePlugin {
         watcher.start();
     }
 }
-

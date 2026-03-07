@@ -18,12 +18,18 @@ import java.util.Map;
 
 public final class VelocityTranslationBundleLoader implements TranslationBundleLoader {
 
-    private final ConfigMergeService service = new ConfigMergeService();
-    private final TranslationFlattener flattener = new TranslationFlattener();
+    private final ConfigMergeService service;
+    private final TranslationFlattener flattener;
     private final Path dataDirectory;
 
-    public VelocityTranslationBundleLoader(Path dataDirectory) {
+    private VelocityTranslationBundleLoader(Path dataDirectory, ConfigMergeService service, TranslationFlattener flattener) {
         this.dataDirectory = dataDirectory;
+        this.service = service;
+        this.flattener = flattener;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     @Override
@@ -39,7 +45,6 @@ public final class VelocityTranslationBundleLoader implements TranslationBundleL
     }
 
     private TranslationBundle loadFromResources(Locale locale, String fileName, Path userFile) throws IOException {
-        // Defaults aus internen Ressourcen laden
         try (var stream = getClass().getClassLoader().getResourceAsStream("lang/" + fileName)) {
             if (stream == null) {
                 throw new IllegalStateException("Missing translation resource: " + fileName);
@@ -50,7 +55,6 @@ public final class VelocityTranslationBundleLoader implements TranslationBundleL
                     .build();
             CommentedConfigurationNode defaultNode = defaultLoader.load();
 
-            // User Konfiguration laden oder erstellen
             HoconConfigurationLoader fileLoader = HoconConfigurationLoader.builder()
                     .prettyPrinting(true)
                     .emitComments(true)
@@ -65,7 +69,20 @@ public final class VelocityTranslationBundleLoader implements TranslationBundleL
             return new TranslationBundle(locale, flattened);
 
         } catch (Exception exception) {
-            throw new IOException("Failed to load bundle " + fileName);
+            throw new IOException("Failed to load bundle " + fileName, exception);
+        }
+    }
+
+    public static final class Builder {
+        private Path dataDirectory;
+
+        public Builder dataDirectory(Path dataDirectory) {
+            this.dataDirectory = dataDirectory;
+            return this;
+        }
+
+        public VelocityTranslationBundleLoader build() {
+            return new VelocityTranslationBundleLoader(dataDirectory, new ConfigMergeService(), new TranslationFlattener());
         }
     }
 }
