@@ -4,9 +4,6 @@ plugins {
     alias(libs.plugins.velocityConvention)
     alias(libs.plugins.runVelocity)
     alias(libs.plugins.shadow)
-
-    alias(libs.plugins.kotlin)
-    alias(libs.plugins.kotest)
 }
 
 dependencies {
@@ -17,45 +14,18 @@ dependencies {
 
     implementation(project(":common"))
     implementation(libs.bundles.cloudVelocity)
-    implementation(libs.jackson.databind)
-    implementation(libs.gson)
-    implementation(libs.configurate.hocon)
-
-    testImplementation(libs.bundles.kotlinTest)
-    testImplementation(libs.bundles.kotest)
-    testImplementation(libs.junit.jupiter)
-    testRuntimeOnly(libs.junit.platform)
 }
 
 tasks {
     val artifact = project.mavenArtifact()
 
     shadowJar {
-        // Dieses Mapping sorgt dafür, dass die Klassen des Dependencies-Pakets
-        // in einen eigenen Namespace verschoben werden, wenn der Shadow-JAR gebaut wird.
-        // So vermeiden wir Konflikte mit anderen Libraries, die dieselben Klassen enthalten.
-        // Format: originalPackage → relocatedPackage
-        // Beispiel: io.github.foo → foo
-
-        // Entferne die nachfolgende Kommentierung, sobald eine Library in das Plugin fest zur Laufzeit integriert werden muss.
-
         val mapping = mapOf(
-            libs.gson to "gson",
             libs.cloud.velocity to "cloud",
-            libs.configurate.hocon to "configurate"
         )
 
         val base = "$group.$artifact.velocity.libs"
         for ((dependency, name) in mapping) relocate(dependency.get().group, "$base.$name")
-    }
-
-    kotlin {
-        jvmToolchain(21)
-    }
-
-    kotest {
-        customGradleTask = true
-        alwaysRerunTests = true
     }
 
     jar {
