@@ -45,5 +45,3 @@ public final class LogMetadata {
         return formatted.substring(2, formatted.length() - 1);
     }
 }
-
-

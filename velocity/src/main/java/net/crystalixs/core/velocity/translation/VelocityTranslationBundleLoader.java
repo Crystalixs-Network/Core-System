@@ -31,5 +31,3 @@ public final class VelocityTranslationBundleLoader extends AbstractTranslationBu
         return logger;
     }
 }
-
-

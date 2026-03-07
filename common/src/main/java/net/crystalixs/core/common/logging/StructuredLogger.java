@@ -16,5 +16,3 @@ public interface StructuredLogger {
 
     void error(String event, LogMetadata fields, Throwable throwable);
 }
-
-

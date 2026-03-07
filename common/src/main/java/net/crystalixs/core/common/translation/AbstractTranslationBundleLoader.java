@@ -100,6 +100,3 @@ public abstract class AbstractTranslationBundleLoader implements TranslationBund
 
     protected abstract StructuredLogger logger();
 }
-
-
-

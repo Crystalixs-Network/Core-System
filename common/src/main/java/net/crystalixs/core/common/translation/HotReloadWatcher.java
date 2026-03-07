@@ -78,5 +78,3 @@ public final class HotReloadWatcher implements Runnable {
         }
     }
 }
-
-

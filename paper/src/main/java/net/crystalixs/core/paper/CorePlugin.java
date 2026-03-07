@@ -98,5 +98,3 @@ public class CorePlugin extends JavaPlugin {
         watcher.start();
     }
 }
-
-

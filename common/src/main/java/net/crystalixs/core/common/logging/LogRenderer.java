@@ -45,5 +45,3 @@ public final class LogRenderer {
         return stringWriter.toString().stripTrailing();
     }
 }
-
-

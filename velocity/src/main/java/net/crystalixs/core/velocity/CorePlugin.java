@@ -169,5 +169,3 @@ public final class CorePlugin {
         watcher.start();
     }
 }
-
-

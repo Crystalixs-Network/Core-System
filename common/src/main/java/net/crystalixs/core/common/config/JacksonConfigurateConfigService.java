@@ -176,6 +176,3 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
         }
     }
 }
-
-
-
