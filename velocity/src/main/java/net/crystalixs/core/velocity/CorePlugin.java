@@ -99,8 +99,8 @@ public final class CorePlugin {
     }
 
     private void registerListener(ProxyServer server) {
-        server.getEventManager().register(this, new MotdListener(configUpdater));
-        server.getEventManager().register(this, new PlayerConnectionListener(configUpdater));
+        server.getEventManager().register(this, new MotdListener(configUpdater, miniMessage));
+        server.getEventManager().register(this, new PlayerConnectionListener(configUpdater, miniMessage));
     }
 
     private void registerCommands() {
@@ -115,7 +115,7 @@ public final class CorePlugin {
         // Hier commands registrieren
         new ProxyStopCommand(this, server).registerTo(commandManager);
         new CoreCommand(this, configUpdater, provider).registerTo(commandManager);
-        new MaintenanceCommand(this, configUpdater, server).registerTo(commandManager);
+        new MaintenanceCommand(this, configUpdater, server, miniMessage).registerTo(commandManager);
         new HelpCommand(this).registerTo(commandManager);
         new GlobalFindCommand(this).registerTo(commandManager);
         new GlobalTeleportCommand(this).registerTo(commandManager);

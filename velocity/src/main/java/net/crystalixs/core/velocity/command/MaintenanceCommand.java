@@ -9,6 +9,7 @@ import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.config.Maintenance;
 import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
@@ -23,11 +24,13 @@ public class MaintenanceCommand extends VelocityCommand {
 
     private final VelocityConfigUpdater updater;
     private final ProxyServer proxy;
+    private final MiniMessage miniMessage;
 
-    public MaintenanceCommand(CorePlugin plugin, VelocityConfigUpdater updater, ProxyServer proxy) {
+    public MaintenanceCommand(CorePlugin plugin, VelocityConfigUpdater updater, ProxyServer proxy, MiniMessage miniMessage) {
         super(plugin);
         this.updater = updater;
         this.proxy = proxy;
+        this.miniMessage = miniMessage;
     }
 
     @Override
@@ -79,7 +82,7 @@ public class MaintenanceCommand extends VelocityCommand {
             if (player.hasPermission("core.bypass.maintenance"))
                 continue;
 
-            player.disconnect(updater.current().maintenance().screen().construct());
+            player.disconnect(updater.current().maintenance().screen().construct(miniMessage));
         }
     }
 }

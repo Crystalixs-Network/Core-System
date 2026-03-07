@@ -2,6 +2,7 @@ package net.crystalixs.core.velocity.config;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.spongepowered.configurate.objectmapping.ConfigSerializable;
 import org.spongepowered.configurate.objectmapping.meta.Setting;
 
@@ -19,14 +20,18 @@ public record Maintenance(@Setting("enabled") boolean isEnabled, String version,
     }
 
     @ConfigSerializable
-    public record Screen(Component header, Component body, Component footer, Component url) {
+    public record Screen(String header, String body, String footer, String url) {
 
-        public Component construct() {
+        public Component construct(MiniMessage miniMessage) {
             return join(JoinConfiguration.separator(newline()),
-                    header(), empty(), // Ein empty Component impliziert eine Leerzeile
-                    body(), empty(),
-                    footer(),
-                    url());
+                    deserialize(miniMessage, header()), empty(), // Ein empty Component impliziert eine Leerzeile
+                    deserialize(miniMessage, body()), empty(),
+                    deserialize(miniMessage, footer()),
+                    deserialize(miniMessage, url()));
+        }
+
+        private static Component deserialize(MiniMessage miniMessage, String input) {
+            return input == null ? empty() : miniMessage.deserialize(input);
         }
     }
 }

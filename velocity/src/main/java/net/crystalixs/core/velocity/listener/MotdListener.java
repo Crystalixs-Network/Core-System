@@ -9,6 +9,7 @@ import net.crystalixs.core.velocity.config.VelocityConfig;
 import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 
 import static net.kyori.adventure.text.Component.join;
 import static net.kyori.adventure.text.Component.newline;
@@ -16,9 +17,11 @@ import static net.kyori.adventure.text.Component.newline;
 public class MotdListener {
 
     private final VelocityConfigUpdater updater;
+    private final MiniMessage miniMessage;
 
-    public MotdListener(VelocityConfigUpdater updater) {
+    public MotdListener(VelocityConfigUpdater updater, MiniMessage miniMessage) {
         this.updater = updater;
+        this.miniMessage = miniMessage;
     }
 
     @Subscribe
@@ -40,8 +43,8 @@ public class MotdListener {
         VelocityConfig config = updater.current();
         Motd motd = config.maintenance().isEnabled() ? config.maintenance().motd() : config.motd();
         return join(JoinConfiguration.separator(newline()),
-                motd.firstLine(),
-                motd.secondLine());
+                motd.firstLineComponent(miniMessage),
+                motd.secondLineComponent(miniMessage));
     }
 
 }
