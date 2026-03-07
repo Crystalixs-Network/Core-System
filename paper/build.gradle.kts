@@ -12,6 +12,7 @@ dependencies {
 
     implementation(project(":common"))
     implementation(libs.bundles.cloudPaper)
+    implementation(libs.configurate.hocon)
 }
 
 tasks {
@@ -20,6 +21,7 @@ tasks {
     shadowJar {
         val mapping = mapOf(
             libs.cloud.paper to "cloud",
+            libs.configurate.hocon to "configurate.hocon",
         )
 
         val base = "$group.$artifact.paper.libs"
