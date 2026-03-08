@@ -1,5 +1,6 @@
 package net.crystalixs.core.paper.bootstrap;
 
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;
@@ -16,10 +17,12 @@ public final class PaperTranslationBootstrap implements AutoCloseable {
     }
 
     public static PaperTranslationBootstrap create(PaperPluginRuntime runtime) {
+        final StructuredLogger logger = runtime.logger().child("translations");
+
         TranslationProvider provider = TranslationProvider.builder()
-                .logger(runtime.logger())
+                .logger(logger)
                 .withMiniMessage(runtime.miniMessage())
-                .withLoader(new PaperTranslationBundleLoader(runtime.plugin(), runtime.logger().child("translations")))
+                .withLoader(new PaperTranslationBundleLoader(runtime.plugin(), logger))
                 .bundle(TranslationBundleMeta.builder()
                         .bundleName("messages")
                         .defaultLocale(Locale.GERMANY)
@@ -28,8 +31,7 @@ public final class PaperTranslationBootstrap implements AutoCloseable {
                 .build();
 
         // TODO Config-Check ergänzen, sobald Hot-Reload konfigurierbar ist.
-        HotReloadWatcher watcher = new HotReloadWatcher(
-                runtime.logger().child("translations"),
+        HotReloadWatcher watcher = new HotReloadWatcher(logger,
                 runtime.scheduler(),
                 runtime.plugin().getDataPath().resolve("lang"),
                 1000L,

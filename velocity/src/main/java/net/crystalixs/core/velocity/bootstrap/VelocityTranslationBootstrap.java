@@ -1,5 +1,6 @@
 package net.crystalixs.core.velocity.bootstrap;
 
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;
@@ -19,10 +20,11 @@ public final class VelocityTranslationBootstrap implements AutoCloseable {
     }
 
     public static VelocityTranslationBootstrap create(VelocityPluginRuntime runtime, VelocityConfigUpdater configUpdater) {
+        final StructuredLogger logger = runtime.logger().child("translations");
         TranslationProvider provider = TranslationProvider.builder()
-                .logger(runtime.logger())
+                .logger(logger)
                 .withMiniMessage(runtime.miniMessage())
-                .withLoader(new VelocityTranslationBundleLoader(runtime.dataDirectory(), runtime.logger().child("translations")))
+                .withLoader(new VelocityTranslationBundleLoader(runtime.dataDirectory(), logger))
                 .bundle(TranslationBundleMeta.builder()
                         .bundleName("messages")
                         .defaultLocale(Locale.GERMANY)
@@ -33,7 +35,7 @@ public final class VelocityTranslationBootstrap implements AutoCloseable {
         HotReloadWatcher watcher = null;
         if (configUpdater.current().isHotReloadingEnabled()) {
             watcher = new HotReloadWatcher(
-                    runtime.logger().child("translations"),
+                    logger,
                     runtime.scheduler(),
                     runtime.dataDirectory().resolve("lang"),
                     1000L,
