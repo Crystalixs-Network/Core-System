@@ -117,7 +117,7 @@ public final class CorePlugin {
 
     private void registerListener(ProxyServer server) {
         server.getEventManager().register(this, new MotdListener(configUpdater, miniMessage));
-        server.getEventManager().register(this, new PlayerConnectionListener(configUpdater, miniMessage));
+        server.getEventManager().register(this, new PlayerConnectionListener(logger, miniMessage, configUpdater));
     }
 
     private void registerCommands() {
