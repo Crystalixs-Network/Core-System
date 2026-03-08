@@ -47,7 +47,9 @@ public final class TranslationProvider {
         if (registry.store() == null) {
             registry.registerBundle(bundleName);
         }
-        reload();
+        if (!reload()) {
+            throw new IllegalStateException("Failed to load translation bundle " + bundleName);
+        }
     }
 
     public boolean reload() {
