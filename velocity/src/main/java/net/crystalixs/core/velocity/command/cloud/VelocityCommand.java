@@ -15,6 +15,6 @@ public abstract class VelocityCommand extends AbstractCommand<VelocityCommandSou
         if (source instanceof Player player) {
             return player.getUsername();
         }
-        return source.getClass().getSimpleName();
+        return "console";
     }
 }
