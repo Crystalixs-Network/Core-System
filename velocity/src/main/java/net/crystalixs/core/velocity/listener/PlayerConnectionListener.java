@@ -4,7 +4,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.proxy.Player;
 import net.crystalixs.core.velocity.config.VelocityConfig;
-import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
+import net.crystalixs.core.velocity.config.platform.VelocityConfigUpdater;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 
 public class PlayerConnectionListener {

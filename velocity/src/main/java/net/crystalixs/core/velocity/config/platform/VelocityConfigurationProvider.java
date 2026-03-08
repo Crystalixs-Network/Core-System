@@ -1,4 +1,4 @@
-package net.crystalixs.core.velocity.config;
+package net.crystalixs.core.velocity.config.platform;
 
 import net.crystalixs.core.common.config.ConfigurateExtensionProvider;
 import net.kyori.adventure.text.Component;

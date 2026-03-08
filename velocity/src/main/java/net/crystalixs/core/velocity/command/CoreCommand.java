@@ -7,7 +7,7 @@ import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
-import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
+import net.crystalixs.core.velocity.config.platform.VelocityConfigUpdater;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
