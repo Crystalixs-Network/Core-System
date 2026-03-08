@@ -4,6 +4,8 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.crystalixs.core.common.config.ExternalConfigModificationException;
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
@@ -22,12 +24,14 @@ import static org.incendo.cloud.parser.standard.BooleanParser.booleanParser;
 
 public class MaintenanceCommand extends VelocityCommand {
 
+    private final StructuredLogger logger;
     private final VelocityConfigUpdater updater;
     private final ProxyServer proxy;
     private final MiniMessage miniMessage;
 
     public MaintenanceCommand(CorePlugin plugin, VelocityConfigUpdater updater, ProxyServer proxy, MiniMessage miniMessage) {
         super(plugin);
+        this.logger = plugin.logger().child("commands").child("maintenance");
         this.updater = updater;
         this.proxy = proxy;
         this.miniMessage = miniMessage;
@@ -67,12 +71,16 @@ public class MaintenanceCommand extends VelocityCommand {
         try {
             updater.setMaintenance(state);
         } catch (ExternalConfigModificationException exception) {
+            logger.warn("maintenance toggle failed due to external config change", LogMetadata.event("maintenance.toggle_failed"), exception);
             source.sendMessage(translatable("command.core.reload.error.external-change"));
             return false;
         } catch (IOException exception) {
+            logger.warn("maintenance toggle failed due to io error", LogMetadata.event("maintenance.toggle_failed"), exception);
             source.sendMessage(translatable("command.core.reload.error.io"));
             return false;
         }
+        logger.info(state ? "maintenance enabled via command" : "maintenance disabled via command",
+                LogMetadata.event(state ? "maintenance.enabled" : "maintenance.disabled"));
         source.sendMessage(translatable(state ? "command.maintenance.enabled" : "command.maintenance.disabled"));
         return true;
     }

@@ -112,6 +112,10 @@ public final class CorePlugin {
         logging.close();
     }
 
+    public StructuredLogger logger() {
+        return logger;
+    }
+
     private void registerListener(ProxyServer server) {
         server.getEventManager().register(this, new MotdListener(configUpdater, miniMessage));
         server.getEventManager().register(this, new PlayerConnectionListener(configUpdater, miniMessage));

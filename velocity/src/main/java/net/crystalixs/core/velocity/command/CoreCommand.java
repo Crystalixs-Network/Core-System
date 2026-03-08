@@ -1,6 +1,8 @@
 package net.crystalixs.core.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
@@ -19,11 +21,13 @@ import static net.kyori.adventure.text.Component.translatable;
 
 public class CoreCommand extends VelocityCommand {
 
+    private final StructuredLogger logger;
     private final VelocityConfigUpdater updater;
     private final TranslationProvider provider;
 
     public CoreCommand(CorePlugin plugin, VelocityConfigUpdater updater, TranslationProvider provider) {
         super(plugin);
+        this.logger = plugin.logger().child("commands").child("core");
         this.updater = updater;
         this.provider = provider;
     }
@@ -83,8 +87,10 @@ public class CoreCommand extends VelocityCommand {
     private boolean reloadConfig() {
         try {
             updater.reload();
+            logger.info("config reloaded via command", LogMetadata.event("command.reload.config"));
             return true;
         } catch (IOException exception) {
+            logger.warn("config reload failed via command", LogMetadata.event("command.reload.config_failed"), exception);
             return false;
         }
     }
