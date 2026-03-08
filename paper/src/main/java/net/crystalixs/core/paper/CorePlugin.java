@@ -95,7 +95,7 @@ public class CorePlugin extends JavaPlugin {
                 .build();
 
         // Hier fehlt noch der Config check
-        watcher = new HotReloadWatcher(logger, scheduler, getDataPath().resolve("lang"), 1000L, provider::reload);
+        watcher = new HotReloadWatcher(logger.child("translations"), scheduler, getDataPath().resolve("lang"), 1000L, provider::reload);
         watcher.start();
     }
 }

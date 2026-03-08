@@ -176,7 +176,7 @@ public final class CorePlugin {
 
         if (!configUpdater.current().isHotReloadingEnabled()) return;
 
-        watcher = new HotReloadWatcher(logger, scheduler, dataDirectory.resolve("lang"), 1000L, provider::reload);
+        watcher = new HotReloadWatcher(logger.child("translations"), scheduler, dataDirectory.resolve("lang"), 1000L, provider::reload);
         watcher.start();
     }
 }

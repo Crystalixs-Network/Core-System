@@ -27,7 +27,7 @@ public final class HotReloadWatcher implements Runnable, AutoCloseable {
     private WatchService watchService;
 
     public HotReloadWatcher(StructuredLogger logger, ScheduledExecutorService scheduler, Path directory, long debounce, Runnable callback) {
-        this.logger = logger.child("hot-reload");
+        this.logger = logger.child("watch");
         this.scheduler = scheduler;
         this.directory = directory;
         this.debounce = debounce;
