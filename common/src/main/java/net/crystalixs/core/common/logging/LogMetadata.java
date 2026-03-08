@@ -50,7 +50,10 @@ public final class LogMetadata {
         DEBOUNCE_MS("debounceMs"),
         PATH("path"),
         CHANGE_TYPE("changeType"),
-        DESCRIPTION("description");
+        DESCRIPTION("description"),
+        ACTOR("actor"),
+        COMMAND("command"),
+        STATE("state");
 
         private final String value;
 

@@ -62,9 +62,9 @@ public class CoreCommand extends VelocityCommand {
 
         presentFlags.forEach(flag -> {
             boolean success = switch (flag) {
-                case CONFIG -> reloadConfig();
-                case MESSAGES -> reloadMessages();
-                default -> reloadAll();
+                case CONFIG -> reloadConfig(source);
+                case MESSAGES -> reloadMessages(source);
+                default -> reloadAll(source);
             };
             if (success) {
                 source.sendMessage(translatable("command.core.reload." + flag.getName()));
@@ -75,22 +75,29 @@ public class CoreCommand extends VelocityCommand {
     }
 
 
-    private boolean reloadAll() {
-        return reloadConfig() && reloadMessages();
+    private boolean reloadAll(CommandSource source) {
+        return reloadConfig(source) && reloadMessages(source);
     }
 
-    private boolean reloadMessages() {
+    private boolean reloadMessages(CommandSource source) {
         provider.reload();
+        logger.info("messages reloaded via command", LogMetadata.event("command.reload.messages")
+                .and(LogMetadata.Key.ACTOR, actorName(source))
+                .and(LogMetadata.Key.COMMAND, "core reload --messages"));
         return true;
     }
 
-    private boolean reloadConfig() {
+    private boolean reloadConfig(CommandSource source) {
         try {
             updater.reload();
-            logger.info("config reloaded via command", LogMetadata.event("command.reload.config"));
+            logger.info("config reloaded via command", LogMetadata.event("command.reload.config")
+                    .and(LogMetadata.Key.ACTOR, actorName(source))
+                    .and(LogMetadata.Key.COMMAND, "core reload --config"));
             return true;
         } catch (IOException exception) {
-            logger.warn("config reload failed via command", LogMetadata.event("command.reload.config_failed"), exception);
+            logger.warn("config reload failed via command", LogMetadata.event("command.reload.config_failed")
+                    .and(LogMetadata.Key.ACTOR, actorName(source))
+                    .and(LogMetadata.Key.COMMAND, "core reload --config"), exception);
             return false;
         }
     }
