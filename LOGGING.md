@@ -1,4 +1,4 @@
-# Logging
+﻿# Logging
 
 ## Regeln
 
@@ -8,8 +8,9 @@
 4. Feldnamen kommen aus `LogMetadata.Key`.
 5. `warn` ist für recoverable Probleme, `error` für echte Fehler.
 6. Exceptions werden immer als `Throwable` übergeben.
-7. Child-Logger grenzen Teilbereiche ab, z. B. `core/config`, `core/translations/watch` oder `core/commands/maintenance`.
-8. Zustandsändernde Admin-Aktionen werden mit Audit-Feldern geloggt.
+7. Erfolgs-Events werden nur geloggt, wenn der Vorgang tatsächlich erfolgreich abgeschlossen wurde.
+8. Child-Logger grenzen Teilbereiche ab, z. B. `core/config`, `core/translations/watch` oder `core/commands/maintenance`.
+9. Zustandsändernde Admin-Aktionen werden mit Audit-Feldern geloggt.
 
 ## Pflichtfälle
 
