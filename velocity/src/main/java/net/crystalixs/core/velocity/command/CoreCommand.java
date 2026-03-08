@@ -27,7 +27,7 @@ public class CoreCommand extends VelocityCommand {
 
     public CoreCommand(CorePlugin plugin, VelocityConfigUpdater updater, TranslationProvider provider) {
         super(plugin);
-        this.logger = plugin.componentLogger("commands", "core");
+        this.logger = commandLogger("core");
         this.updater = updater;
         this.provider = provider;
     }

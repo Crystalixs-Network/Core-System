@@ -55,4 +55,12 @@ public final class CorePlugin {
         }
         return bootstrap.runtime().componentLogger(component, nestedComponents);
     }
+
+    public StructuredLogger commandLogger(String commandName) {
+        return componentLogger("commands", commandName);
+    }
+
+    public StructuredLogger listenerLogger(String listenerName) {
+        return componentLogger("listeners", listenerName);
+    }
 }
