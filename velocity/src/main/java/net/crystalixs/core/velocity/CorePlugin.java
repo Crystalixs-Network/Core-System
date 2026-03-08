@@ -37,6 +37,7 @@ import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
 import org.incendo.cloud.velocity.VelocityCommandManager;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
+import org.spongepowered.configurate.serialize.SerializationException;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -78,8 +79,10 @@ public final class CorePlugin {
         try {
             createOrLoadConfig();
         } catch (Exception exception) {
-            throw new IllegalStateException("Could not load config", exception);
+            logger.error("config failed to load", LogMetadata.event("config.load_failed"), exception);
+            return;
         }
+
         registerTranslations();
         registerCommands();
         registerListener(server);
@@ -140,7 +143,7 @@ public final class CorePlugin {
                 VelocityCommandSource::plattformSender);
     }
 
-    private void createOrLoadConfig() throws Exception {
+    private void createOrLoadConfig() throws IOException {
         ConfigService<VelocityConfig> configService = ConfigServiceFactory.create(new ConfigDefinition<>(
                 dataDirectory.resolve("config.json"), "config.json",
                 VelocityConfig.class,
