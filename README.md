@@ -10,6 +10,7 @@
 |-----------------------|------------------------------------------------------------------------------|
 | Wartungsmodus         | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch. |
 | MOTD-Steuerung        | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.   |
+| Dynamische Tablist    | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen.   |
 | Netzwerk-Commands     | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.         |
 | Konfigurations-Reload | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.     |
 
@@ -38,6 +39,13 @@ Die Serverliste reagiert direkt auf den aktuellen Netzwerkzustand:
 - im Normalbetrieb wird die reguläre MOTD angezeigt
 - im Wartungsmodus erscheint eine eigene Wartungs-MOTD
 - zusätzlich wird eine abweichende Versionsanzeige gesetzt, damit Wartung sofort erkennbar ist
+
+### Dynamische Tablist
+
+Beim Verbinden zu einem Backend wird die Tablist automatisch neu gesetzt:
+
+- konfigurierbarer Header
+- konfigurierbarer Footer (& aktueller Servername)
 
 ### Globale Netzwerkbefehle
 
@@ -119,6 +127,7 @@ Dort werden unter anderem folgende Bereiche gesteuert:
 - Wartungsstatus
 - Wartungs-MOTD
 - Wartungsscreen inklusive Hinweistext und Link
+- Tablist-Header und -Footer
 
 > [!TIP]
 > Die Texte unterstützen [MiniMessage](https://docs.papermc.io/adventure/minimessage/format/) und lassen sich dadurch flexibel gestalten.

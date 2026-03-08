@@ -14,8 +14,8 @@ import net.crystalixs.core.common.config.ConfigService;
 import net.crystalixs.core.common.config.ConfigServiceFactory;
 import net.crystalixs.core.common.logging.LogFactory;
 import net.crystalixs.core.common.logging.LogManager;
-import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;
@@ -23,12 +23,11 @@ import net.crystalixs.core.velocity.command.*;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.VelocityConfig;
-import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
-import net.crystalixs.core.velocity.config.VelocityConfigurationProvider;
+import net.crystalixs.core.velocity.config.platform.VelocityConfigUpdater;
+import net.crystalixs.core.velocity.config.platform.VelocityConfigurationProvider;
 import net.crystalixs.core.velocity.listener.MotdListener;
 import net.crystalixs.core.velocity.listener.PlayerConnectionListener;
 import net.crystalixs.core.velocity.translation.VelocityTranslationBundleLoader;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import org.incendo.cloud.SenderMapper;
@@ -51,7 +50,7 @@ public final class CorePlugin {
 
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final MiniMessage miniMessage = MiniMessage.builder()
-            .editTags(builder -> builder.tag("prefix", Tag.inserting(Component.translatable("prefix"))))
+            .editTags(builder -> builder.tag("prefix", Tag.inserting(translatable("prefix"))))
             .build();
 
     private final PluginContainer pluginContainer;
@@ -118,7 +117,7 @@ public final class CorePlugin {
 
     private void registerListener(ProxyServer server) {
         server.getEventManager().register(this, new MotdListener(configUpdater, miniMessage));
-        server.getEventManager().register(this, new PlayerConnectionListener(configUpdater, miniMessage));
+        server.getEventManager().register(this, new PlayerConnectionListener(logger, miniMessage, configUpdater));
     }
 
     private void registerCommands() {

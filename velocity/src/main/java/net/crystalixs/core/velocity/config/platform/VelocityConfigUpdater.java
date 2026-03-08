@@ -1,7 +1,8 @@
-package net.crystalixs.core.velocity.config;
+package net.crystalixs.core.velocity.config.platform;
 
 import net.crystalixs.core.common.config.ConfigFacade;
 import net.crystalixs.core.common.config.ConfigService;
+import net.crystalixs.core.velocity.config.VelocityConfig;
 
 import java.io.IOException;
 import java.util.function.UnaryOperator;

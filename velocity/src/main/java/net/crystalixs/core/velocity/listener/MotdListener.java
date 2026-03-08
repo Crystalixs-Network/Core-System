@@ -6,7 +6,7 @@ import com.velocitypowered.api.proxy.server.ServerPing;
 import net.crystalixs.core.velocity.config.Maintenance;
 import net.crystalixs.core.velocity.config.Motd;
 import net.crystalixs.core.velocity.config.VelocityConfig;
-import net.crystalixs.core.velocity.config.VelocityConfigUpdater;
+import net.crystalixs.core.velocity.config.platform.VelocityConfigUpdater;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
