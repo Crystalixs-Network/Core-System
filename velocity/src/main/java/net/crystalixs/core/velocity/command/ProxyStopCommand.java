@@ -20,7 +20,7 @@ public class ProxyStopCommand extends VelocityCommand {
 
     public ProxyStopCommand(CorePlugin plugin, ProxyServer server) {
         super(plugin);
-        this.logger = plugin.logger().child("commands").child("proxy-stop");
+        this.logger = commandLogger("proxy-stop");
         this.server = server;
     }
 

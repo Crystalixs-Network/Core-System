@@ -1,17 +1,16 @@
 package net.crystalixs.core.common.translation;
 
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.kyori.adventure.key.KeyPattern.Value;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.translation.MiniMessageTranslationStore;
 import net.kyori.adventure.translation.GlobalTranslator;
-import net.crystalixs.core.common.logging.StructuredLogger;
-import net.crystalixs.core.common.logging.LogMetadata;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 
 public final class TranslationProvider {
 
@@ -24,7 +23,7 @@ public final class TranslationProvider {
     private Locale[] locales;
 
     public TranslationProvider(StructuredLogger logger, MiniMessage miniMessage, TranslationBundleLoader loader, Locale defaultLocale) {
-        this.logger = logger.child("translations");
+        this.logger = logger;
         this.loader = loader;
         this.defaultLocale = defaultLocale;
         this.registry = new TranslationRegistry(miniMessage, defaultLocale);
@@ -114,8 +113,12 @@ public final class TranslationProvider {
         }
 
         public TranslationProvider build() {
-            Objects.requireNonNull(logger, "logger");
-            Objects.requireNonNull(loader, "loader");
+            if (logger == null) {
+                throw new IllegalStateException("Logger is required");
+            }
+            if (loader == null) {
+                throw new IllegalStateException("Translation loader is required");
+            }
             if (bundleName == null) {
                 throw new IllegalStateException("Bundle name is required");
             }

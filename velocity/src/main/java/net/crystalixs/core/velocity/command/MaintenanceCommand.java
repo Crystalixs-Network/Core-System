@@ -31,7 +31,7 @@ public class MaintenanceCommand extends VelocityCommand {
 
     public MaintenanceCommand(CorePlugin plugin, VelocityConfigUpdater updater, ProxyServer proxy, MiniMessage miniMessage) {
         super(plugin);
-        this.logger = plugin.logger().child("commands").child("maintenance");
+        this.logger = commandLogger("maintenance");
         this.updater = updater;
         this.proxy = proxy;
         this.miniMessage = miniMessage;
