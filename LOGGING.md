@@ -22,6 +22,7 @@
 ## Event-Namen
 
 - Format: `<bereich>.<aktion>`
+- Bei unterschiedlichen Fehlerursachen darf ein Event feiner gesplittet werden, z. B. nach externem Konflikt vs. IO-Fehler
 - Beispiele:
     - `plugin.enabled`
     - `config.load_failed`
