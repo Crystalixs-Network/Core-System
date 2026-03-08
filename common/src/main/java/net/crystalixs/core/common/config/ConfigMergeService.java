@@ -23,9 +23,15 @@ public final class ConfigMergeService extends AbstractNodeMergeService {
             return;
         }
 
-        if (defaults.virtual()) {
+        if (user.virtual()) {
             replace(user, defaults);
             changes.added(path);
+            return;
+        }
+
+        if (user.isMap() || user.isList()) {
+            replace(user, defaults);
+            changes.replaced(path);
         }
     }
 }
