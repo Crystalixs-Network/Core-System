@@ -80,12 +80,14 @@ public class CoreCommand extends VelocityCommand {
     }
 
     private boolean reloadMessages(CommandSource source) {
-        provider.reload();
-        logger.info("messages reloaded via command", LogMetadata.event("command.reload.messages")
-                .and(LogMetadata.Key.ACTOR, actorName(source))
-                .and(LogMetadata.Key.COMMAND, "core reload --messages")
-        );
-        return true;
+        boolean success = provider.reload();
+        if (success) {
+            logger.info("messages reloaded via command", LogMetadata.event("command.reload.messages")
+                    .and(LogMetadata.Key.ACTOR, actorName(source))
+                    .and(LogMetadata.Key.COMMAND, "core reload --messages")
+            );
+        }
+        return success;
     }
 
     private boolean reloadConfig(CommandSource source) {

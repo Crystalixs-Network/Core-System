@@ -50,7 +50,7 @@ public final class TranslationProvider {
         reload();
     }
 
-    public void reload() {
+    public boolean reload() {
         MiniMessageTranslationStore oldStore = registry.store();
         if (oldStore != null) {
             GlobalTranslator.translator().removeSource(oldStore);
@@ -67,10 +67,12 @@ public final class TranslationProvider {
                     .event("translations.reloaded")
                     .and(LogMetadata.Key.BUNDLE, bundleName)
                     .and(LogMetadata.Key.LOCALE_COUNT, locales.length));
+            return true;
         } catch (IOException exception) {
             logger.warn("translation reload failed", LogMetadata
                     .event("translations.reload_failed")
                     .and(LogMetadata.Key.BUNDLE, bundleName), exception);
+            return false;
         }
     }
 
