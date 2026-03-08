@@ -17,17 +17,5 @@
       "footer": "<gray>Weitere Informationen findest du auf unserem Discord",
       "url": "<red>https://discord.gg/crystalixs"
     }
-  },
-  "tablist": {
-    "header": [
-      " ",
-      "<light_purple><bold>Crystalixs Network",
-      " "
-    ],
-    "footer": [
-      " ",
-      "<gray>Du befindest dich auf <yellow><server>",
-      " "
-    ]
   }
 }

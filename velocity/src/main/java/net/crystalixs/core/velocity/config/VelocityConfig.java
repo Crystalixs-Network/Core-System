@@ -7,11 +7,10 @@ import org.spongepowered.configurate.objectmapping.meta.Setting;
 public record VelocityConfig(
         @Setting("enable-hot-reloading") boolean isHotReloadingEnabled,
         Motd motd,
-        Maintenance maintenance,
-        Tablist tablist
+        Maintenance maintenance
 ) {
 
     public VelocityConfig withMaintenance(Maintenance maintenance) {
-        return new VelocityConfig(isHotReloadingEnabled, motd, maintenance, tablist);
+        return new VelocityConfig(isHotReloadingEnabled, motd, maintenance);
     }
 }

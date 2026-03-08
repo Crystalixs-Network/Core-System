@@ -127,7 +127,6 @@ Dort werden unter anderem folgende Bereiche gesteuert:
 - Wartungsstatus
 - Wartungs-MOTD
 - Wartungsscreen inklusive Hinweistext und Link
-- Tablist-Header und -Footer
 
 > [!TIP]
 > Die Texte unterstützen [MiniMessage](https://docs.papermc.io/adventure/minimessage/format/) und lassen sich dadurch flexibel gestalten.

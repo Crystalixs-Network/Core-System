@@ -4,6 +4,7 @@ import net.crystalixs.core.common.logging.ChangeSetLogger;
 import net.crystalixs.core.common.logging.ChangeSet;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.sync.NodeOrderNormalizer;
 import org.spongepowered.configurate.BasicConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.jackson.JacksonConfigurationLoader;
@@ -31,6 +32,7 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
     private final ConfigMergeService mergeService;
     private final ChangeSetLogger changeSetLogger;
     private final StructuredLogger logger;
+    private final NodeOrderNormalizer orderNormalizer;
 
     private final ObjectMapper<T> mapper;
     private final ConfigurationOptions options;
@@ -41,6 +43,7 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
         this.mergeService = mergeService;
         this.changeSetLogger = changeSetLogger;
         this.logger = definition.logger();
+        this.orderNormalizer = new NodeOrderNormalizer();
 
         TypeSerializerCollection.Builder serializerBuilder = TypeSerializerCollection.defaults().childBuilder();
         definition.extensionProvider().configureSerializers(serializerBuilder);
@@ -92,8 +95,12 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
         } else {
             effective = loader.load();
             ChangeSet changeSet = mergeService.merge(defaults, effective);
+            boolean orderChanged = orderNormalizer.matchesNotDefaultOrder(defaults, effective);
+            if (orderChanged) {
+                effective = orderNormalizer.orderedLike(defaults, effective);
+            }
 
-            if (changeSet.hasChanges()) {
+            if (changeSet.hasChanges() || orderChanged) {
                 saveAtomically(effective);
                 changeSetLogger.log(logger, "config", file().toString(), changeSet);
             }
@@ -121,6 +128,7 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
 
         BasicConfigurationNode defaults = defaults();
         ChangeSet changeSet = mergeService.merge(defaults, target);
+        target = orderNormalizer.orderedLike(defaults, target);
         saveAtomically(target);
 
         if (changeSet.hasChanges()) {
