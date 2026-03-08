@@ -3,6 +3,7 @@ package net.crystalixs.core.common.translation;
 import net.crystalixs.core.common.logging.ChangeSetLogger;
 import net.crystalixs.core.common.logging.ChangeSet;
 import net.crystalixs.core.common.logging.StructuredLogger;
+import net.crystalixs.core.common.sync.NodeOrderNormalizer;
 import org.spongepowered.configurate.CommentedConfigurationNode;
 import org.spongepowered.configurate.hocon.HoconConfigurationLoader;
 
@@ -23,19 +24,22 @@ public abstract class AbstractTranslationBundleLoader implements TranslationBund
     private final ChangeSetLogger changeSetLogger;
     private final TranslationConfigMergeService mergeService;
     private final TranslationFlattener flattener;
+    private final NodeOrderNormalizer orderNormalizer;
 
     protected AbstractTranslationBundleLoader() {
-        this(ChangeSetLogger.createDefault(), new TranslationConfigMergeService(), new TranslationFlattener());
+        this(ChangeSetLogger.createDefault(), new TranslationConfigMergeService(), new TranslationFlattener(), new NodeOrderNormalizer());
     }
 
     protected AbstractTranslationBundleLoader(
             ChangeSetLogger changeSetLogger,
             TranslationConfigMergeService mergeService,
-            TranslationFlattener flattener
+            TranslationFlattener flattener,
+            NodeOrderNormalizer orderNormalizer
     ) {
         this.changeSetLogger = changeSetLogger;
         this.mergeService = mergeService;
         this.flattener = flattener;
+        this.orderNormalizer = orderNormalizer;
     }
 
     @Override
@@ -53,8 +57,14 @@ public abstract class AbstractTranslationBundleLoader implements TranslationBund
             CommentedConfigurationNode userNode = loadUserNode(userFile, defaultNode);
 
             ChangeSet changeSet = mergeService.merge(defaultNode, userNode);
+            boolean orderChanged = orderNormalizer.matchesNotDefaultOrder(defaultNode, userNode);
+            if (orderChanged) {
+                userNode = orderNormalizer.orderedLike(defaultNode, userNode);
+            }
             changeSetLogger.log(logger(), CHANGE_SUBJECT, fileName, changeSet);
-            saveUserNode(userFile, userNode);
+            if (changeSet.hasChanges() || orderChanged || Files.notExists(userFile)) {
+                saveUserNode(userFile, userNode);
+            }
 
             Map<String, String> flattened = flattener.flattern(userNode);
             return new TranslationBundle(locale, flattened);
