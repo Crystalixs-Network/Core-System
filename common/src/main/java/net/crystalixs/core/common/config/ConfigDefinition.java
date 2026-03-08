@@ -1,13 +1,14 @@
 package net.crystalixs.core.common.config;
 
+import net.crystalixs.core.common.logging.StructuredLogger;
+
 import java.nio.file.Path;
-import java.util.logging.Logger;
 
 public record ConfigDefinition<T>(
         Path file,
         String defaultResource,
         Class<T> type,
-        Logger logger,
+        StructuredLogger logger,
         ConfigurateExtensionProvider extensionProvider,
         ClassLoader resourceClassLoader
 ) {

@@ -1,6 +1,8 @@
 package net.crystalixs.core.velocity.command;
 
 import com.velocitypowered.api.command.CommandSource;
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.CorePlugin;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
@@ -19,11 +21,13 @@ import static net.kyori.adventure.text.Component.translatable;
 
 public class CoreCommand extends VelocityCommand {
 
+    private final StructuredLogger logger;
     private final VelocityConfigUpdater updater;
     private final TranslationProvider provider;
 
     public CoreCommand(CorePlugin plugin, VelocityConfigUpdater updater, TranslationProvider provider) {
         super(plugin);
+        this.logger = plugin.logger().child("commands").child("core");
         this.updater = updater;
         this.provider = provider;
     }
@@ -58,9 +62,9 @@ public class CoreCommand extends VelocityCommand {
 
         presentFlags.forEach(flag -> {
             boolean success = switch (flag) {
-                case CONFIG -> reloadConfig();
-                case MESSAGES -> reloadMessages();
-                default -> reloadAll();
+                case CONFIG -> reloadConfig(source);
+                case MESSAGES -> reloadMessages(source);
+                default -> reloadAll(source);
             };
             if (success) {
                 source.sendMessage(translatable("command.core.reload." + flag.getName()));
@@ -71,20 +75,34 @@ public class CoreCommand extends VelocityCommand {
     }
 
 
-    private boolean reloadAll() {
-        return reloadConfig() && reloadMessages();
+    private boolean reloadAll(CommandSource source) {
+        return reloadConfig(source) && reloadMessages(source);
     }
 
-    private boolean reloadMessages() {
-        provider.reload();
-        return true;
+    private boolean reloadMessages(CommandSource source) {
+        boolean success = provider.reload();
+        if (success) {
+            logger.info("messages reloaded via command", LogMetadata.event("command.reload.messages")
+                    .and(LogMetadata.Key.ACTOR, actorName(source))
+                    .and(LogMetadata.Key.COMMAND, "core reload --messages")
+            );
+        }
+        return success;
     }
 
-    private boolean reloadConfig() {
+    private boolean reloadConfig(CommandSource source) {
         try {
             updater.reload();
+            logger.info("config reloaded via command", LogMetadata.event("command.reload.config")
+                    .and(LogMetadata.Key.ACTOR, actorName(source))
+                    .and(LogMetadata.Key.COMMAND, "core reload --config")
+            );
             return true;
         } catch (IOException exception) {
+            logger.warn("config reload failed via command", LogMetadata.event("command.reload.config_failed")
+                    .and(LogMetadata.Key.ACTOR, actorName(source))
+                    .and(LogMetadata.Key.COMMAND, "core reload --config"), exception
+            );
             return false;
         }
     }

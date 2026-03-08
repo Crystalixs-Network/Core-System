@@ -1,5 +1,9 @@
 package net.crystalixs.core.common.config;
 
+import net.crystalixs.core.common.logging.ChangeSetLogger;
+import net.crystalixs.core.common.logging.ChangeSet;
+import net.crystalixs.core.common.logging.StructuredLogger;
+import net.crystalixs.core.common.logging.LogMetadata;
 import org.spongepowered.configurate.BasicConfigurationNode;
 import org.spongepowered.configurate.ConfigurationOptions;
 import org.spongepowered.configurate.jackson.JacksonConfigurationLoader;
@@ -25,16 +29,18 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
 
     private final ConfigDefinition<T> definition;
     private final ConfigMergeService mergeService;
-    private final ConfigChangeLogger changeLogger;
+    private final ChangeSetLogger changeSetLogger;
+    private final StructuredLogger logger;
 
     private final ObjectMapper<T> mapper;
     private final ConfigurationOptions options;
     private final JacksonConfigurationLoader loader;
 
-    JacksonConfigurateConfigService(ConfigDefinition<T> definition, ConfigMergeService mergeService, ConfigChangeLogger changeLogger) throws SerializationException {
+    JacksonConfigurateConfigService(ConfigDefinition<T> definition, ConfigMergeService mergeService, ChangeSetLogger changeSetLogger) throws SerializationException {
         this.definition = definition;
         this.mergeService = mergeService;
-        this.changeLogger = changeLogger;
+        this.changeSetLogger = changeSetLogger;
+        this.logger = definition.logger().child("config");
 
         TypeSerializerCollection.Builder serializerBuilder = TypeSerializerCollection.defaults().childBuilder();
         definition.extensionProvider().configureSerializers(serializerBuilder);
@@ -81,14 +87,15 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
             createParentDirectories();
             effective = defaults.copy();
             saveAtomically(effective);
-            definition.logger().info("Config file does not exist, creating new one. Wrote defaults to: " + file());
+            logger.info("default config created", LogMetadata.event("config.created").and(LogMetadata.Key.FILE, file()));
+
         } else {
             effective = loader.load();
-            ConfigChangeSet changeSet = mergeService.merge(defaults, effective);
+            ChangeSet changeSet = mergeService.merge(defaults, effective);
 
             if (changeSet.hasChanges()) {
                 saveAtomically(effective);
-                changeLogger.log(definition.logger(), file().toString(), changeSet);
+                changeSetLogger.log(logger, "config", file().toString(), changeSet);
             }
         }
         try {
@@ -113,11 +120,11 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
         }
 
         BasicConfigurationNode defaults = defaults();
-        ConfigChangeSet changeSet = mergeService.merge(defaults, target);
+        ChangeSet changeSet = mergeService.merge(defaults, target);
         saveAtomically(target);
 
         if (changeSet.hasChanges()) {
-            changeLogger.log(definition.logger(), file().toString(), changeSet);
+            changeSetLogger.log(logger, "config", file().toString(), changeSet);
         }
     }
 

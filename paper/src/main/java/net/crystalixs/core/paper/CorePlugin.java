@@ -1,7 +1,12 @@
 package net.crystalixs.core.paper;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.crystalixs.core.common.logging.LogFactory;
+import net.crystalixs.core.common.logging.LogManager;
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
+import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.paper.command.PaperCommandSource;
 import net.crystalixs.core.paper.command.PaperPlayerCommandSource;
@@ -24,23 +29,37 @@ public class CorePlugin extends JavaPlugin {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final MiniMessage miniMessage = MiniMessage.builder()
             .build();
+    private LogFactory logging;
+    private StructuredLogger logger;
 
     private HotReloadWatcher watcher;
 
     @Override
     public void onEnable() {
+        this.logging = LogManager.createForJavaUtil(getLogger(), getDataPath().resolve("logs"));
+        this.logger = logging.logger("core");
         registerTranslations();
         registerCommands();
 
-        getLogger().info("Plugin enabled!");
+        logger.info("plugin enabled", LogMetadata.event("plugin.enabled"));
     }
 
     @Override
     public void onDisable() {
         scheduler.shutdownNow();
-        watcher.stop();
+        if (watcher != null) {
+            watcher.close();
+        }
+        if (logger != null) {
+            logger.info("plugin disabled", LogMetadata.event("plugin.disabled"));
+        }
+        if (logging != null) {
+            logging.close();
+        }
+    }
 
-        getLogger().info("Plugin disabled!");
+    public StructuredLogger logger() {
+        return logger;
     }
 
     private void registerCommands() {
@@ -62,12 +81,21 @@ public class CorePlugin extends JavaPlugin {
     }
 
     private void registerTranslations() {
-        PaperTranslationBundleLoader translationLoader = new PaperTranslationBundleLoader(this);
-        TranslationProvider provider = new TranslationProvider(miniMessage, translationLoader, Locale.GERMANY);
-        provider.load("messages", Locale.GERMANY);
+        PaperTranslationBundleLoader translationLoader = new PaperTranslationBundleLoader(this, logger.child("translations"));
+        TranslationProvider provider = TranslationProvider.builder()
+                .logger(logger)
+                .withMiniMessage(miniMessage)
+                .withLoader(translationLoader)
+                .bundle(TranslationBundleMeta.builder()
+                        .bundleName("messages")
+                        .defaultLocale(Locale.GERMANY)
+                        .build()
+                )
+                .language(Locale.GERMANY)
+                .build();
 
         // Hier fehlt noch der Config check
-        watcher = new HotReloadWatcher(scheduler, getDataPath().resolve("lang"), 1000L, provider::reload);
+        watcher = new HotReloadWatcher(logger.child("translations"), scheduler, getDataPath().resolve("lang"), 1000L, provider::reload);
         watcher.start();
     }
 }

@@ -4,17 +4,18 @@ import net.kyori.adventure.key.KeyPattern.Value;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.translation.MiniMessageTranslationStore;
 import net.kyori.adventure.translation.GlobalTranslator;
+import net.crystalixs.core.common.logging.StructuredLogger;
+import net.crystalixs.core.common.logging.LogMetadata;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
+import java.util.Objects;
 
 public final class TranslationProvider {
 
-    private final Logger logger = Logger.getLogger(getClass().getSimpleName());
-
+    private final StructuredLogger logger;
     private final TranslationBundleLoader loader;
     private final TranslationRegistry registry;
     private final Locale defaultLocale;
@@ -22,7 +23,8 @@ public final class TranslationProvider {
     private @Value String bundleName;
     private Locale[] locales;
 
-    public TranslationProvider(MiniMessage miniMessage, TranslationBundleLoader loader, Locale defaultLocale) {
+    public TranslationProvider(StructuredLogger logger, MiniMessage miniMessage, TranslationBundleLoader loader, Locale defaultLocale) {
+        this.logger = logger.child("translations");
         this.loader = loader;
         this.defaultLocale = defaultLocale;
         this.registry = new TranslationRegistry(miniMessage, defaultLocale);
@@ -38,15 +40,19 @@ public final class TranslationProvider {
 
         if (locales == null || locales.length == 0) {
             this.locales = new Locale[]{defaultLocale};
-            logger.warning("No language was registered. Using default locale " + defaultLocale.toLanguageTag());
+            logger.warn("default locale selected", LogMetadata
+                    .event("translations.locales.defaulted")
+                    .and(LogMetadata.Key.LOCALE, defaultLocale.toLanguageTag()));
         }
         if (registry.store() == null) {
             registry.registerBundle(bundleName);
         }
-        reload();
+        if (!reload()) {
+            throw new IllegalStateException("Failed to load translation bundle " + bundleName);
+        }
     }
 
-    public void reload() {
+    public boolean reload() {
         MiniMessageTranslationStore oldStore = registry.store();
         if (oldStore != null) {
             GlobalTranslator.translator().removeSource(oldStore);
@@ -59,19 +65,32 @@ public final class TranslationProvider {
                 TranslationBundle bundle = loader.load(bundleName, locale);
                 bundle.entries().forEach((key, value) -> store.register(key, locale, value));
             }
+            logger.info("translation bundles reloaded", LogMetadata
+                    .event("translations.reloaded")
+                    .and(LogMetadata.Key.BUNDLE, bundleName)
+                    .and(LogMetadata.Key.LOCALE_COUNT, locales.length));
+            return true;
         } catch (IOException exception) {
-            logger.warning("Failed to reload translations: " + exception.getMessage());
+            logger.warn("translation reload failed", LogMetadata
+                    .event("translations.reload_failed")
+                    .and(LogMetadata.Key.BUNDLE, bundleName), exception);
+            return false;
         }
     }
 
     public static final class Builder {
-        private final Logger logger = Logger.getLogger(getClass().getSimpleName());
         private final List<Locale> languages = new ArrayList<>();
 
+        private StructuredLogger logger;
         private MiniMessage miniMessage;
         private TranslationBundleLoader loader;
         private Locale defaultLocale;
         private String bundleName;
+
+        public Builder logger(StructuredLogger logger) {
+            this.logger = logger;
+            return this;
+        }
 
         public Builder withMiniMessage(MiniMessage miniMessage) {
             this.miniMessage = miniMessage;
@@ -95,6 +114,8 @@ public final class TranslationProvider {
         }
 
         public TranslationProvider build() {
+            Objects.requireNonNull(logger, "logger");
+            Objects.requireNonNull(loader, "loader");
             if (bundleName == null) {
                 throw new IllegalStateException("Bundle name is required");
             }
@@ -102,11 +123,11 @@ public final class TranslationProvider {
                 throw new IllegalStateException("Default locale is required");
             }
             if (miniMessage == null) {
-                logger.warning("No MiniMessage instance was provided. Using default instance.");
+                logger.warn("default minimessage selected", LogMetadata.event("translations.minimessage.defaulted"));
                 this.miniMessage = MiniMessage.miniMessage();
             }
 
-            TranslationProvider provider = new TranslationProvider(miniMessage, loader, defaultLocale);
+            TranslationProvider provider = new TranslationProvider(logger, miniMessage, loader, defaultLocale);
             @Value String bundleName = this.bundleName;
 
             Locale[] selectedLocales;

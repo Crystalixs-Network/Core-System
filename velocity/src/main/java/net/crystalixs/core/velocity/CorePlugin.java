@@ -12,6 +12,10 @@ import jakarta.inject.Inject;
 import net.crystalixs.core.common.config.ConfigDefinition;
 import net.crystalixs.core.common.config.ConfigService;
 import net.crystalixs.core.common.config.ConfigServiceFactory;
+import net.crystalixs.core.common.logging.LogFactory;
+import net.crystalixs.core.common.logging.LogManager;
+import net.crystalixs.core.common.logging.StructuredLogger;
+import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.translation.HotReloadWatcher;
 import net.crystalixs.core.common.translation.TranslationBundleMeta;
 import net.crystalixs.core.common.translation.TranslationProvider;
@@ -32,13 +36,13 @@ import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
 import org.incendo.cloud.velocity.VelocityCommandManager;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.logging.Logger;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
@@ -53,18 +57,20 @@ public final class CorePlugin {
     private final PluginContainer pluginContainer;
     private final ProxyServer server;
     private final Path dataDirectory;
-    private final Logger logger;
+    private final LogFactory logging;
+    private final StructuredLogger logger;
 
     private VelocityConfigUpdater configUpdater;
     private TranslationProvider provider;
     private HotReloadWatcher watcher;
 
     @Inject
-    public CorePlugin(PluginContainer pluginContainer, ProxyServer server, @DataDirectory Path dataDirectory) {
+    public CorePlugin(PluginContainer pluginContainer, ProxyServer server, @DataDirectory Path dataDirectory, Logger platformLogger) {
         this.pluginContainer = pluginContainer;
         this.server = server;
         this.dataDirectory = dataDirectory;
-        this.logger = Logger.getLogger(getClass().getSimpleName());
+        this.logging = LogManager.createForSlf4j(platformLogger, dataDirectory.resolve("logs"));
+        this.logger = logging.logger("core");
     }
 
     @Subscribe
@@ -72,30 +78,42 @@ public final class CorePlugin {
         try {
             createOrLoadConfig();
         } catch (Exception exception) {
+            logger.error("config load failed during startup", LogMetadata
+                    .event("config.load_failed")
+                    .and(LogMetadata.Key.FILE, dataDirectory.resolve("config.json")), exception);
+
             throw new IllegalStateException("Could not load config", exception);
         }
+
         registerTranslations();
         registerCommands();
         registerListener(server);
 
-        logger.info("Velocity core plugin has been enabled!");
+        logger.info("plugin enabled", LogMetadata.event("plugin.enabled"));
     }
 
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         scheduler.shutdownNow();
         if (watcher != null) {
-            watcher.stop();
+            watcher.close();
         }
         if (configUpdater != null) {
             try {
                 configUpdater.save();
             } catch (IOException exception) {
-                logger.severe("Could not save config: " + exception.getMessage());
+                logger.error("config save failed during shutdown", LogMetadata
+                        .event("config.save_failed")
+                        .and(LogMetadata.Key.FILE, dataDirectory.resolve("config.json")), exception);
             }
         }
 
-        logger.info("Velocity core plugin has been disabled!");
+        logger.info("plugin disabled", LogMetadata.event("plugin.disabled"));
+        logging.close();
+    }
+
+    public StructuredLogger logger() {
+        return logger;
     }
 
     private void registerListener(ProxyServer server) {
@@ -131,10 +149,9 @@ public final class CorePlugin {
                 VelocityCommandSource::plattformSender);
     }
 
-    private void createOrLoadConfig() throws Exception {
+    private void createOrLoadConfig() throws IOException {
         ConfigService<VelocityConfig> configService = ConfigServiceFactory.create(new ConfigDefinition<>(
-                dataDirectory.resolve("config.json"),
-                "config.json",
+                dataDirectory.resolve("config.json"), "config.json",
                 VelocityConfig.class,
                 logger,
                 new VelocityConfigurationProvider(miniMessage),
@@ -146,11 +163,9 @@ public final class CorePlugin {
 
     private void registerTranslations() {
         provider = TranslationProvider.builder()
+                .logger(logger)
                 .withMiniMessage(miniMessage)
-                .withLoader(VelocityTranslationBundleLoader.builder()
-                        .dataDirectory(dataDirectory)
-                        .build()
-                )
+                .withLoader(new VelocityTranslationBundleLoader(dataDirectory, logger.child("translations")))
                 .bundle(TranslationBundleMeta.builder()
                         .bundleName("messages")
                         .defaultLocale(Locale.GERMANY)
@@ -161,7 +176,7 @@ public final class CorePlugin {
 
         if (!configUpdater.current().isHotReloadingEnabled()) return;
 
-        watcher = new HotReloadWatcher(scheduler, dataDirectory.resolve("lang"), 1000L, provider::reload);
+        watcher = new HotReloadWatcher(logger.child("translations"), scheduler, dataDirectory.resolve("lang"), 1000L, () -> provider.reload());
         watcher.start();
     }
 }
