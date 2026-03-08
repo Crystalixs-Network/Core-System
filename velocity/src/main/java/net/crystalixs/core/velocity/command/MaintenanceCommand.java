@@ -71,14 +71,14 @@ public class MaintenanceCommand extends VelocityCommand {
         try {
             updater.setMaintenance(state);
         } catch (ExternalConfigModificationException exception) {
-            logger.warn("maintenance toggle failed due to external config change", LogMetadata.event("maintenance.toggle_failed")
+            logger.warn("maintenance toggle failed due to external config change", LogMetadata.event("maintenance.toggle_external_change")
                     .and(LogMetadata.Key.ACTOR, actorName(source))
                     .and(LogMetadata.Key.COMMAND, "maintenance")
                     .and(LogMetadata.Key.STATE, state), exception);
             source.sendMessage(translatable("command.core.reload.error.external-change"));
             return false;
         } catch (IOException exception) {
-            logger.warn("maintenance toggle failed due to io error", LogMetadata.event("maintenance.toggle_failed")
+            logger.warn("maintenance toggle failed due to io error", LogMetadata.event("maintenance.toggle_io_failed")
                     .and(LogMetadata.Key.ACTOR, actorName(source))
                     .and(LogMetadata.Key.COMMAND, "maintenance")
                     .and(LogMetadata.Key.STATE, state), exception);
