@@ -6,10 +6,13 @@ import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
 import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
-import net.crystalixs.core.velocity.config.Tablist;
 import net.crystalixs.core.velocity.config.VelocityConfig;
 import net.crystalixs.core.velocity.config.platform.VelocityConfigUpdater;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
 public class PlayerConnectionListener {
 
@@ -37,7 +40,6 @@ public class PlayerConnectionListener {
     @Subscribe
     public void onBackendConnect(ServerPostConnectEvent event) {
         Player player = event.getPlayer();
-        Tablist tablist = updater.current().tablist();
 
         String serverName = player.getCurrentServer()
                 .map(connection -> connection.getServerInfo().getName())
@@ -49,8 +51,8 @@ public class PlayerConnectionListener {
                 });
 
         player.sendPlayerListHeaderAndFooter(
-                tablist.headerComponent(miniMessage),
-                tablist.footerComponent(miniMessage, serverName));
+                translatable("tablist.header"),
+                translatable("tablist.footer").arguments(component("server", text(serverName))));
     }
 
 }
