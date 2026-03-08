@@ -24,7 +24,13 @@ public interface ChangeSetLogger {
                     .and(LogMetadata.Key.ENTRIES, changeSet.size()));
 
             for (ChangeSet.Entry entry : changeSet.getEntries()) {
-                syncLogger.info(entry.render(), LogMetadata.event("sync.entry"));
+                LogMetadata metadata = LogMetadata.event("sync.entry")
+                        .and(LogMetadata.Key.PATH, entry.path())
+                        .and(LogMetadata.Key.CHANGE_TYPE, entry.type().name().toLowerCase());
+                if (entry.description() != null && !entry.description().isBlank()) {
+                    metadata = metadata.and(LogMetadata.Key.DESCRIPTION, entry.description());
+                }
+                syncLogger.info("synchronized change entry", metadata);
             }
         }
     }

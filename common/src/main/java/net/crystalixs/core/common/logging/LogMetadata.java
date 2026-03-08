@@ -47,7 +47,10 @@ public final class LogMetadata {
         LOCALE_COUNT("localeCount"),
         SUBJECT("subject"),
         ENTRIES("entries"),
-        DEBOUNCE_MS("debounceMs");
+        DEBOUNCE_MS("debounceMs"),
+        PATH("path"),
+        CHANGE_TYPE("changeType"),
+        DESCRIPTION("description");
 
         private final String value;
 
