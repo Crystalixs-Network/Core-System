@@ -40,7 +40,7 @@ public final class JacksonConfigurateConfigService<T> implements ConfigService<T
         this.definition = definition;
         this.mergeService = mergeService;
         this.changeSetLogger = changeSetLogger;
-        this.logger = definition.logger().child("config");
+        this.logger = definition.logger();
 
         TypeSerializerCollection.Builder serializerBuilder = TypeSerializerCollection.defaults().childBuilder();
         definition.extensionProvider().configureSerializers(serializerBuilder);
