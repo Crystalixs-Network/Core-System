@@ -4,6 +4,7 @@ import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
 import com.velocitypowered.api.proxy.Player;
+import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.velocity.config.Tablist;
 import net.crystalixs.core.velocity.config.VelocityConfig;
@@ -40,7 +41,12 @@ public class PlayerConnectionListener {
 
         String serverName = player.getCurrentServer()
                 .map(connection -> connection.getServerInfo().getName())
-                .orElse("fehler");
+                .orElseGet(() -> {
+                    logger.warn("failed to resolve server name for tablist", LogMetadata
+                            .event("tablist.server_name_unresolved")
+                            .and(LogMetadata.Key.ACTOR, player.getUsername()));
+                    return "fehler";
+                });
 
         player.sendPlayerListHeaderAndFooter(
                 tablist.headerComponent(miniMessage),
