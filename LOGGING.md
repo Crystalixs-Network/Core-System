@@ -24,19 +24,10 @@
 - Format: `<bereich>.<aktion>`
 - Beispiele:
     - `plugin.enabled`
-    - `plugin.disabled`
-    - `config.created`
     - `config.load_failed`
-    - `config.save_failed`
-    - `translations.reloaded`
-    - `translations.reload_failed`
     - `translations.watch.started`
     - `command.reload.config`
-    - `command.reload.config_failed`
-    - `command.reload.messages`
     - `maintenance.enabled`
-    - `maintenance.disabled`
-    - `maintenance.toggle_failed`
 
 ## Audit-Felder
 
