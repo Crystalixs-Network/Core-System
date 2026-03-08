@@ -1,119 +1,143 @@
-# Core System
+﻿# Core System
 
-Velocity-Core-Plugin für Netzwerk-Grundfunktionen
+> Zentrale Netzwerklogik für Velocity und die grundlegenden Systemfunktionen eines Minecraft-Netzwerks.
 
-## Overview
+<br>
 
-Dieses Plugin stellt zentrale Proxy-Funktionen für Velocity bereit:
+## Überblick
 
-- Verwaltung eines Wartungsmodus
-- Dynamische MOTD-Ausgabe (normal / Wartung)
-- Login-Blockierung im Wartungsmodus (inkl. Bypass-Recht)
-- Befehl zur Laufzeitsteuerung des Wartungsmodus
+| Bereich               | Nutzen                                                                       |
+|-----------------------|------------------------------------------------------------------------------|
+| Wartungsmodus         | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch. |
+| MOTD-Steuerung        | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.   |
+| Netzwerk-Commands     | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.         |
+| Konfigurations-Reload | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.     |
 
 ---
+<br>
 
-## Aktuell implementierte Funktionen
+## Kernfeatures
 
-### 1) Wartungsmodus
+### Wartungsmodus
 
-Der Wartungsmodus legt fest, ob Spieler sich mit dem Proxy verbinden können (analog zu einer Whitelist). Mit einer entsprechenden Berechtigung kann dieser Filter
-umgangen werden und der Spieler kann trotz aktivem Wartungsmodus sich verbinden. Spieler ohne Berechtigung werden bei Aktivierung des Wartunsmodus vom Netzwerk 
-getrennt.<br>
+Der Wartungsmodus ist die zentrale Betriebsfunktion des Plugins.
 
-> [!CAUTION]
-> Der Wartungsmodus sollte **ausschließlich** über den entsprechenden Befehl getoggelt werden.
+Beim Aktivieren passiert Folgendes:
 
-#### Permissions
+- normale Spieler können dem Proxy nicht mehr beitreten
+- bereits verbundene Spieler ohne Freigabe werden getrennt
+- die MOTD wechselt automatisch in den Wartungszustand
+- ein konfigurierbarer Wartungsscreen mit Hinweistext und Link wird angezeigt
 
-- `core.command.maintenance`: Erlaubt den Command `/maintenance` zu nutzen.
-- `core.bypass.maintenance`: Umgeht Login-Sperre bei aktivem Wartungsmodus.
+Das eignet sich für Updates, kurzfristige Eingriffe und kontrollierte Tests im Live-Betrieb.
 
-#### Befehl
+### Dynamische MOTD
 
-- /maintenance `<state>`: Toggelt den aktuellen Zustand des Wartungsmodus. Benötigt die Permission `core.command.maintenance`.
-    - `state`: boolean (true/false)
+Die Serverliste reagiert direkt auf den aktuellen Netzwerkzustand:
 
-#### Bypass
+- im Normalbetrieb wird die reguläre MOTD angezeigt
+- im Wartungsmodus erscheint eine eigene Wartungs-MOTD
+- zusätzlich wird eine abweichende Versionsanzeige gesetzt, damit Wartung sofort erkennbar ist
 
-Um trotz aktivem Wartungsmodus zum Proxy verbinden zu können, benötigt man die Permission `core.bypass.maintenance`. Andernfalls verliert er die Verbindung. Ein
-Screen wird anschließend gezeigt. Dieser folgt folgendem Muster:
+### Globale Netzwerkbefehle
 
-- `HEADER`
-- `LEERZEILE`
-- `BODY`
-- `LEERZEILE`
-- `FOOTER`
-- `URL` (Link zu weiteren Informationen)
+Über den Proxy lassen sich zentrale Informationen schnell abrufen:
+
+- auf welchem Backend ein Spieler gerade online ist
+- ob ein registrierter Backend-Server erreichbar ist
+- zu welchem Server man einem Spieler folgen möchte
+
+### Reloads ohne Neustart
+
+Konfigurations- und Textänderungen lassen sich direkt übernehmen, ohne den Proxy komplett neu zu starten.
+
+Unterstützt werden Reloads für:
+
+- Config
+- Nachrichten
+- beides zusammen
+
+Wenn Hot-Reloading in der Config aktiv ist, können Sprachdateien zusätzlich automatisch neu eingelesen werden.
+
+### Logging im Hintergrund
+
+Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und Fehler nachvollziehbar bleiben. Die Details dazu stehen in `LOGGING.md`.
+
+---
+<br>
+
+## Projektstruktur
+
+| Modul      | Rolle                                                                       |
+|------------|-----------------------------------------------------------------------------|
+| `velocity` | Zentrale Netzwerkfunktionen wie Commands, MOTD, Join-Kontrolle und Wartung. |
+| `paper`    | Grundlage für Backend-seitige Erweiterungen auf Paper.                      |
+
+---
+<br>
+
+## Commands
+
+| Command                                          | Zweck                                                      | Typischer Einsatz                            |
+|--------------------------------------------------|------------------------------------------------------------|----------------------------------------------|
+| `/maintenance <true\|false>`                     | Aktiviert oder deaktiviert den Wartungsmodus.              | Updates, Tests, Notfallarbeiten              |
+| `/core reload --config`                          | Lädt nur die Konfiguration neu.                            | Nach Änderungen an `config.json`             |
+| `/core reload --messages`                        | Lädt nur die Nachrichten neu.                              | Nach Änderungen an Texten oder Übersetzungen |
+| `/core reload --all`                             | Lädt Config und Nachrichten gemeinsam neu.                 | Nach größeren inhaltlichen Anpassungen       |
+| `/help` oder `/?`                                | Zeigt das Hilfemenü.                                       | Zum Nachschlagen verfügbarer Befehle         |
+| `/global-find <player>` oder `/gfind <player>`   | Zeigt, auf welchem Server ein Spieler ist.                 | Support, Moderation, Teamarbeit              |
+| `/global-teleport <player>` oder `/gtp <player>` | Verbindet dich auf den Server des Zielspielers.            | Direktes Wechseln zu einem Spieler           |
+| `/online <server>`                               | Prüft, ob ein registrierter Backend-Server erreichbar ist. | Betriebscheck, Fehlersuche                   |
+| `/proxy-stop`                                    | Stoppt den Proxy kontrolliert.                             | Geplante Eingriffe oder Wartung              |
+
+---
+<br>
+
+## Permissions
+
+| Permission                     | Bedeutung                                                            |
+|--------------------------------|----------------------------------------------------------------------|
+| `core.command.maintenance`     | Erlaubt das Ein- und Ausschalten des Wartungsmodus.                  |
+| `core.bypass.maintenance`      | Erlaubt den Beitritt trotz aktivem Wartungsmodus.                    |
+| `core.command.core`            | Erlaubt Reload-Befehle für Config und Nachrichten.                   |
+| `core.command.proxy-stop`      | Erlaubt das kontrollierte Stoppen des Proxy.                         |
+| `core.command.global-find`     | Erlaubt das Abfragen des aktuellen Servers eines Spielers.           |
+| `core.command.global-teleport` | Erlaubt das Wechseln auf den Server eines anderen Spielers.          |
+| `core.command.online`          | Erlaubt die Prüfung registrierter Backend-Server auf Erreichbarkeit. |
+
+---
+<br>
+
+## Konfiguration
+
+Die wichtigste Runtime-Datei im Velocity-Modul ist `config.json`.
+
+Dort werden unter anderem folgende Bereiche gesteuert:
+
+- Hot-Reloading für Nachrichten
+- normale MOTD
+- Wartungsstatus
+- Wartungs-MOTD
+- Wartungsscreen inklusive Hinweistext und Link
 
 > [!TIP]
-> `HEADER`, `BODY`, `FOOTER` und `URL` können in der `config.json` angepasst werden. Ihr Text unterstützt [MiniMessage](https://docs.papermc.io/adventure/minimessage/format/). Eine Vorschau kannst du dir [hier](https://webui.advntr.dev/) anzeigen
-> lassen.
+> Die Texte unterstützen [MiniMessage](https://docs.papermc.io/adventure/minimessage/format/) und lassen sich dadurch flexibel gestalten.
+> Einen Editor für Liveansichten gibt es als [Adventure Text-Editor](https://adventure.kyori.net/).
+
+---
+<br>
+
+## Technische Basis
+
+- Java 21
+- Velocity für Proxy-Funktionen
+- Paper für Backend-Erweiterungen
+- Cloud Command Framework für Commands
+- Configurate für Konfigurationen
+- Adventure und MiniMessage für Komponenten und formatierte Texte
 
 ---
 
-## 2) MOTD-Anpassung abhängig vom Wartungsstatus
+## Status
 
-Die MOTD wird abhängig vom Wartungsstatus angepasst. Ist der Wartungsmodus aktiviert, so wird zusätzlich das Protokoll invalidiert und als benötigte Version ein
-einstellbarer Text angezeigt. <br>
-
-> [!TIP]
-> MOTDs können in der `config.json` angepasst werden. Ihr Text unterstützt [MiniMessage](https://docs.papermc.io/adventure/minimessage/format/). Eine Vorschau kannst du dir [hier](https://webui.advntr.dev/) anzeigen lassen.
-
----
-
-## 3) Reloading
-
-Die Config-Datei kann mittels eines Befehls neu geladen werden.
-
-#### Befehl
-
-- /core reload: Benötigt die Permission `core.command.core`
-
----
-
-## 4) Proxy Stopp
-
-Der Proxy kann mit einem Befehl gestoppt werden. Ohne externes Skript (bspw. Crone job) startet sich dieser nicht von alleine neu.
-
-#### Befehl
-
-- /proxy-stop: Benötigt die Permission `core.command.proxy-stop`
-
----
-
-## 5) Onlinestatus von Backend Servern
-
-Der Onlinestatus von Backend Servern kann mittels eines Befehls abgefragt werden. Es werden nur im Proxy registrierte Server unterstützt.
-
-#### Befehl
-
-- /online `<server>`: Benötigt die Permission `core.command.online`
-    - `server`: Der Name des zu prüfenden Servers
-
----
-
-## Globale Spieler Befehle
-
-Der aktuelle Server eines Spielers kann mittels eines Befehls gefunden werden und ruch einen Weiteren betreten werden.
-
-#### Befehle
-
-- /global-find `<player>`: Findet den aktuellen Server eines Spielers. Benötigt die Permission `core.command.global-find`
-    - `player`: Der Spielername
-    - Alias: gfind
-- /global-teleport `<player>`: Teleportiert dich auf den Server des angegebenen Spielers. Benötigt die Permission `core.command.global-teleport`
-    - `player`: Der Spielername
-    - Alias: gtp
-
----
-
-## Derzeitiger Funktionsumfang (kurz)
-
-✅ Wartungsmodus umschaltbar  
-✅ Wartungsabhängige MOTD  
-✅ Wartungs-Login-Block mit Bypass  
-✅ Custom Help-System mit Pagination  
-✅ Stoppen des Proxyservers  
-✅ Onlinestatus von Servern  
-✅ Globale Spielerbefehle
+Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und bildet eine saubere Grundlage für weitere Systemfunktionen.
