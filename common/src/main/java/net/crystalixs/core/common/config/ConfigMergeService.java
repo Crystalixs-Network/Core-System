@@ -16,7 +16,7 @@ public final class ConfigMergeService extends AbstractNodeMergeService {
                 changes.added(path);
                 return;
             }
-            if (user.isList()) {
+            if (!user.isList()) {
                 replace(user, defaults);
                 changes.replaced(path);
             }
