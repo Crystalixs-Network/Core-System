@@ -17,7 +17,7 @@ public final class PaperTranslationBootstrap implements AutoCloseable {
     }
 
     public static PaperTranslationBootstrap create(PaperPluginRuntime runtime) {
-        final StructuredLogger logger = runtime.logger().child("translations");
+        final StructuredLogger logger = runtime.componentLogger("translations");
 
         TranslationProvider provider = TranslationProvider.builder()
                 .logger(logger)

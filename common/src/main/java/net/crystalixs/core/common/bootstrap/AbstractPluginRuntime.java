@@ -26,6 +26,14 @@ public abstract class AbstractPluginRuntime implements AutoCloseable {
         return logger;
     }
 
+    public StructuredLogger componentLogger(String component, String... nestedComponents) {
+        StructuredLogger scopedLogger = logger.child(component);
+        for (String nestedComponent : nestedComponents) {
+            scopedLogger = scopedLogger.child(nestedComponent);
+        }
+        return scopedLogger;
+    }
+
     @Override
     public void close() {
         scheduler.shutdownNow();

@@ -27,4 +27,11 @@ public class CorePlugin extends JavaPlugin {
         }
         return bootstrap.runtime().logger();
     }
+
+    public StructuredLogger componentLogger(String component, String... nestedComponents) {
+        if (bootstrap == null) {
+            throw new IllegalStateException("Plugin bootstrap is not available");
+        }
+        return bootstrap.runtime().componentLogger(component, nestedComponents);
+    }
 }

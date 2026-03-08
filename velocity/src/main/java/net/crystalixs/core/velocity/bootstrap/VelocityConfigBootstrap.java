@@ -14,7 +14,7 @@ import java.io.IOException;
 public final class VelocityConfigBootstrap {
 
     public VelocityConfigUpdater load(VelocityPluginRuntime runtime) {
-        final StructuredLogger logger = runtime.logger().child("config");
+        final StructuredLogger logger = runtime.componentLogger("config");
         try {
             ConfigService<VelocityConfig> configService = ConfigServiceFactory.create(new ConfigDefinition<>(
                     runtime.dataDirectory().resolve("config.json"), "config.json",
@@ -38,7 +38,7 @@ public final class VelocityConfigBootstrap {
         if (configUpdater == null) {
             return;
         }
-        final StructuredLogger logger = runtime.logger().child("config");
+        final StructuredLogger logger = runtime.componentLogger("config");
         try {
             configUpdater.save();
         } catch (IOException exception) {

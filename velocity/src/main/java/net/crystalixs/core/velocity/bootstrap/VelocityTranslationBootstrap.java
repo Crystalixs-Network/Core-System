@@ -20,7 +20,7 @@ public final class VelocityTranslationBootstrap implements AutoCloseable {
     }
 
     public static VelocityTranslationBootstrap create(VelocityPluginRuntime runtime, VelocityConfigUpdater configUpdater) {
-        final StructuredLogger logger = runtime.logger().child("translations");
+        final StructuredLogger logger = runtime.componentLogger("translations");
         TranslationProvider provider = TranslationProvider.builder()
                 .logger(logger)
                 .withMiniMessage(runtime.miniMessage())
