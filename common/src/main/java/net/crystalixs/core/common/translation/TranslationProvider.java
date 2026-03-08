@@ -113,6 +113,12 @@ public final class TranslationProvider {
         }
 
         public TranslationProvider build() {
+            if (logger == null) {
+                throw new IllegalStateException("Logger is required");
+            }
+            if (loader == null) {
+                throw new IllegalStateException("Translation loader is required");
+            }
             if (bundleName == null) {
                 throw new IllegalStateException("Bundle name is required");
             }
