@@ -19,8 +19,6 @@ import java.util.Map;
 
 public abstract class AbstractTranslationBundleLoader implements TranslationBundleLoader {
 
-    private static final String CHANGE_SUBJECT = "translations";
-
     private final ChangeSetLogger changeSetLogger;
     private final TranslationConfigMergeService mergeService;
     private final TranslationFlattener flattener;
@@ -30,12 +28,7 @@ public abstract class AbstractTranslationBundleLoader implements TranslationBund
         this(ChangeSetLogger.createDefault(), new TranslationConfigMergeService(), new TranslationFlattener(), new NodeOrderNormalizer());
     }
 
-    protected AbstractTranslationBundleLoader(
-            ChangeSetLogger changeSetLogger,
-            TranslationConfigMergeService mergeService,
-            TranslationFlattener flattener,
-            NodeOrderNormalizer orderNormalizer
-    ) {
+    protected AbstractTranslationBundleLoader(ChangeSetLogger changeSetLogger, TranslationConfigMergeService mergeService, TranslationFlattener flattener, NodeOrderNormalizer orderNormalizer) {
         this.changeSetLogger = changeSetLogger;
         this.mergeService = mergeService;
         this.flattener = flattener;
@@ -61,7 +54,7 @@ public abstract class AbstractTranslationBundleLoader implements TranslationBund
             if (orderChanged) {
                 userNode = orderNormalizer.orderedLike(defaultNode, userNode);
             }
-            changeSetLogger.log(logger(), CHANGE_SUBJECT, fileName, changeSet);
+            changeSetLogger.log(logger(), "translations", fileName, changeSet);
             if (changeSet.hasChanges() || orderChanged || Files.notExists(userFile)) {
                 saveUserNode(userFile, userNode);
             }
