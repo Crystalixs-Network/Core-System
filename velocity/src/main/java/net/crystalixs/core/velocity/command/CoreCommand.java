@@ -83,7 +83,8 @@ public class CoreCommand extends VelocityCommand {
         provider.reload();
         logger.info("messages reloaded via command", LogMetadata.event("command.reload.messages")
                 .and(LogMetadata.Key.ACTOR, actorName(source))
-                .and(LogMetadata.Key.COMMAND, "core reload --messages"));
+                .and(LogMetadata.Key.COMMAND, "core reload --messages")
+        );
         return true;
     }
 
@@ -92,12 +93,14 @@ public class CoreCommand extends VelocityCommand {
             updater.reload();
             logger.info("config reloaded via command", LogMetadata.event("command.reload.config")
                     .and(LogMetadata.Key.ACTOR, actorName(source))
-                    .and(LogMetadata.Key.COMMAND, "core reload --config"));
+                    .and(LogMetadata.Key.COMMAND, "core reload --config")
+            );
             return true;
         } catch (IOException exception) {
             logger.warn("config reload failed via command", LogMetadata.event("command.reload.config_failed")
                     .and(LogMetadata.Key.ACTOR, actorName(source))
-                    .and(LogMetadata.Key.COMMAND, "core reload --config"), exception);
+                    .and(LogMetadata.Key.COMMAND, "core reload --config"), exception
+            );
             return false;
         }
     }
