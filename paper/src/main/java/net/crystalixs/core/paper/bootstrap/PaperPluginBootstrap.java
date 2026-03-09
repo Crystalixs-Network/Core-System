@@ -14,13 +14,7 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     private PaperConfigUpdater configUpdater;
     private PersistenceContext persistenceContext;
 
-    private PaperPluginBootstrap(
-            PaperPluginRuntime runtime,
-            PaperConfigBootstrap config,
-            PaperPersistenceBootstrap persistence,
-            PaperTranslationBootstrap translations,
-            PaperCommandBootstrap commands
-    ) {
+    private PaperPluginBootstrap(PaperPluginRuntime runtime, PaperConfigBootstrap config, PaperPersistenceBootstrap persistence, PaperTranslationBootstrap translations, PaperCommandBootstrap commands) {
         super(runtime);
         this.config = config;
         this.persistence = persistence;
