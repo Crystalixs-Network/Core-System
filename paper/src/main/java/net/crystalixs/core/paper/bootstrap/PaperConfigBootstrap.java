@@ -9,6 +9,8 @@ import net.crystalixs.core.paper.config.PaperConfig;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.config.platform.PaperConfigurationProvider;
 
+import java.io.IOException;
+
 public final class PaperConfigBootstrap {
 
     public PaperConfigUpdater load(PaperPluginRuntime runtime) {
@@ -29,6 +31,20 @@ public final class PaperConfigBootstrap {
                     .event("config.load_failed")
                     .and(LogMetadata.Key.FILE, runtime.plugin().getDataPath().resolve("config.json")), exception);
             throw new IllegalStateException("Could not load config", exception);
+        }
+    }
+
+    public void save(PaperPluginRuntime runtime, PaperConfigUpdater configUpdater) {
+        if (configUpdater == null) {
+            return;
+        }
+        final StructuredLogger logger = runtime.componentLogger("config");
+        try {
+            configUpdater.save();
+        } catch (IOException exception) {
+            logger.error("config save failed during shutdown", LogMetadata
+                    .event("config.save_failed")
+                    .and(LogMetadata.Key.FILE, runtime.plugin().getDataPath().resolve("config.json")), exception);
         }
     }
 }

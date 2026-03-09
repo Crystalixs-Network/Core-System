@@ -17,4 +17,8 @@ public final class PaperConfigUpdater {
     public PaperConfig current() {
         return facade.current();
     }
+
+    public void save() throws IOException {
+        facade.save();
+    }
 }
