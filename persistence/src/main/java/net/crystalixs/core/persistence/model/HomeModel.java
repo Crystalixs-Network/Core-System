@@ -1,7 +1,11 @@
 package net.crystalixs.core.persistence.model;
 
+import de.chojo.sadu.mapper.rowmapper.RowMapping;
+
 import java.time.Instant;
 import java.util.UUID;
+
+import static net.crystalixs.core.persistence.model.UuidReader.uuidReader;
 
 public record HomeModel(
         long id,
@@ -10,4 +14,13 @@ public record HomeModel(
         HomePositionModel position,
         Instant createdAt
 ) {
+
+    public static RowMapping<HomeModel> map() {
+        return row -> new HomeModel(
+                row.getLong("id"),
+                row.get("player_id", uuidReader()),
+                row.getString("name"),
+                HomePositionModel.fromRow(row),
+                row.getTimestamp("created_at").toInstant());
+    }
 }
