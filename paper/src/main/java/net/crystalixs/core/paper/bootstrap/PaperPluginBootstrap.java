@@ -45,7 +45,7 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
             translations.close();
         } finally {
             try {
-                if (persistence != null) {
+                if (persistenceContext != null) {
                     persistenceContext.close();
                 }
             } finally {
