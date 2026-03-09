@@ -1,4 +1,4 @@
-package net.crystalixs.core.persistence.internal.defaults;
+package net.crystalixs.core.persistence.defaults;
 
 import com.zaxxer.hikari.HikariDataSource;
 import net.crystalixs.core.common.logging.LogMetadata;
