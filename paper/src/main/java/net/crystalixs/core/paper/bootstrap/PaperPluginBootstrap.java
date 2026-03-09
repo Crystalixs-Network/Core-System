@@ -1,24 +1,23 @@
 package net.crystalixs.core.paper.bootstrap;
 
 import net.crystalixs.core.common.bootstrap.AbstractPluginBootstrap;
-import net.crystalixs.core.paper.config.PaperConfig;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.persistence.api.PersistenceContext;
-import net.crystalixs.core.persistence.api.PersistenceContextFactory;
-import net.crystalixs.core.persistence.config.DatabaseCredentials;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPluginRuntime> {
 
-    private final PaperConfigUpdater config;
-    private final PersistenceContext persistence;
+    private final PaperConfigBootstrap config;
+    private final PaperPersistenceBootstrap persistence;
     private final PaperTranslationBootstrap translations;
     private final PaperCommandBootstrap commands;
+    private PaperConfigUpdater configUpdater;
+    private PersistenceContext persistenceContext;
 
     private PaperPluginBootstrap(
             PaperPluginRuntime runtime,
-            PaperConfigUpdater config,
-            PersistenceContext persistence,
+            PaperConfigBootstrap config,
+            PaperPersistenceBootstrap persistence,
             PaperTranslationBootstrap translations,
             PaperCommandBootstrap commands
     ) {
@@ -31,8 +30,8 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
 
     public static PaperPluginBootstrap create(JavaPlugin plugin) {
         PaperPluginRuntime runtime = PaperPluginRuntime.create(plugin);
-        PaperConfigUpdater config = new PaperConfigBootstrap().load(runtime);
-        PersistenceContext persistence = PersistenceContextFactory.create(runtime.logger(), toDatabaseCredentials(config.current()));
+        PaperConfigBootstrap config = new PaperConfigBootstrap();
+        PaperPersistenceBootstrap persistence = new PaperPersistenceBootstrap();
         PaperTranslationBootstrap translations = PaperTranslationBootstrap.create(runtime);
         PaperCommandBootstrap commands = new PaperCommandBootstrap(runtime);
 
@@ -41,6 +40,8 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
 
     @Override
     protected void enableInternal() {
+        configUpdater = config.load(runtime());
+        persistenceContext = persistence.create(runtime(), configUpdater);
         commands.registerCommands();
     }
 
@@ -49,25 +50,20 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
         try {
             translations.close();
         } finally {
-            persistence.close();
+            try {
+                if (persistence != null) {
+                    persistenceContext.close();
+                }
+            } finally {
+                config.save(runtime(), configUpdater);
+            }
         }
     }
 
-    public PaperConfigUpdater config() {
-        return config;
-    }
-
     public PersistenceContext persistence() {
-        return persistence;
-    }
-
-    private static DatabaseCredentials toDatabaseCredentials(PaperConfig config) {
-        return new DatabaseCredentials(
-                config.database().host(),
-                config.database().port(),
-                config.database().database(),
-                config.database().username(),
-                config.database().password()
-        );
+        if (persistence == null) {
+            throw new IllegalStateException("Persistence is not available");
+        }
+        return persistenceContext;
     }
 }
