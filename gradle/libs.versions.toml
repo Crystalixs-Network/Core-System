@@ -5,11 +5,19 @@ velocity = "3.5.0-SNAPSHOT"
 cloud = "2.0.0-beta.10"
 adventure = "4.26.1"
 configurate = "4.2.0"
+sadu = "2.3.5"
 
 [libraries]
 # Server software
 paper = { group = "io.papermc.paper", name = "paper-api", version = "1.21.11-R0.1-SNAPSHOT" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+
+# Datasource
+mariadb = {group="org.mariadb.jdbc", name="mariadb-java-client", version="3.4.1"}
+sadu-mariadb = { group = "de.chojo.sadu", name = "sadu-mariadb", version.ref = "sadu" }
+sadu-datasource = { group = "de.chojo.sadu", name = "sadu-datasource", version.ref = "sadu" }
+sadu-queries = { group = "de.chojo.sadu", name = "sadu-queries", version.ref = "sadu" }
+sadu-updater = { group = "de.chojo.sadu", name = "sadu-updater", version.ref = "sadu" }
 
 # Configuration
 configurate-hocon = { group = "org.spongepowered", name = "configurate-hocon", version.ref = "configurate" }
@@ -39,3 +47,4 @@ cloudPaper = ["cloud-paper", "cloud-minecraftExtras", ]
 cloudVelocity = ["cloud-velocity", "cloud-minecraftExtras"]
 adventure = ["adventure-api", "adventure-text-minimessage"]
 configurate = ["configurate-hocon", "configurate-jackson"]
+sadu = ["sadu-datasource", "sadu-mariadb", "sadu-queries", "sadu-updater"]
