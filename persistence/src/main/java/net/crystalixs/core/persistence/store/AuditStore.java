@@ -8,6 +8,6 @@ public interface AuditStore {
 
     void create(AuditModel model);
 
-    List<AuditModel> findByPlayer(String playerName, int limit);
+    List<AuditModel> findByAction(String action, int limit);
 
 }
