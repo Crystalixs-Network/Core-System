@@ -4,8 +4,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import net.crystalixs.core.persistence.config.DataSourceFactory;
 import net.crystalixs.core.persistence.config.DatabaseCredentials;
-import net.crystalixs.core.persistence.internal.sadu.DefaultHomeStore;
-import net.crystalixs.core.persistence.internal.sadu.DefaultPlayerStore;
 import net.crystalixs.core.persistence.store.HomeStore;
 import net.crystalixs.core.persistence.store.PlayerStore;
 

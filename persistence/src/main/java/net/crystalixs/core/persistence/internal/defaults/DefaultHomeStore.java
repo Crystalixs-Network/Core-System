@@ -1,4 +1,4 @@
-package net.crystalixs.core.persistence.internal.sadu;
+package net.crystalixs.core.persistence.internal.defaults;
 
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import net.crystalixs.core.persistence.model.HomeModel;
