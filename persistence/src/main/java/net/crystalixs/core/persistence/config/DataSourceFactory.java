@@ -8,7 +8,7 @@ import org.mariadb.jdbc.Driver;
 
 public final class DataSourceFactory {
 
-    public HikariDataSource create(DatabaseCredentials credentials) {
+    public static HikariDataSource create(DatabaseCredentials credentials) {
         return DataSourceCreator.create(MariaDb.get())
                 .configure(jdbc -> jdbc
                         .host(credentials.host())
