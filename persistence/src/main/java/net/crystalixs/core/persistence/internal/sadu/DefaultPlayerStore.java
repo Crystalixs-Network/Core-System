@@ -10,11 +10,11 @@ import java.util.UUID;
 
 import static de.chojo.sadu.queries.api.call.Call.call;
 
-public final class SaduPlayerStore implements PlayerStore {
+public final class DefaultPlayerStore implements PlayerStore {
 
     private final QueryConfiguration config;
 
-    public SaduPlayerStore(DataSource dataSource) {
+    public DefaultPlayerStore(DataSource dataSource) {
         this.config = QueryConfiguration.builder(dataSource)
                 .setThrowExceptions(true)
                 .build();
@@ -57,7 +57,7 @@ public final class SaduPlayerStore implements PlayerStore {
 
     @Override
     public boolean delete(UUID playerId) {
-        return config.query("DELETE FROM player WHERE uuid = ?;")
+        return config.query("DELETE FROM player WHERE uuid = ?")
                 .single(call().bind(playerId.toString()))
                 .delete()
                 .changed();

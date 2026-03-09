@@ -11,11 +11,11 @@ import java.util.UUID;
 
 import static de.chojo.sadu.queries.api.call.Call.call;
 
-public final class SaduHomeStore implements HomeStore {
+public final class DefaultHomeStore implements HomeStore {
 
     private final QueryConfiguration config;
 
-    public SaduHomeStore(DataSource dataSource) {
+    public DefaultHomeStore(DataSource dataSource) {
         this.config = QueryConfiguration.builder(dataSource)
                 .setThrowExceptions(true)
                 .build();
