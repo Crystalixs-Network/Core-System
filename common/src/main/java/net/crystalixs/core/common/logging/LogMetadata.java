@@ -53,7 +53,8 @@ public final class LogMetadata {
         DESCRIPTION("description"),
         ACTOR("actor"),
         COMMAND("command"),
-        STATE("state");
+        STATE("state"),
+        CREDENTIALS("credentials");
 
         private final String value;
 
