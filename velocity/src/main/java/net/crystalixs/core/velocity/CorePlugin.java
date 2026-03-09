@@ -42,13 +42,6 @@ public final class CorePlugin {
         }
     }
 
-    public StructuredLogger logger() {
-        if (bootstrap == null) {
-            throw new IllegalStateException("Plugin bootstrap is not available");
-        }
-        return bootstrap.runtime().logger();
-    }
-
     public StructuredLogger componentLogger(String component, String... nestedComponents) {
         if (bootstrap == null) {
             throw new IllegalStateException("Plugin bootstrap is not available");
