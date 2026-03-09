@@ -19,6 +19,7 @@ public final class MigrationRunner {
                 .and(LogMetadata.Key.VERSION_TABLE, VERSION_TABLE));
         try {
             SqlUpdater.builder(source, MariaDb.get())
+                    .withClassLoader(getClass().getClassLoader())
                     .setVersionTable(VERSION_TABLE)
                     .execute();
             logger.info("completed", LogMetadata
