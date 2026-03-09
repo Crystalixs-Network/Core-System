@@ -2,6 +2,7 @@ package net.crystalixs.core.paper;
 
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.bootstrap.PaperPluginBootstrap;
+import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class CorePlugin extends JavaPlugin {
@@ -21,13 +22,6 @@ public class CorePlugin extends JavaPlugin {
         }
     }
 
-    public StructuredLogger logger() {
-        if (bootstrap == null) {
-            throw new IllegalStateException("Plugin bootstrap is not available");
-        }
-        return bootstrap.runtime().logger();
-    }
-
     public StructuredLogger componentLogger(String component, String... nestedComponents) {
         if (bootstrap == null) {
             throw new IllegalStateException("Plugin bootstrap is not available");
@@ -39,7 +33,10 @@ public class CorePlugin extends JavaPlugin {
         return componentLogger("commands", commandName);
     }
 
-    public StructuredLogger listenerLogger(String listenerName) {
-        return componentLogger("listeners", listenerName);
+    public PersistenceContext persistence() {
+        if (bootstrap == null) {
+            throw new IllegalStateException("Plugin bootstrap is not available");
+        }
+        return bootstrap.persistence();
     }
 }
