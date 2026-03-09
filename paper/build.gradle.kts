@@ -11,6 +11,7 @@ dependencies {
     compileOnly(libs.brigadier)
 
     implementation(project(":common"))
+    implementation(project(":persistence"))
     implementation(libs.bundles.cloudPaper)
     implementation(libs.configurate.hocon)
 }
