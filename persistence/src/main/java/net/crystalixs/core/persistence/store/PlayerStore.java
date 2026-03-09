@@ -11,7 +11,7 @@ public interface PlayerStore {
 
     boolean exists(UUID playerId);
 
-    void create(PlayerModel model);
+    void create(UUID playerId);
 
     void update(PlayerModel model);
 

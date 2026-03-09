@@ -26,7 +26,7 @@ public class DefaultAuditStore implements AuditStore {
     public void create(AuditModel model) {
         try {
             config.query("""
-                            INSERT INTO economy_audit (action, payload, status) 
+                            INSERT INTO economy_audit (action, payload, status)
                             VALUES (?, ?, ?);
                             """)
                     .single(call()

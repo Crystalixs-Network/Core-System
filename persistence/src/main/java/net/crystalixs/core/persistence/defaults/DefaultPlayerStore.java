@@ -47,17 +47,13 @@ public final class DefaultPlayerStore implements PlayerStore {
     }
 
     @Override
-    public void create(PlayerModel model) {
+    public void create(UUID playerId) {
         try {
-            config.query("INSERT INTO player (uuid, playtime, coins, gems) VALUES (?, ?, ?, ?);")
-                    .single(call()
-                            .bind(model.uuid().toString())
-                            .bind(model.playtime())
-                            .bind(model.coins())
-                            .bind(model.gems()))
+            config.query("INSERT INTO player (uuid) VALUES (?);")
+                    .single(call().bind(playerId.toString()))
                     .insert();
         } catch (RuntimeException exception) {
-            throw failure("persistence.player.create_failed", model.uuid(), "Could not create player", exception);
+            throw failure("persistence.player.create_failed", playerId, "Could not create player", exception);
         }
     }
 

@@ -31,9 +31,8 @@ public final class DefaultEconomyService implements EconomyService {
 
     private PlayerModel getOrCreatePlayer(UUID playerId) {
         return store.findById(playerId).orElseGet(() -> {
-            PlayerModel model = new PlayerModel(playerId, 0L, 0L, 0L);
-            store.create(model);
-            return store.findById(playerId).orElse(model);
+            store.create(playerId);
+            return store.findById(playerId).orElseThrow(() -> new IllegalStateException("Could not load player after creation: " + playerId));
         });
     }
 }
