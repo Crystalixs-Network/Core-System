@@ -5,6 +5,7 @@ plugins {
 
 dependencies {
     api(project(":common"))
+    implementation(libs.mariadb)
     implementation(libs.bundles.sadu)
 }
 
@@ -16,7 +17,8 @@ tasks {
             libs.sadu.datasource to "sadu.datasource",
             libs.sadu.mariadb to "sadu.mariadb",
             libs.sadu.queries to "sadu.queries",
-            libs.sadu.updater to "sadu.updater"
+            libs.sadu.updater to "sadu.updater",
+            libs.mariadb to "mariadb",
         )
 
         val base = "$group.$artifact.persistence.libs"
