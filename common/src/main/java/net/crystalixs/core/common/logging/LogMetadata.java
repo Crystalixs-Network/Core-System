@@ -54,7 +54,8 @@ public final class LogMetadata {
         ACTOR("actor"),
         COMMAND("command"),
         STATE("state"),
-        CREDENTIALS("credentials");
+        CREDENTIALS("credentials"),
+        VERSION_TABLE("versionTable");
 
         private final String value;
 

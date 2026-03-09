@@ -15,22 +15,21 @@ public final class MigrationRunner {
 
     public void run(DataSource source, StructuredLogger logger) {
         logger.info("starting", LogMetadata
-                .event("persistence.migration.start")
-                .and(LogMetadata.Key.SUBJECT, VERSION_TABLE));
+                .event("persistence.migration.run")
+                .and(LogMetadata.Key.VERSION_TABLE, VERSION_TABLE));
         try {
             SqlUpdater.builder(source, MariaDb.get())
                     .setVersionTable(VERSION_TABLE)
                     .execute();
             logger.info("completed", LogMetadata
                     .event("persistence.migration.completed")
-                    .and(LogMetadata.Key.SUBJECT, VERSION_TABLE));
+                    .and(LogMetadata.Key.VERSION_TABLE, VERSION_TABLE));
 
         } catch (IOException | SQLException exception) {
-            logger.error("failed", LogMetadata.
-                    event("persistence.migration.failed")
-                    .and(LogMetadata.Key.SUBJECT, VERSION_TABLE), exception);
+            logger.error("failed", LogMetadata
+                    .event("persistence.migration.failed")
+                    .and(LogMetadata.Key.VERSION_TABLE, VERSION_TABLE), exception);
             throw new IllegalStateException("Could not execute database migration", exception);
         }
     }
-
 }
