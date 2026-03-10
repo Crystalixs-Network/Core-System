@@ -1,8 +1,8 @@
 package net.crystalixs.core.paper.bootstrap;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import net.crystalixs.core.paper.command.PaperCommandSource;
-import net.crystalixs.core.paper.command.PaperPlayerCommandSource;
+import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
+import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.SenderMapper;

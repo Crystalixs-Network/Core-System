@@ -1,4 +1,4 @@
-package net.crystalixs.core.paper.command;
+package net.crystalixs.core.paper.command.cloud;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
