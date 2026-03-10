@@ -11,6 +11,7 @@ import net.crystalixs.core.paper.economy.EconomyService;
 import net.crystalixs.core.persistence.model.Currency;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
@@ -53,6 +54,63 @@ public class EconomyCommand extends PaperCommand {
                         RichDescription.translatable("command.economy.description.amount"),
                         noSuggestions())
                 .handler(this::handleEconomyAdd));
+
+        commandManager.command(commandManager.commandBuilder("eco", "eco")
+                .commandDescription(RichDescription.translatable("command.economy.description.main"))
+                .senderType(PaperCommandSource.class)
+                .permission(Permission.of("core.command.economy"))
+                .literal("set", RichDescription.translatable("command.economy.description.set"))
+                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player"))
+                .required("currency", stringParser(),
+                        RichDescription.translatable("command.economy.description.currency"),
+                        SuggestionProvider.suggestingStrings("coins", "gems"))
+                .required("amount", longParser(),
+                        RichDescription.translatable("command.economy.description.amount"),
+                        noSuggestions())
+                .handler(this::handleEconomySet)
+        );
+    }
+
+    private void handleEconomySet(CommandContext<PaperCommandSource> context) {
+        CommandSender sender = context.sender().plattformSender();
+        Player target = context.get("player");
+        long amount = context.get("amount");
+        Currency currency = parseCurrency(context.get("currency"));
+
+        if (currency == null) {
+            sender.sendMessage("error.invalid-currency");
+            return;
+        }
+
+        try {
+            service.setCurrency(target.getUniqueId(), currency, amount);
+            sender.sendMessage(translatable("command.economy.success.set").arguments(
+                    component("player", target.name()),
+                    numeric("amount", amount),
+                    component("currency", text(currency.name()))));
+            target.sendMessage(translatable("command.economy.succsess.set.receive").arguments(
+                    numeric("amount", amount),
+                    component("currency", text(currency.name()))));
+
+        } catch (EconomyException exception) {
+            if (exception.error() == EconomyError.PLAYER_CREATION_FAILED) {
+                logger.warn("eco give command failed", LogMetadata
+                        .event("command.eco.give.failed")
+                        .and(LogMetadata.Key.ACTOR, sender.getName())
+                        .and(LogMetadata.Key.SUBJECT, target.getUniqueId().toString())
+                        .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
+            }
+
+            String key = switch (exception.error()) {
+                case PLAYER_CREATION_FAILED -> "error.player-load";
+                case INVALID_AMOUNT -> "error.invalid-amount";
+                default -> null;
+            };
+
+            if (key != null) {
+                sender.sendMessage(translatable(key));
+            }
+        }
     }
 
     private void handleEconomyAdd(CommandContext<PaperCommandSource> context) {
@@ -72,7 +130,7 @@ public class EconomyCommand extends PaperCommand {
                     component("player", target.name()),
                     numeric("amount", amount),
                     component("currency", text(currency.name()))));
-            target.sendMessage(translatable("command.economy.success.receive").arguments(
+            target.sendMessage(translatable("command.economy.success.give.receive").arguments(
                     numeric("amount", amount),
                     component("currency", text(currency.name()))));
 
