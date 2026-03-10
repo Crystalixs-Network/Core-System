@@ -97,7 +97,7 @@ public final class DefaultEconomyService implements EconomyService {
         }
 
         PlayerModel from = getOrCreatePlayer(fromPlayerId);
-        PlayerModel to = getOrCreatePlayer(fromPlayerId);
+        PlayerModel to = getOrCreatePlayer(toPlayerId);
 
         if (from.coins() < amount) {
             throw new IllegalStateException("Insufficient coins");
