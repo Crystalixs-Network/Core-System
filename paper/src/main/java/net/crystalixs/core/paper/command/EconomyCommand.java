@@ -53,7 +53,7 @@ public class EconomyCommand extends PaperCommand {
                 .required("amount", longParser(),
                         RichDescription.translatable("command.economy.description.amount"),
                         noSuggestions())
-                .handler(this::handleEconomyAdd));
+                .handler(this::handleEconomyGive));
 
         commandManager.command(commandManager.commandBuilder("economy", "eco")
                 .commandDescription(RichDescription.translatable("command.economy.description.main"))
@@ -72,48 +72,22 @@ public class EconomyCommand extends PaperCommand {
     }
 
     private void handleEconomySet(CommandContext<PaperCommandSource> context) {
-        CommandSender sender = context.sender().plattformSender();
-        Player target = context.get("player");
-        long amount = context.get("amount");
-        Currency currency = parseCurrency(context.get("currency"));
-
-        if (currency == null) {
-            sender.sendMessage("error.invalid-currency");
-            return;
-        }
-
-        try {
-            service.setCurrency(target.getUniqueId(), currency, amount);
-            sender.sendMessage(translatable("command.economy.success.set").arguments(
-                    component("player", target.name()),
-                    numeric("amount", amount),
-                    component("currency", text(currency.name()))));
-            target.sendMessage(translatable("command.economy.succsess.set.receive").arguments(
-                    numeric("amount", amount),
-                    component("currency", text(currency.name()))));
-
-        } catch (EconomyException exception) {
-            if (exception.error() == EconomyError.PLAYER_CREATION_FAILED) {
-                logger.warn("eco give command failed", LogMetadata
-                        .event("command.eco.give.failed")
-                        .and(LogMetadata.Key.ACTOR, sender.getName())
-                        .and(LogMetadata.Key.SUBJECT, target.getUniqueId().toString())
-                        .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
-            }
-
-            String key = switch (exception.error()) {
-                case PLAYER_CREATION_FAILED -> "error.player-load";
-                case INVALID_AMOUNT -> "error.invalid-amount";
-                default -> null;
-            };
-
-            if (key != null) {
-                sender.sendMessage(translatable(key));
-            }
-        }
+        mutateCurrency(context,
+                (target, currency, amount) -> service.setCurrency(target.getUniqueId(), currency, amount),
+                "command.economy.success.set",
+                "command.economy.success.set.send",
+                "command.economy.set.failed");
     }
 
-    private void handleEconomyAdd(CommandContext<PaperCommandSource> context) {
+    private void handleEconomyGive(CommandContext<PaperCommandSource> context) {
+        mutateCurrency(context,
+                (target, currency, amount) -> service.setCurrency(target.getUniqueId(), currency, amount),
+                "command.economy.success.give",
+                "command.economy.success.give.receive",
+                "command.economy.give.failed");
+    }
+
+    private void mutateCurrency(CommandContext<PaperCommandSource> context, Mutation mutation, String senderSuccessKey, String targetSuccessKey, String logEvent) {
         CommandSender sender = context.sender().plattformSender();
         Player target = context.get("player");
         long amount = context.get("amount");
@@ -125,30 +99,29 @@ public class EconomyCommand extends PaperCommand {
         }
 
         try {
-            service.addCurrency(target.getUniqueId(), currency, amount);
-            sender.sendMessage(translatable("command.economy.success.give").arguments(
+            mutation.apply(target, currency, amount);
+
+            sender.sendMessage(translatable(senderSuccessKey).arguments(
                     component("player", target.name()),
                     numeric("amount", amount),
                     component("currency", text(currency.name()))));
-            target.sendMessage(translatable("command.economy.success.give.receive").arguments(
+            target.sendMessage(translatable(targetSuccessKey).arguments(
                     numeric("amount", amount),
                     component("currency", text(currency.name()))));
 
         } catch (EconomyException exception) {
             if (exception.error() == EconomyError.PLAYER_CREATION_FAILED) {
-                logger.warn("eco give command failed", LogMetadata
-                        .event("command.eco.give.failed")
+                logger.warn(logEvent + " command failed", LogMetadata
+                        .event(logEvent + ".failed")
                         .and(LogMetadata.Key.ACTOR, sender.getName())
                         .and(LogMetadata.Key.SUBJECT, target.getUniqueId().toString())
                         .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
             }
-
             String key = switch (exception.error()) {
                 case PLAYER_CREATION_FAILED -> "error.player-load";
                 case INVALID_AMOUNT -> "error.invalid-amount";
                 default -> null;
             };
-
             if (key != null) {
                 sender.sendMessage(translatable(key));
             }
@@ -161,5 +134,10 @@ public class EconomyCommand extends PaperCommand {
             case "gems" -> Currency.GEMS;
             default -> null;
         };
+    }
+
+    @FunctionalInterface
+    private interface Mutation {
+        void apply(Player target, Currency currency, long amount);
     }
 }
