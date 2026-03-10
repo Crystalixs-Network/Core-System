@@ -6,7 +6,6 @@ import net.crystalixs.core.paper.command.CoinsCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
-import net.crystalixs.core.paper.economy.EconomyErrorMessageMapper;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.SenderMapper;
@@ -30,9 +29,8 @@ public final class PaperCommandBootstrap {
         CorePlugin plugin = (CorePlugin) runtime.plugin();
         var persistence = plugin.persistence();
         var service = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
-        var errorMapper = new EconomyErrorMessageMapper();
 
-        new CoinsCommand(plugin, service, errorMapper).registerTo(commandManager);
+        new CoinsCommand(plugin, service).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {

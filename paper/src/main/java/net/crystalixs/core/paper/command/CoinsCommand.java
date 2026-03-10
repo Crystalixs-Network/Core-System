@@ -4,9 +4,9 @@ import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
-import net.crystalixs.core.paper.economy.EconomyErrorMessageMapper;
 import net.crystalixs.core.paper.economy.EconomyException;
 import net.crystalixs.core.paper.economy.EconomyService;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
@@ -20,12 +20,10 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 public final class CoinsCommand extends PaperCommand {
 
     private final EconomyService service;
-    private final EconomyErrorMessageMapper errorMapper;
 
-    public CoinsCommand(CorePlugin plugin, EconomyService service, EconomyErrorMessageMapper errorMapper) {
+    public CoinsCommand(CorePlugin plugin, EconomyService service) {
         super(plugin);
         this.service = service;
-        this.errorMapper = errorMapper;
     }
 
     @Override
@@ -41,7 +39,14 @@ public final class CoinsCommand extends PaperCommand {
                         context.sender().sendMessage(translatable("command.coins.success").arguments(component("amount", text(coins))));
 
                     } catch (EconomyException exception) {
-                        context.sender().sendMessage(translatable(errorMapper.keyForCoins(exception.error())));
+                        Component component = translatable(switch (exception.error()) {
+                            case INVALID_AMOUNT -> "command.pay.error.invalid-amount";
+                            case SELF_TRANSFER -> "command.pay.error.self-transfer";
+                            case INSUFFICIENT_FUNDS -> "command.pay.error.insufficient-funds";
+                            case PLAYER_NOT_FOUND -> "command.pay.error.player-not-found";
+                            case PLAYER_CREATION_FAILED -> "command.pay.error.player-load";
+                        });
+                        context.sender().sendMessage(component);
                     }
                 }));
     }
