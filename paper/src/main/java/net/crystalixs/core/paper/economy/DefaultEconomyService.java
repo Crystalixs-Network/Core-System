@@ -50,7 +50,8 @@ public final class DefaultEconomyService implements EconomyService {
             case GEMS -> gems = safeAdd(gems, amount);
         }
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
-        transactions.create(new TransactionModel(0L, TransactionType.ADMIN_GIVE, currency, amount, null, playerId, null, "admin_give", null));
+
+        transaction(TransactionType.ADMIN_GIVE, currency, amount, null, playerId, null, "admin_give");
         audit("economy.addCurrency", "playerId=" + playerId + ",currency=" + currency + ",amount=" + amount + ",reason=admin_give");
     }
 
@@ -76,11 +77,10 @@ public final class DefaultEconomyService implements EconomyService {
 
         long delta = Math.abs(previous - amount);
         TransactionType type = amount >= previous ? TransactionType.ADMIN_GIVE : TransactionType.ADMIN_TAKE;
-        transactions.create(new TransactionModel(0L,
-                type, currency, delta,
-                amount >= previous ? null : playerId,
-                amount >= previous ? playerId : null,
-                null, "admin_set", null));
+        UUID fromPlayerId = amount >= previous ? null : playerId;
+        UUID toPlayerId = amount >= previous ? playerId : null;
+
+        transaction(type, currency, delta, fromPlayerId, toPlayerId, null, "admin_set");
         audit("economy.setCurrency", "playerId=" + playerId + ",currency=" + currency + ",amount=" + amount + ",reason=admin_set");
     }
 
@@ -105,7 +105,8 @@ public final class DefaultEconomyService implements EconomyService {
             }
         }
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
-        transactions.create(new TransactionModel(0L, TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take", null));
+
+        transaction(TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take");
         audit("economy.takeCurrency", "playerId=" + playerId + ",currency=" + currency + ",amount=" + amount + ",reason=admin_take");
     }
 
@@ -130,12 +131,16 @@ public final class DefaultEconomyService implements EconomyService {
         store.update(new PlayerModel(from.uuid(), from.playtime(), updatedFromCoins, from.gems()));
         store.update(new PlayerModel(to.uuid(), to.playtime(), updatedToCoins, to.gems()));
 
-        transactions.create(new TransactionModel(0L, TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer", null));
+        transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
         audit("economy.transferCoins", "fromPlayerId=" + fromPlayerId + ",toPlayerId=" + toPlayerId + ",amount=" + amount + ",reason=player_transfer");
     }
 
     private void audit(String action, String payload) {
         audits.create(new AuditModel(0L, action, payload, "SUCCESS", null));
+    }
+
+    private void transaction(TransactionType type, Currency currency, long amount, UUID fromPlayerId, UUID toPlayerId, UUID actorPlayerId, String reason) {
+        transactions.create(new TransactionModel(0L, type, currency, amount, fromPlayerId, toPlayerId, actorPlayerId, reason, null));
     }
 
     private long safeAdd(long current, long delta) {
