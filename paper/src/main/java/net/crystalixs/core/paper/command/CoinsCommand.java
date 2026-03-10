@@ -1,5 +1,7 @@
 package net.crystalixs.core.paper.command;
 
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
@@ -19,10 +21,13 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 
 public final class CoinsCommand extends PaperCommand {
 
+    private final StructuredLogger logger;
     private final EconomyService service;
 
-    public CoinsCommand(CorePlugin plugin, EconomyService service) {
+
+    public CoinsCommand(CorePlugin plugin, StructuredLogger logger, EconomyService service) {
         super(plugin);
+        this.logger = logger;
         this.service = service;
     }
 
@@ -34,19 +39,18 @@ public final class CoinsCommand extends PaperCommand {
                 .permission(Permission.of("core.command.coins"))
                 .handler(context -> {
                     Player player = context.sender().player();
+
                     try {
                         long coins = service.getCoins(player.getUniqueId());
                         context.sender().sendMessage(translatable("command.coins.success").arguments(component("amount", text(coins))));
 
                     } catch (EconomyException exception) {
-                        Component component = translatable(switch (exception.error()) {
-                            case INVALID_AMOUNT -> "command.pay.error.invalid-amount";
-                            case SELF_TRANSFER -> "command.pay.error.self-transfer";
-                            case INSUFFICIENT_FUNDS -> "command.pay.error.insufficient-funds";
-                            case PLAYER_NOT_FOUND -> "command.pay.error.player-not-found";
-                            case PLAYER_CREATION_FAILED -> "command.pay.error.player-load";
-                        });
-                        context.sender().sendMessage(component);
+                        logger.warn("coins command failed", LogMetadata.event("command.coins.failed")
+                                .and(LogMetadata.Key.ACTOR, player.getName())
+                                .and(LogMetadata.Key.SUBJECT, player.getUniqueId().toString())
+                                .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
+
+                        player.sendMessage(translatable("error.player-load"));
                     }
                 }));
     }
