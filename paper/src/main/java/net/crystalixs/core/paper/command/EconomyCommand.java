@@ -90,7 +90,7 @@ public class EconomyCommand extends PaperCommand {
                 (target, currency, amount) -> service.takeCurrency(target.getUniqueId(), currency, amount),
                 "command.economy.success.take.actor",
                 "command.economy.success.take.receiver",
-                "command.economy.take.failed");
+                "command.economy.take");
     }
 
     private void handleEconomySet(CommandContext<PaperCommandSource> context) {
@@ -98,7 +98,7 @@ public class EconomyCommand extends PaperCommand {
                 (target, currency, amount) -> service.setCurrency(target.getUniqueId(), currency, amount),
                 "command.economy.success.set.actor",
                 "command.economy.success.set.receiver",
-                "command.economy.set.failed");
+                "command.economy.set");
     }
 
     private void handleEconomyGive(CommandContext<PaperCommandSource> context) {
@@ -106,7 +106,7 @@ public class EconomyCommand extends PaperCommand {
                 (target, currency, amount) -> service.addCurrency(target.getUniqueId(), currency, amount),
                 "command.economy.success.give.actor",
                 "command.economy.success.give.receiver",
-                "command.economy.give.failed");
+                "command.economy.give");
     }
 
     private void mutateCurrency(CommandContext<PaperCommandSource> context, Mutation mutation, String senderSuccessKey, String targetSuccessKey, String logEvent) {
