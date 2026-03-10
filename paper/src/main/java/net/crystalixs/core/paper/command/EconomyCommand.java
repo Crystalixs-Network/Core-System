@@ -21,8 +21,9 @@ import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
-import static net.kyori.adventure.text.minimessage.translation.Argument.numeric;
+import static net.kyori.adventure.text.minimessage.translation.Argument.tagResolver;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 import static org.incendo.cloud.parser.standard.LongParser.longParser;
 import static org.incendo.cloud.parser.standard.StringParser.stringParser;
@@ -125,10 +126,10 @@ public class EconomyCommand extends PaperCommand {
 
             sender.sendMessage(translatable(senderSuccessKey).arguments(
                     component("player", target.name()),
-                    numeric("amount", amount),
+                    tagResolver(number("amount", amount)),
                     component("currency", text(currency.name()))));
             target.sendMessage(translatable(targetSuccessKey).arguments(
-                    numeric("amount", amount),
+                    tagResolver(number("amount", amount)),
                     component("currency", text(currency.name()))));
 
         } catch (EconomyException exception) {
