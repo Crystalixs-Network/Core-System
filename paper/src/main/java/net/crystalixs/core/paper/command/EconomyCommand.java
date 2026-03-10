@@ -46,7 +46,7 @@ public class EconomyCommand extends PaperCommand {
                 .senderType(PaperCommandSource.class)
                 .permission(Permission.of("core.command.economy"))
                 .literal("give", RichDescription.translatable("command.economy.description.give"))
-                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player"))
+                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player.give"))
                 .required("currency", stringParser(),
                         RichDescription.translatable("command.economy.description.currency"),
                         SuggestionProvider.suggestingStrings("coins", "gems"))
@@ -60,7 +60,7 @@ public class EconomyCommand extends PaperCommand {
                 .senderType(PaperCommandSource.class)
                 .permission(Permission.of("core.command.economy"))
                 .literal("set", RichDescription.translatable("command.economy.description.set"))
-                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player"))
+                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player.set"))
                 .required("currency", stringParser(),
                         RichDescription.translatable("command.economy.description.currency"),
                         SuggestionProvider.suggestingStrings("coins", "gems"))
@@ -74,7 +74,7 @@ public class EconomyCommand extends PaperCommand {
                 .senderType(PaperCommandSource.class)
                 .permission(Permission.of("core.command.economy"))
                 .literal("take", RichDescription.translatable("command.economy.description.take"))
-                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player"))
+                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player.take"))
                 .required("currency", stringParser(),
                         RichDescription.translatable("command.economy.description.currency"),
                         SuggestionProvider.suggestingStrings("coins", "gems"))
