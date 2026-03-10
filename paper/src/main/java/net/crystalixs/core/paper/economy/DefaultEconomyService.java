@@ -7,7 +7,6 @@ import net.crystalixs.core.persistence.model.TransactionType;
 import net.crystalixs.core.persistence.store.PlayerStore;
 import net.crystalixs.core.persistence.store.TransactionStore;
 
-import java.time.Instant;
 import java.util.UUID;
 
 public final class DefaultEconomyService implements EconomyService {
@@ -51,6 +50,7 @@ public final class DefaultEconomyService implements EconomyService {
             case GEMS -> gems = safeAdd(gems, amount);
         }
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
+        transactions.create(new TransactionModel(0L, TransactionType.ADMIN_GIVE, currency, amount, null, playerId, null, "admin_give", null));
     }
 
     @Override
@@ -60,6 +60,10 @@ public final class DefaultEconomyService implements EconomyService {
         }
 
         PlayerModel model = getOrCreatePlayer(playerId);
+        long previous = switch (currency) {
+            case COINS -> model.coins();
+            case GEMS -> model.gems();
+        };
         long coins = model.coins();
         long gems = model.gems();
 
@@ -68,6 +72,14 @@ public final class DefaultEconomyService implements EconomyService {
             case GEMS -> gems = amount;
         }
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
+
+        long delta = Math.abs(previous - amount);
+        TransactionType type = amount >= previous ? TransactionType.ADMIN_GIVE : TransactionType.ADMIN_TAKE;
+        transactions.create(new TransactionModel(0L,
+                type, currency, delta,
+                amount >= previous ? null : playerId,
+                amount >= previous ? playerId : null,
+                null, "admin_set", null));
     }
 
     @Override
@@ -91,6 +103,7 @@ public final class DefaultEconomyService implements EconomyService {
             }
         }
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
+        transactions.create(new TransactionModel(0L, TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take", null));
     }
 
     @Override
