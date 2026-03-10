@@ -52,7 +52,7 @@ public final class DefaultEconomyService implements EconomyService {
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
 
         transaction(TransactionType.ADMIN_GIVE, currency, amount, null, playerId, null, "admin_give");
-        audit("economy.addCurrency", "playerId=" + playerId + ",currency=" + currency + ",amount=" + amount + ",reason=admin_give");
+        auditSuccess("economy.addCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_give");
     }
 
     @Override
@@ -81,7 +81,7 @@ public final class DefaultEconomyService implements EconomyService {
         UUID toPlayerId = amount >= previous ? playerId : null;
 
         transaction(type, currency, delta, fromPlayerId, toPlayerId, null, "admin_set");
-        audit("economy.setCurrency", "playerId=" + playerId + ",currency=" + currency + ",amount=" + amount + ",reason=admin_set");
+        auditSuccess("economy.setCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_set");
     }
 
     @Override
@@ -107,7 +107,7 @@ public final class DefaultEconomyService implements EconomyService {
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
 
         transaction(TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take");
-        audit("economy.takeCurrency", "playerId=" + playerId + ",currency=" + currency + ",amount=" + amount + ",reason=admin_take");
+        auditSuccess("economy.takeCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_take");
     }
 
     @Override
@@ -132,15 +132,24 @@ public final class DefaultEconomyService implements EconomyService {
         store.update(new PlayerModel(to.uuid(), to.playtime(), updatedToCoins, to.gems()));
 
         transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
-        audit("economy.transferCoins", "fromPlayerId=" + fromPlayerId + ",toPlayerId=" + toPlayerId + ",amount=" + amount + ",reason=player_transfer");
+        auditSuccess("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
     }
 
-    private void audit(String action, String payload) {
-        audits.create(new AuditModel(0L, action, payload, "SUCCESS", null));
+    private void auditSuccess(String action, Object... payloadPairs) {
+        audits.create(new AuditModel(0L, action, payload(payloadPairs), "SUCCESS", null));
     }
 
     private void transaction(TransactionType type, Currency currency, long amount, UUID fromPlayerId, UUID toPlayerId, UUID actorPlayerId, String reason) {
         transactions.create(new TransactionModel(0L, type, currency, amount, fromPlayerId, toPlayerId, actorPlayerId, reason, null));
+    }
+
+    private String payload(Object... pairs) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < pairs.length; i += 2) {
+            if (i > 0) builder.append(",");
+            builder.append(pairs[i]).append("=").append(pairs[i + 1]);
+        }
+        return builder.toString();
     }
 
     private long safeAdd(long current, long delta) {
