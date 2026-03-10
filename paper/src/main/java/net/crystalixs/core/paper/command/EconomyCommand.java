@@ -11,7 +11,6 @@ import net.crystalixs.core.paper.economy.EconomyService;
 import net.crystalixs.core.persistence.model.Currency;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
