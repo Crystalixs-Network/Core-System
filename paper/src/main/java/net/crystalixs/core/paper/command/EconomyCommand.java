@@ -68,6 +68,9 @@ public class EconomyCommand extends PaperCommand {
                                 component("player", target.name()),
                                 numeric("amount", amount),
                                 component("currency", text(currency.name()))));
+                        target.sendMessage(translatable("command.economy.success.receive").arguments(
+                                numeric("amount", amount),
+                                component("currency", text(currency.name()))));
 
                     } catch (EconomyException exception) {
                         if (exception.error() == EconomyError.PLAYER_CREATION_FAILED) {
