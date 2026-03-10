@@ -2,16 +2,22 @@ package net.crystalixs.core.paper.economy;
 
 import net.crystalixs.core.persistence.model.Currency;
 import net.crystalixs.core.persistence.model.PlayerModel;
+import net.crystalixs.core.persistence.model.TransactionModel;
+import net.crystalixs.core.persistence.model.TransactionType;
 import net.crystalixs.core.persistence.store.PlayerStore;
+import net.crystalixs.core.persistence.store.TransactionStore;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public final class DefaultEconomyService implements EconomyService {
 
     private final PlayerStore store;
+    private final TransactionStore transactions;
 
-    public DefaultEconomyService(PlayerStore store) {
+    public DefaultEconomyService(PlayerStore store, TransactionStore transactions) {
         this.store = store;
+        this.transactions = transactions;
     }
 
     @Override
@@ -107,6 +113,8 @@ public final class DefaultEconomyService implements EconomyService {
 
         store.update(new PlayerModel(from.uuid(), from.playtime(), updatedFromCoins, from.gems()));
         store.update(new PlayerModel(to.uuid(), to.playtime(), updatedToCoins, to.gems()));
+
+        transactions.create(new TransactionModel(0L, TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, null, null));
     }
 
     private long safeAdd(long current, long delta) {
