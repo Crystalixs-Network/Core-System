@@ -127,7 +127,7 @@ public final class DefaultEconomyService implements EconomyService {
         store.update(new PlayerModel(from.uuid(), from.playtime(), updatedFromCoins, from.gems()));
         store.update(new PlayerModel(to.uuid(), to.playtime(), updatedToCoins, to.gems()));
 
-        transactions.create(new TransactionModel(0L, TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, null, null));
+        transactions.create(new TransactionModel(0L, TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer", null));
     }
 
     private long safeAdd(long current, long delta) {
