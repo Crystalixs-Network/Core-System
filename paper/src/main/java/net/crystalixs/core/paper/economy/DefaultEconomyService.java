@@ -1,9 +1,7 @@
 package net.crystalixs.core.paper.economy;
 
-import net.crystalixs.core.persistence.model.Currency;
-import net.crystalixs.core.persistence.model.PlayerModel;
-import net.crystalixs.core.persistence.model.TransactionModel;
-import net.crystalixs.core.persistence.model.TransactionType;
+import net.crystalixs.core.persistence.model.*;
+import net.crystalixs.core.persistence.store.AuditStore;
 import net.crystalixs.core.persistence.store.PlayerStore;
 import net.crystalixs.core.persistence.store.TransactionStore;
 
@@ -13,10 +11,12 @@ public final class DefaultEconomyService implements EconomyService {
 
     private final PlayerStore store;
     private final TransactionStore transactions;
+    private final AuditStore audits;
 
-    public DefaultEconomyService(PlayerStore store, TransactionStore transactions) {
+    public DefaultEconomyService(PlayerStore store, TransactionStore transactions, AuditStore audits) {
         this.store = store;
         this.transactions = transactions;
+        this.audits = audits;
     }
 
     @Override
@@ -51,6 +51,7 @@ public final class DefaultEconomyService implements EconomyService {
         }
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
         transactions.create(new TransactionModel(0L, TransactionType.ADMIN_GIVE, currency, amount, null, playerId, null, "admin_give", null));
+        audit("economy.addCurrency", "playerId=" + playerId + ",currency=" + currency + ",amount=" + amount + ",reason=admin_give");
     }
 
     @Override
@@ -80,6 +81,7 @@ public final class DefaultEconomyService implements EconomyService {
                 amount >= previous ? null : playerId,
                 amount >= previous ? playerId : null,
                 null, "admin_set", null));
+        audit("economy.setCurrency", "playerId=" + playerId + ",currency=" + currency + ",amount=" + amount + ",reason=admin_set");
     }
 
     @Override
@@ -104,6 +106,7 @@ public final class DefaultEconomyService implements EconomyService {
         }
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
         transactions.create(new TransactionModel(0L, TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take", null));
+        audit("economy.takeCurrency", "playerId=" + playerId + ",currency=" + currency + ",amount=" + amount + ",reason=admin_take");
     }
 
     @Override
@@ -128,6 +131,11 @@ public final class DefaultEconomyService implements EconomyService {
         store.update(new PlayerModel(to.uuid(), to.playtime(), updatedToCoins, to.gems()));
 
         transactions.create(new TransactionModel(0L, TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer", null));
+        audit("economy.transferCoins", "fromPlayerId=" + fromPlayerId + ",toPlayerId=" + toPlayerId + ",amount=" + amount + ",reason=player_transfer");
+    }
+
+    private void audit(String action, String payload) {
+        audits.create(new AuditModel(0L, action, payload, "SUCCESS", null));
     }
 
     private long safeAdd(long current, long delta) {
