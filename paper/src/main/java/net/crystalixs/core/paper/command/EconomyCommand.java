@@ -66,8 +66,30 @@ public class EconomyCommand extends PaperCommand {
                 .required("amount", longParser(),
                         RichDescription.translatable("command.economy.description.amount"),
                         noSuggestions())
-                .handler(this::handleEconomySet)
+                .handler(this::handleEconomySet));
+
+        commandManager.command(commandManager.commandBuilder("economy", "eco")
+                .commandDescription(RichDescription.translatable("command.economy.description.main"))
+                .senderType(PaperCommandSource.class)
+                .permission(Permission.of("core.command.economy"))
+                .literal("take", RichDescription.translatable("command.economy.description.take"))
+                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player"))
+                .required("currency", stringParser(),
+                        RichDescription.translatable("command.economy.description.currency"),
+                        SuggestionProvider.suggestingStrings("coins", "gems"))
+                .required("amount", longParser(),
+                        RichDescription.translatable("command.economy.description.currency"),
+                        noSuggestions())
+                .handler(this::handleEconomyTake)
         );
+    }
+
+    private void handleEconomyTake(CommandContext<PaperCommandSource> context) {
+        mutateCurrency(context,
+                (target, currency, amount) -> service.takeCurrency(target.getUniqueId(), currency, amount),
+                "command.economy.success.take.actor",
+                "command.economy.success.take.receiver",
+                "command.economy.take.failed");
     }
 
     private void handleEconomySet(CommandContext<PaperCommandSource> context) {
