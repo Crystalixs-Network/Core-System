@@ -55,7 +55,7 @@ public class EconomyCommand extends PaperCommand {
                         noSuggestions())
                 .handler(this::handleEconomyAdd));
 
-        commandManager.command(commandManager.commandBuilder("eco", "eco")
+        commandManager.command(commandManager.commandBuilder("economy", "eco")
                 .commandDescription(RichDescription.translatable("command.economy.description.main"))
                 .senderType(PaperCommandSource.class)
                 .permission(Permission.of("core.command.economy"))
