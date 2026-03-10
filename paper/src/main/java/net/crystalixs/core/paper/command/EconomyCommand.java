@@ -9,6 +9,7 @@ import net.crystalixs.core.paper.economy.EconomyError;
 import net.crystalixs.core.paper.economy.EconomyException;
 import net.crystalixs.core.paper.economy.EconomyService;
 import net.crystalixs.core.persistence.model.Currency;
+import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
@@ -144,9 +145,14 @@ public class EconomyCommand extends PaperCommand {
                 case INSUFFICIENT_FUNDS -> "command.economy.error.insuficient-funs";
                 default -> null;
             };
-            if (key != null) {
-                sender.sendMessage(translatable(key).arguments(component("currency", text(currency.name()))));
+
+            if (key == null) return;
+
+            TranslatableComponent component = translatable(key);
+            if (exception.error() == EconomyError.INSUFFICIENT_FUNDS) {
+                component = component.arguments(component("currency", text(currency.name())));
             }
+            sender.sendMessage(component);
         }
     }
 
