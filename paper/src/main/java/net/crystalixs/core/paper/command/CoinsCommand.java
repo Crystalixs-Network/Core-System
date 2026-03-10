@@ -14,9 +14,8 @@ import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jspecify.annotations.NonNull;
 
-import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
-import static net.kyori.adventure.text.minimessage.translation.Argument.component;
+import static net.kyori.adventure.text.minimessage.translation.Argument.numeric;
 
 public final class CoinsCommand extends PaperCommand {
 
@@ -40,7 +39,7 @@ public final class CoinsCommand extends PaperCommand {
 
                     try {
                         long coins = service.getCoins(player.getUniqueId());
-                        player.sendMessage(translatable("command.coins.success").arguments(component("amount", text(coins))));
+                        player.sendMessage(translatable("command.coins.success").arguments(numeric("amount", coins)));
 
                     } catch (EconomyException exception) {
                         logger.warn("coins command failed", LogMetadata.event("command.coins.failed")
