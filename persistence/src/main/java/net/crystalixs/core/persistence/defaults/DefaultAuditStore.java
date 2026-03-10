@@ -1,4 +1,4 @@
-package net.crystalixs.core.persistence.internal.defaults;
+package net.crystalixs.core.persistence.defaults;
 
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import net.crystalixs.core.common.logging.LogMetadata;
@@ -26,7 +26,7 @@ public class DefaultAuditStore implements AuditStore {
     public void create(AuditModel model) {
         try {
             config.query("""
-                            INSERT INTO economy_audit (action, payload, status) 
+                            INSERT INTO economy_audit (action, payload, status)
                             VALUES (?, ?, ?);
                             """)
                     .single(call()
