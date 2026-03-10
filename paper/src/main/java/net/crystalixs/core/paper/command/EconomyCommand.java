@@ -73,16 +73,16 @@ public class EconomyCommand extends PaperCommand {
     private void handleEconomySet(CommandContext<PaperCommandSource> context) {
         mutateCurrency(context,
                 (target, currency, amount) -> service.setCurrency(target.getUniqueId(), currency, amount),
-                "command.economy.success.set",
-                "command.economy.success.set.send",
+                "command.economy.success.set.actor",
+                "command.economy.success.set.receiver",
                 "command.economy.set.failed");
     }
 
     private void handleEconomyGive(CommandContext<PaperCommandSource> context) {
         mutateCurrency(context,
                 (target, currency, amount) -> service.setCurrency(target.getUniqueId(), currency, amount),
-                "command.economy.success.give",
-                "command.economy.success.give.receive",
+                "command.economy.success.give.actor",
+                "command.economy.success.give.receiver",
                 "command.economy.give.failed");
     }
 
