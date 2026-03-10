@@ -79,7 +79,7 @@ public class EconomyCommand extends PaperCommand {
                         RichDescription.translatable("command.economy.description.currency"),
                         SuggestionProvider.suggestingStrings("coins", "gems"))
                 .required("amount", longParser(),
-                        RichDescription.translatable("command.economy.description.currency"),
+                        RichDescription.translatable("command.economy.description.amount"),
                         noSuggestions())
                 .handler(this::handleEconomyTake)
         );
@@ -116,7 +116,7 @@ public class EconomyCommand extends PaperCommand {
         Currency currency = parseCurrency(context.get("currency"));
 
         if (currency == null) {
-            sender.sendMessage("error.invalid-currency");
+            sender.sendMessage(translatable("error.invalid-currency"));
             return;
         }
 
@@ -142,7 +142,7 @@ public class EconomyCommand extends PaperCommand {
             String key = switch (exception.error()) {
                 case PLAYER_CREATION_FAILED -> "error.player-load";
                 case INVALID_AMOUNT -> "error.invalid-amount";
-                case INSUFFICIENT_FUNDS -> "command.economy.error.insuficient-funs";
+                case INSUFFICIENT_FUNDS -> "command.economy.error.insuficient-funds";
                 default -> null;
             };
 
