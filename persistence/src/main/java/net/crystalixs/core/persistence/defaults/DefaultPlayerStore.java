@@ -4,6 +4,7 @@ import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.persistence.PersistenceException;
+import net.crystalixs.core.persistence.model.Currency;
 import net.crystalixs.core.persistence.model.PlayerModel;
 import net.crystalixs.core.persistence.store.PlayerStore;
 
@@ -85,6 +86,50 @@ public final class DefaultPlayerStore implements PlayerStore {
     }
 
     @Override
+    public void addCurrency(UUID playerId, Currency currency, long amount) {
+        String column = column(currency);
+        try {
+            config.query("UPDATE player SET " + column + " = " + column + " + ? WHERE uuid = ?;")
+                    .single(call()
+                            .bind(amount)
+                            .bind(playerId.toString()))
+                    .update();
+        } catch (RuntimeException exception) {
+            throw failure("persistence.player.addCurrency_failed", playerId, "Could not add currency", exception);
+        }
+    }
+
+    @Override
+    public void setCurrency(UUID playerId, Currency currency, long amount) {
+        String column = column(currency);
+        try {
+            config.query("UPDATE player SET " + column + " = ? WHERE uuid = ?;")
+                    .single(call()
+                            .bind(amount)
+                            .bind(playerId.toString()))
+                    .update();
+        } catch (RuntimeException exception) {
+            throw failure("persistence.player.set_currency_failed", playerId, "Could not set currency", exception);
+        }
+    }
+
+    @Override
+    public boolean takeCurrency(UUID playerId, Currency currency, long amount) {
+        String column = column(currency);
+        try {
+            return config.query("UPDATE player SET " + column + " = " + column + " - ? WHERE uuid = ? AND " + column + " >= ?;")
+                    .single(call()
+                            .bind(amount)
+                            .bind(playerId.toString())
+                            .bind(amount))
+                    .update()
+                    .changed();
+        } catch (RuntimeException exception) {
+            throw failure("persistence.player.take_currency_failed", playerId, "Could not take currency", exception);
+        }
+    }
+
+    @Override
     public boolean transferCoins(UUID fromPlayerId, UUID toPlayerId, long amount) {
         try {
             return config.query("""
@@ -115,6 +160,13 @@ public final class DefaultPlayerStore implements PlayerStore {
         } catch (RuntimeException exception) {
             throw failure("persistence.player.transfer_failed", fromPlayerId, "Could not transfer coins", exception);
         }
+    }
+
+    private String column(Currency currency) {
+        return switch (currency) {
+            case COINS -> "coins";
+            case GEMS -> "gems";
+        };
     }
 
     private PersistenceException failure(String event, UUID playerId, String message, RuntimeException exception) {
