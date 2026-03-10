@@ -17,4 +17,5 @@ public interface PlayerStore {
 
     boolean delete(UUID playerId);
 
+    boolean transferCoins(UUID fromPlayerId, UUID toPlayerId, long amount);
 }

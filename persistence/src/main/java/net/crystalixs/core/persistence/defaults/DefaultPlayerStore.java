@@ -84,6 +84,39 @@ public final class DefaultPlayerStore implements PlayerStore {
         }
     }
 
+    @Override
+    public boolean transferCoins(UUID fromPlayerId, UUID toPlayerId, long amount) {
+        try {
+            return config.query("""
+                            UPDATE player
+                            SET coins = CASE
+                                WHEN uuid = ? THEN coins - ?
+                                WHEN uuid = ? THEN coins + ?
+                                ELSE coins
+                            END
+                            WHERE uuid IN (?, ?)
+                              AND (SELECT COUNT(*) FROM player WHERE uuid IN (?, ?)) = 2
+                              AND (SELECT coins FROM player WHERE uuid = ?) >= ?;
+                            """)
+                    .single(call()
+                            .bind(fromPlayerId.toString())
+                            .bind(amount)
+                            .bind(toPlayerId.toString())
+                            .bind(amount)
+                            .bind(fromPlayerId.toString())
+                            .bind(toPlayerId.toString())
+                            .bind(fromPlayerId.toString())
+                            .bind(toPlayerId.toString())
+                            .bind(fromPlayerId.toString())
+                            .bind(amount)
+                    )
+                    .update()
+                    .changed();
+        } catch (RuntimeException exception) {
+            throw failure("persistence.player.transfer_failed", fromPlayerId, "Could not transfer coins", exception);
+        }
+    }
+
     private PersistenceException failure(String event, UUID playerId, String message, RuntimeException exception) {
         logger.warn(event, LogMetadata
                 .event(event)

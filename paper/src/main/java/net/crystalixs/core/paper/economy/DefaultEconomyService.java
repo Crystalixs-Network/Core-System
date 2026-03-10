@@ -89,6 +89,7 @@ public final class DefaultEconomyService implements EconomyService {
 
             transaction(type, currency, delta, fromPlayerId, toPlayerId, null, "admin_set");
             auditSuccess("economy.setCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_set");
+
         } catch (RuntimeException exception) {
             auditFailed("economy.setCurrency", exception.getMessage(), "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_set");
             throw exception;
@@ -120,6 +121,7 @@ public final class DefaultEconomyService implements EconomyService {
 
             transaction(TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take");
             auditSuccess("economy.takeCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_take");
+
         } catch (RuntimeException exception) {
             auditFailed("economy.takeCurrency", exception.getMessage(), "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_take");
             throw exception;
@@ -136,20 +138,13 @@ public final class DefaultEconomyService implements EconomyService {
                 throw new IllegalArgumentException("Amount must be > 0");
             }
 
-            PlayerModel from = getOrCreatePlayer(fromPlayerId);
-            PlayerModel to = getOrCreatePlayer(toPlayerId);
-
-            if (from.coins() < amount) {
+            boolean success = store.transferCoins(fromPlayerId, toPlayerId, amount);
+            if (!success) {
                 throw new IllegalStateException("Insufficient coins");
             }
-            long updatedFromCoins = from.coins() - amount;
-            long updatedToCoins = safeAdd(to.coins(), amount);
-
-            store.update(new PlayerModel(from.uuid(), from.playtime(), updatedFromCoins, from.gems()));
-            store.update(new PlayerModel(to.uuid(), to.playtime(), updatedToCoins, to.gems()));
-
             transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
             auditSuccess("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
+
         } catch (RuntimeException exception) {
             auditFailed("economy.transferCoins", exception.getMessage(), "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
             throw exception;
