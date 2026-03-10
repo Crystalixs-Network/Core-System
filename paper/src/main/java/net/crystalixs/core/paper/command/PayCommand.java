@@ -60,7 +60,7 @@ public class PayCommand extends PaperCommand {
                                 .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
 
                         String key = switch (exception.error()) {
-                            case SELF_TRANSFER -> "command.error.self-transfer";
+                            case SELF_TRANSFER -> "command.pay.error.self-transfer";
                             case INVALID_AMOUNT -> "command.pay.error.invalid-amount";
                             case INSUFFICIENT_FUNDS -> "command.pay.error.insufficient-funds";
                             default -> null;
