@@ -89,25 +89,19 @@ public final class DefaultEconomyService implements EconomyService {
 
     @Override
     public void transferCoins(UUID fromPlayerId, UUID toPlayerId, long amount) {
-        try {
-            if (fromPlayerId.equals(toPlayerId)) {
-                throw new IllegalArgumentException("Cannot transfer coins to yourself");
-            }
-            if (amount <= 0) {
-                throw new IllegalArgumentException("Amount must be > 0");
-            }
-
-            boolean success = store.transferCoins(fromPlayerId, toPlayerId, amount);
-            if (!success) {
-                throw new IllegalStateException("Insufficient coins");
-            }
-            transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
-            auditSuccess("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
-
-        } catch (RuntimeException exception) {
-            auditFailed("economy.transferCoins", exception.getMessage(), "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
-            throw exception;
+        if (fromPlayerId.equals(toPlayerId)) {
+            throw new IllegalArgumentException("Cannot transfer coins to yourself");
         }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be > 0");
+        }
+
+        boolean success = store.transferCoins(fromPlayerId, toPlayerId, amount);
+        if (!success) {
+            throw new IllegalStateException("Insufficient coins");
+        }
+        transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
+        auditSuccess("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
     }
 
     private void auditSuccess(String action, Object... payloadPairs) {
