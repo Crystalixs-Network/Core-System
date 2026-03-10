@@ -13,8 +13,9 @@ import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
-import static net.kyori.adventure.text.minimessage.translation.Argument.numeric;
+import static net.kyori.adventure.text.minimessage.translation.Argument.tagResolver;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 import static org.incendo.cloud.parser.standard.LongParser.longParser;
 import static org.incendo.cloud.suggestion.SuggestionProvider.noSuggestions;
@@ -45,14 +46,14 @@ public class PayCommand extends PaperCommand {
                         service.transferCoins(sender.getUniqueId(), target.getUniqueId(), amount);
                         sender.sendMessage(translatable("command.pay.success.actor").arguments(
                                 component("player", target.name()),
-                                numeric("amount", amount)));
+                                tagResolver(number("amount", amount))));
 
                         // Zielspieler kann zwischen Parsing und Antwort theoretisch disconnecten
                         Player receiver = target.isOnline() ? target : sender.getServer().getPlayer(target.getUniqueId());
                         if (receiver != null) {
                             receiver.sendMessage(translatable("command.pay.success.receiver").arguments(
                                     component("player", sender.name()),
-                                    numeric("amount", amount)));
+                                    tagResolver(number("amount", amount))));
                         }
 
                     } catch (EconomyException exception) {
