@@ -33,7 +33,7 @@ public class PayCommand extends PaperCommand {
                 .senderType(PaperPlayerCommandSource.class)
                 .permission("core.command.pay")
                 .required("player", playerParser(), RichDescription.translatable("command.pay.description.player"))
-                .required("amount", longParser(1L), RichDescription.translatable("command.pay.description.amount"))
+                .required("amount", longParser(), RichDescription.translatable("command.pay.description.amount"))
                 .handler(context -> {
                     Player sender = context.sender().player();
                     Player target = context.get("player");
