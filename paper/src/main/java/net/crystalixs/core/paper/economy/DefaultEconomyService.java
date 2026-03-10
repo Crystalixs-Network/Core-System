@@ -38,7 +38,7 @@ public final class DefaultEconomyService implements EconomyService {
     @Override
     public void addCurrency(UUID playerId, Currency currency, long amount) {
         if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be > 0");
+            throw new EconomyException(EconomyError.INVALID_AMOUNT, "Amount must be > 0");
         }
 
         getOrCreatePlayer(playerId);
@@ -51,7 +51,7 @@ public final class DefaultEconomyService implements EconomyService {
     @Override
     public void setCurrency(UUID playerId, Currency currency, long amount) {
         if (amount < 0) {
-            throw new IllegalArgumentException("Amount must be >= 0");
+            throw new EconomyException(EconomyError.INVALID_AMOUNT, "Amount must be >= 0");
         }
 
         PlayerModel model = getOrCreatePlayer(playerId);
@@ -74,13 +74,13 @@ public final class DefaultEconomyService implements EconomyService {
     @Override
     public void takeCurrency(UUID playerId, Currency currency, long amount) {
         if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be > 0");
+            throw new EconomyException(EconomyError.INVALID_AMOUNT, "Amount must be > 0");
         }
 
         getOrCreatePlayer(playerId);
         boolean success = store.takeCurrency(playerId, currency, amount);
         if (!success) {
-            throw new IllegalStateException("Insufficient " + currency.name().toLowerCase());
+            throw new EconomyException(EconomyError.INSUFFICIENT_FUNDS, "Insufficient " + currency.name().toLowerCase());
         }
 
         transaction(TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take");
@@ -90,15 +90,15 @@ public final class DefaultEconomyService implements EconomyService {
     @Override
     public void transferCoins(UUID fromPlayerId, UUID toPlayerId, long amount) {
         if (fromPlayerId.equals(toPlayerId)) {
-            throw new IllegalArgumentException("Cannot transfer coins to yourself");
+            throw new EconomyException(EconomyError.SELF_TRANSFER, "Cannot transfer to yourself");
         }
         if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be > 0");
+            throw new EconomyException(EconomyError.INVALID_AMOUNT, "Amount must be > 0");
         }
 
         boolean success = store.transferCoins(fromPlayerId, toPlayerId, amount);
         if (!success) {
-            throw new IllegalStateException("Insufficient coins");
+            throw new EconomyException(EconomyError.INSUFFICIENT_FUNDS, "Insufficient coins");
         }
         transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
         audit("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
@@ -124,7 +124,7 @@ public final class DefaultEconomyService implements EconomyService {
     private PlayerModel getOrCreatePlayer(UUID playerId) {
         return store.findById(playerId).orElseGet(() -> {
             store.create(playerId);
-            return store.findById(playerId).orElseThrow(() -> new IllegalStateException("Could not load player after creation: " + playerId));
+            return store.findById(playerId).orElseThrow(() -> new EconomyException(EconomyError.PLAYER_CREATION_FAILED, "Could not create player " + playerId));
         });
     }
 }
