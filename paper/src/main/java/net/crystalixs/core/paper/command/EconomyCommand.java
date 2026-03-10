@@ -80,7 +80,7 @@ public class EconomyCommand extends PaperCommand {
 
     private void handleEconomyGive(CommandContext<PaperCommandSource> context) {
         mutateCurrency(context,
-                (target, currency, amount) -> service.setCurrency(target.getUniqueId(), currency, amount),
+                (target, currency, amount) -> service.addCurrency(target.getUniqueId(), currency, amount),
                 "command.economy.success.give.actor",
                 "command.economy.success.give.receiver",
                 "command.economy.give.failed");
