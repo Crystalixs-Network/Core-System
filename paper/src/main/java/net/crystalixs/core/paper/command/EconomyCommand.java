@@ -145,7 +145,7 @@ public class EconomyCommand extends PaperCommand {
                 default -> null;
             };
             if (key != null) {
-                sender.sendMessage(translatable(key));
+                sender.sendMessage(translatable(key).arguments(component("currency", text(currency.name()))));
             }
         }
     }
