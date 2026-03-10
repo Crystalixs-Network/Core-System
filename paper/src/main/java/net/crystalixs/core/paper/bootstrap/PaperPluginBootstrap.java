@@ -11,15 +11,17 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     private final PaperPersistenceBootstrap persistence;
     private final PaperTranslationBootstrap translations;
     private final PaperCommandBootstrap commands;
+    private final PaperListenerBootstrap listeners;
     private PaperConfigUpdater configUpdater;
     private PersistenceContext persistenceContext;
 
-    private PaperPluginBootstrap(PaperPluginRuntime runtime, PaperConfigBootstrap config, PaperPersistenceBootstrap persistence, PaperTranslationBootstrap translations, PaperCommandBootstrap commands) {
+    private PaperPluginBootstrap(PaperPluginRuntime runtime, PaperConfigBootstrap config, PaperPersistenceBootstrap persistence, PaperTranslationBootstrap translations, PaperCommandBootstrap commands, PaperListenerBootstrap listeners) {
         super(runtime);
         this.config = config;
         this.persistence = persistence;
         this.translations = translations;
         this.commands = commands;
+        this.listeners = listeners;
     }
 
     public static PaperPluginBootstrap create(JavaPlugin plugin) {
@@ -28,14 +30,16 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
         PaperPersistenceBootstrap persistence = new PaperPersistenceBootstrap();
         PaperTranslationBootstrap translations = PaperTranslationBootstrap.create(runtime);
         PaperCommandBootstrap commands = new PaperCommandBootstrap(runtime);
+        PaperListenerBootstrap listeners = new PaperListenerBootstrap();
 
-        return new PaperPluginBootstrap(runtime, config, persistence, translations, commands);
+        return new PaperPluginBootstrap(runtime, config, persistence, translations, commands, listeners);
     }
 
     @Override
     protected void enableInternal() {
         configUpdater = config.load(runtime());
         persistenceContext = persistence.create(runtime(), configUpdater);
+        listeners.register(runtime(), persistenceContext);
         commands.registerCommands();
     }
 
