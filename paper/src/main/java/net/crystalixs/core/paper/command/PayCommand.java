@@ -9,6 +9,7 @@ import net.crystalixs.core.paper.economy.EconomyService;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
+import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.Component.text;
@@ -32,7 +33,7 @@ public class PayCommand extends PaperCommand {
         commandManager.command(commandManager.commandBuilder("pay")
                 .commandDescription(RichDescription.translatable("command.pay.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
-                .permission("core.command.pay")
+                .permission(Permission.of("core.command.pay"))
                 .required("player", playerParser(), RichDescription.translatable("command.pay.description.player"))
                 .required("amount", longParser(), RichDescription.translatable("command.pay.description.amount"), noSuggestions())
                 .handler(context -> {

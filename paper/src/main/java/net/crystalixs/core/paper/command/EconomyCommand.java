@@ -46,7 +46,7 @@ public class EconomyCommand extends PaperCommand {
                 .senderType(PaperCommandSource.class)
                 .permission(Permission.of("core.command.economy"))
                 .literal("give", RichDescription.translatable("command.economy.description.give"))
-                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player"))
+                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player.give"))
                 .required("currency", stringParser(),
                         RichDescription.translatable("command.economy.description.currency"),
                         SuggestionProvider.suggestingStrings("coins", "gems"))
@@ -60,7 +60,7 @@ public class EconomyCommand extends PaperCommand {
                 .senderType(PaperCommandSource.class)
                 .permission(Permission.of("core.command.economy"))
                 .literal("set", RichDescription.translatable("command.economy.description.set"))
-                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player"))
+                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player.set"))
                 .required("currency", stringParser(),
                         RichDescription.translatable("command.economy.description.currency"),
                         SuggestionProvider.suggestingStrings("coins", "gems"))
@@ -74,7 +74,7 @@ public class EconomyCommand extends PaperCommand {
                 .senderType(PaperCommandSource.class)
                 .permission(Permission.of("core.command.economy"))
                 .literal("take", RichDescription.translatable("command.economy.description.take"))
-                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player"))
+                .required("player", playerParser(), RichDescription.translatable("command.economy.description.player.take"))
                 .required("currency", stringParser(),
                         RichDescription.translatable("command.economy.description.currency"),
                         SuggestionProvider.suggestingStrings("coins", "gems"))
@@ -90,7 +90,7 @@ public class EconomyCommand extends PaperCommand {
                 (target, currency, amount) -> service.takeCurrency(target.getUniqueId(), currency, amount),
                 "command.economy.success.take.actor",
                 "command.economy.success.take.receiver",
-                "command.economy.take.failed");
+                "command.economy.take");
     }
 
     private void handleEconomySet(CommandContext<PaperCommandSource> context) {
@@ -98,7 +98,7 @@ public class EconomyCommand extends PaperCommand {
                 (target, currency, amount) -> service.setCurrency(target.getUniqueId(), currency, amount),
                 "command.economy.success.set.actor",
                 "command.economy.success.set.receiver",
-                "command.economy.set.failed");
+                "command.economy.set");
     }
 
     private void handleEconomyGive(CommandContext<PaperCommandSource> context) {
@@ -106,7 +106,7 @@ public class EconomyCommand extends PaperCommand {
                 (target, currency, amount) -> service.addCurrency(target.getUniqueId(), currency, amount),
                 "command.economy.success.give.actor",
                 "command.economy.success.give.receiver",
-                "command.economy.give.failed");
+                "command.economy.give");
     }
 
     private void mutateCurrency(CommandContext<PaperCommandSource> context, Mutation mutation, String senderSuccessKey, String targetSuccessKey, String logEvent) {
@@ -142,7 +142,7 @@ public class EconomyCommand extends PaperCommand {
             String key = switch (exception.error()) {
                 case PLAYER_CREATION_FAILED -> "error.player-load";
                 case INVALID_AMOUNT -> "error.invalid-amount";
-                case INSUFFICIENT_FUNDS -> "command.economy.error.insuficient-funds";
+                case INSUFFICIENT_FUNDS -> "command.economy.error.insufficient-funds";
                 default -> null;
             };
 

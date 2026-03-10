@@ -46,7 +46,8 @@ public class BalanceCommand extends PaperCommand {
                                 component("gems", text(balance.gems()))));
 
                     } catch (EconomyException exception) {
-                        logger.warn("coins command failed", LogMetadata.event("command.coins.failed")
+                        logger.warn("balance command failed", LogMetadata
+                                .event("command.balance.failed")
                                 .and(LogMetadata.Key.ACTOR, player.getName())
                                 .and(LogMetadata.Key.SUBJECT, player.getUniqueId().toString())
                                 .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
