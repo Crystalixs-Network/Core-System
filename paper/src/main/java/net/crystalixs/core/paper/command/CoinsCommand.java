@@ -8,7 +8,6 @@ import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.economy.EconomyException;
 import net.crystalixs.core.paper.economy.EconomyService;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
@@ -21,14 +20,13 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 
 public final class CoinsCommand extends PaperCommand {
 
-    private final StructuredLogger logger;
     private final EconomyService service;
+    private final StructuredLogger logger;
 
-
-    public CoinsCommand(CorePlugin plugin, StructuredLogger logger, EconomyService service) {
+    public CoinsCommand(CorePlugin plugin, EconomyService service) {
         super(plugin);
-        this.logger = logger;
         this.service = service;
+        this.logger = commandLogger("coins");
     }
 
     @Override
