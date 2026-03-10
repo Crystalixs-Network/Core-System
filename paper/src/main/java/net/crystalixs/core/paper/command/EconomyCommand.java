@@ -141,6 +141,7 @@ public class EconomyCommand extends PaperCommand {
             String key = switch (exception.error()) {
                 case PLAYER_CREATION_FAILED -> "error.player-load";
                 case INVALID_AMOUNT -> "error.invalid-amount";
+                case INSUFFICIENT_FUNDS -> "command.economy.error.insuficient-funs";
                 default -> null;
             };
             if (key != null) {
