@@ -12,6 +12,7 @@ import net.crystalixs.core.persistence.model.Currency;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.suggestion.SuggestionProvider;
@@ -51,47 +52,49 @@ public class EconomyCommand extends PaperCommand {
                 .required("amount", longParser(),
                         RichDescription.translatable("command.economy.description.amount"),
                         noSuggestions())
-                .handler(context -> {
-                    CommandSender sender = context.sender().plattformSender();
-                    Player target = context.get("player");
-                    long amount = context.get("amount");
-                    Currency currency = parseCurrency(context.get("currency"));
+                .handler(this::handleEconomyAdd));
+    }
 
-                    if (currency == null) {
-                        sender.sendMessage("error.invalid-currency");
-                        return;
-                    }
+    private void handleEconomyAdd(CommandContext<PaperCommandSource> context) {
+        CommandSender sender = context.sender().plattformSender();
+        Player target = context.get("player");
+        long amount = context.get("amount");
+        Currency currency = parseCurrency(context.get("currency"));
 
-                    try {
-                        service.addCurrency(target.getUniqueId(), currency, amount);
-                        sender.sendMessage(translatable("command.economy.success.give").arguments(
-                                component("player", target.name()),
-                                numeric("amount", amount),
-                                component("currency", text(currency.name()))));
-                        target.sendMessage(translatable("command.economy.success.receive").arguments(
-                                numeric("amount", amount),
-                                component("currency", text(currency.name()))));
+        if (currency == null) {
+            sender.sendMessage("error.invalid-currency");
+            return;
+        }
 
-                    } catch (EconomyException exception) {
-                        if (exception.error() == EconomyError.PLAYER_CREATION_FAILED) {
-                            logger.warn("eco give command failed", LogMetadata
-                                    .event("command.eco.give.failed")
-                                    .and(LogMetadata.Key.ACTOR, sender.getName())
-                                    .and(LogMetadata.Key.SUBJECT, target.getUniqueId().toString())
-                                    .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
-                        }
+        try {
+            service.addCurrency(target.getUniqueId(), currency, amount);
+            sender.sendMessage(translatable("command.economy.success.give").arguments(
+                    component("player", target.name()),
+                    numeric("amount", amount),
+                    component("currency", text(currency.name()))));
+            target.sendMessage(translatable("command.economy.success.receive").arguments(
+                    numeric("amount", amount),
+                    component("currency", text(currency.name()))));
 
-                        String key = switch (exception.error()) {
-                            case PLAYER_CREATION_FAILED -> "error.player-load";
-                            case INVALID_AMOUNT -> "error.invalid-amount";
-                            default -> null;
-                        };
+        } catch (EconomyException exception) {
+            if (exception.error() == EconomyError.PLAYER_CREATION_FAILED) {
+                logger.warn("eco give command failed", LogMetadata
+                        .event("command.eco.give.failed")
+                        .and(LogMetadata.Key.ACTOR, sender.getName())
+                        .and(LogMetadata.Key.SUBJECT, target.getUniqueId().toString())
+                        .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
+            }
 
-                        if (key != null) {
-                            sender.sendMessage(translatable(key));
-                        }
-                    }
-                }));
+            String key = switch (exception.error()) {
+                case PLAYER_CREATION_FAILED -> "error.player-load";
+                case INVALID_AMOUNT -> "error.invalid-amount";
+                default -> null;
+            };
+
+            if (key != null) {
+                sender.sendMessage(translatable(key));
+            }
+        }
     }
 
     private Currency parseCurrency(String value) {
