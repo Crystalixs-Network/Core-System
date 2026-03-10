@@ -37,110 +37,143 @@ public final class DefaultEconomyService implements EconomyService {
 
     @Override
     public void addCurrency(UUID playerId, Currency currency, long amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be > 0");
+        try {
+            if (amount <= 0) {
+                throw new IllegalArgumentException("Amount must be > 0");
+            }
+
+            PlayerModel model = getOrCreatePlayer(playerId);
+            long coins = model.coins();
+            long gems = model.gems();
+
+            switch (currency) {
+                case COINS -> coins = safeAdd(coins, amount);
+                case GEMS -> gems = safeAdd(gems, amount);
+            }
+            store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
+
+            transaction(TransactionType.ADMIN_GIVE, currency, amount, null, playerId, null, "admin_give");
+            auditSuccess("economy.addCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_give");
+
+        } catch (RuntimeException exception) {
+            auditFailed("economy.addCurrency", exception.getMessage(), "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_give");
+            throw exception;
         }
-
-        PlayerModel model = getOrCreatePlayer(playerId);
-        long coins = model.coins();
-        long gems = model.gems();
-
-        switch (currency) {
-            case COINS -> coins = safeAdd(coins, amount);
-            case GEMS -> gems = safeAdd(gems, amount);
-        }
-        store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
-
-        transaction(TransactionType.ADMIN_GIVE, currency, amount, null, playerId, null, "admin_give");
-        auditSuccess("economy.addCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_give");
     }
 
     @Override
     public void setCurrency(UUID playerId, Currency currency, long amount) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("Amount must be >= 0");
+        try {
+            if (amount < 0) {
+                throw new IllegalArgumentException("Amount must be >= 0");
+            }
+
+            PlayerModel model = getOrCreatePlayer(playerId);
+            long previous = switch (currency) {
+                case COINS -> model.coins();
+                case GEMS -> model.gems();
+            };
+            long coins = model.coins();
+            long gems = model.gems();
+
+            switch (currency) {
+                case COINS -> coins = amount;
+                case GEMS -> gems = amount;
+            }
+            store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
+
+            long delta = Math.abs(previous - amount);
+            TransactionType type = amount >= previous ? TransactionType.ADMIN_GIVE : TransactionType.ADMIN_TAKE;
+            UUID fromPlayerId = amount >= previous ? null : playerId;
+            UUID toPlayerId = amount >= previous ? playerId : null;
+
+            transaction(type, currency, delta, fromPlayerId, toPlayerId, null, "admin_set");
+            auditSuccess("economy.setCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_set");
+        } catch (RuntimeException exception) {
+            auditFailed("economy.setCurrency", exception.getMessage(), "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_set");
+            throw exception;
         }
-
-        PlayerModel model = getOrCreatePlayer(playerId);
-        long previous = switch (currency) {
-            case COINS -> model.coins();
-            case GEMS -> model.gems();
-        };
-        long coins = model.coins();
-        long gems = model.gems();
-
-        switch (currency) {
-            case COINS -> coins = amount;
-            case GEMS -> gems = amount;
-        }
-        store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
-
-        long delta = Math.abs(previous - amount);
-        TransactionType type = amount >= previous ? TransactionType.ADMIN_GIVE : TransactionType.ADMIN_TAKE;
-        UUID fromPlayerId = amount >= previous ? null : playerId;
-        UUID toPlayerId = amount >= previous ? playerId : null;
-
-        transaction(type, currency, delta, fromPlayerId, toPlayerId, null, "admin_set");
-        auditSuccess("economy.setCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_set");
     }
 
     @Override
     public void takeCurrency(UUID playerId, Currency currency, long amount) {
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be > 0");
-        }
-
-        PlayerModel model = getOrCreatePlayer(playerId);
-        long coins = model.coins();
-        long gems = model.gems();
-
-        switch (currency) {
-            case COINS -> {
-                if (coins < amount) throw new IllegalStateException("Insufficient coins");
-                coins -= amount;
+        try {
+            if (amount <= 0) {
+                throw new IllegalArgumentException("Amount must be > 0");
             }
-            case GEMS -> {
-                if (gems < amount) throw new IllegalStateException("Insufficient gems");
-                gems -= amount;
-            }
-        }
-        store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
 
-        transaction(TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take");
-        auditSuccess("economy.takeCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_take");
+            PlayerModel model = getOrCreatePlayer(playerId);
+            long coins = model.coins();
+            long gems = model.gems();
+
+            switch (currency) {
+                case COINS -> {
+                    if (coins < amount) throw new IllegalStateException("Insufficient coins");
+                    coins -= amount;
+                }
+                case GEMS -> {
+                    if (gems < amount) throw new IllegalStateException("Insufficient gems");
+                    gems -= amount;
+                }
+            }
+            store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
+
+            transaction(TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take");
+            auditSuccess("economy.takeCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_take");
+        } catch (RuntimeException exception) {
+            auditFailed("economy.takeCurrency", exception.getMessage(), "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_take");
+            throw exception;
+        }
     }
 
     @Override
     public void transferCoins(UUID fromPlayerId, UUID toPlayerId, long amount) {
-        if (fromPlayerId.equals(toPlayerId)) {
-            throw new IllegalArgumentException("Cannot transfer coins to yourself");
+        try {
+            if (fromPlayerId.equals(toPlayerId)) {
+                throw new IllegalArgumentException("Cannot transfer coins to yourself");
+            }
+            if (amount <= 0) {
+                throw new IllegalArgumentException("Amount must be > 0");
+            }
+
+            PlayerModel from = getOrCreatePlayer(fromPlayerId);
+            PlayerModel to = getOrCreatePlayer(toPlayerId);
+
+            if (from.coins() < amount) {
+                throw new IllegalStateException("Insufficient coins");
+            }
+            long updatedFromCoins = from.coins() - amount;
+            long updatedToCoins = safeAdd(to.coins(), amount);
+
+            store.update(new PlayerModel(from.uuid(), from.playtime(), updatedFromCoins, from.gems()));
+            store.update(new PlayerModel(to.uuid(), to.playtime(), updatedToCoins, to.gems()));
+
+            transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
+            auditSuccess("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
+        } catch (RuntimeException exception) {
+            auditFailed("economy.transferCoins", exception.getMessage(), "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
+            throw exception;
         }
-        if (amount <= 0) {
-            throw new IllegalArgumentException("Amount must be > 0");
-        }
-
-        PlayerModel from = getOrCreatePlayer(fromPlayerId);
-        PlayerModel to = getOrCreatePlayer(toPlayerId);
-
-        if (from.coins() < amount) {
-            throw new IllegalStateException("Insufficient coins");
-        }
-        long updatedFromCoins = from.coins() - amount;
-        long updatedToCoins = safeAdd(to.coins(), amount);
-
-        store.update(new PlayerModel(from.uuid(), from.playtime(), updatedFromCoins, from.gems()));
-        store.update(new PlayerModel(to.uuid(), to.playtime(), updatedToCoins, to.gems()));
-
-        transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
-        auditSuccess("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
     }
 
     private void auditSuccess(String action, Object... payloadPairs) {
         audits.create(new AuditModel(0L, action, payload(payloadPairs), "SUCCESS", null));
     }
 
+    private void auditFailed(String action, String error, Object... payloadPairs) {
+        audits.create(new AuditModel(0, action, payload(concat(payloadPairs, error)), "FAILED", null));
+    }
+
     private void transaction(TransactionType type, Currency currency, long amount, UUID fromPlayerId, UUID toPlayerId, UUID actorPlayerId, String reason) {
         transactions.create(new TransactionModel(0L, type, currency, amount, fromPlayerId, toPlayerId, actorPlayerId, reason, null));
+    }
+
+    private Object[] concat(Object[] pairs, Object value) {
+        Object[] merged = new Object[pairs.length + 2];
+        System.arraycopy(pairs, 0, merged, 0, pairs.length);
+        merged[pairs.length] = "error";
+        merged[pairs.length + 1] = value;
+        return merged;
     }
 
     private String payload(Object... pairs) {
