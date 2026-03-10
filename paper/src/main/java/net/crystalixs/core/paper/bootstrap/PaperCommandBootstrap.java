@@ -1,8 +1,12 @@
 package net.crystalixs.core.paper.bootstrap;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.crystalixs.core.paper.CorePlugin;
+import net.crystalixs.core.paper.command.CoinsCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
+import net.crystalixs.core.paper.economy.DefaultEconomyService;
+import net.crystalixs.core.paper.economy.EconomyErrorMessageMapper;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.SenderMapper;
@@ -23,7 +27,12 @@ public final class PaperCommandBootstrap {
                 .executionCoordinator(ExecutionCoordinator.<PaperCommandSource>builder().build())
                 .buildOnEnable(runtime.plugin());
 
-        // Hier Commands registrieren
+        CorePlugin plugin = (CorePlugin) runtime.plugin();
+        var persistence = plugin.persistence();
+        var service = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
+        var errorMapper = new EconomyErrorMessageMapper();
+
+        new CoinsCommand(plugin, service, errorMapper).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
