@@ -16,6 +16,7 @@ import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 import static org.incendo.cloud.parser.standard.LongParser.longParser;
+import static org.incendo.cloud.suggestion.SuggestionProvider.noSuggestions;
 
 public class PayCommand extends PaperCommand {
 
@@ -33,7 +34,7 @@ public class PayCommand extends PaperCommand {
                 .senderType(PaperPlayerCommandSource.class)
                 .permission("core.command.pay")
                 .required("player", playerParser(), RichDescription.translatable("command.pay.description.player"))
-                .required("amount", longParser(), RichDescription.translatable("command.pay.description.amount"))
+                .required("amount", longParser(), RichDescription.translatable("command.pay.description.amount"), noSuggestions())
                 .handler(context -> {
                     Player sender = context.sender().player();
                     Player target = context.get("player");
