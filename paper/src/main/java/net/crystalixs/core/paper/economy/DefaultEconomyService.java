@@ -87,6 +87,28 @@ public final class DefaultEconomyService implements EconomyService {
         store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
     }
 
+    @Override
+    public void transferCoins(UUID fromPlayerId, UUID toPlayerId, long amount) {
+        if (fromPlayerId.equals(toPlayerId)) {
+            throw new IllegalArgumentException("Cannot transfer coins to yourself");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be > 0");
+        }
+
+        PlayerModel from = getOrCreatePlayer(fromPlayerId);
+        PlayerModel to = getOrCreatePlayer(fromPlayerId);
+
+        if (from.coins() < amount) {
+            throw new IllegalStateException("Insufficient coins");
+        }
+        long updatedFromCoins = from.coins() - amount;
+        long updatedToCoins = safeAdd(to.coins(), amount);
+
+        store.update(new PlayerModel(from.uuid(), from.playtime(), updatedFromCoins, from.gems()));
+        store.update(new PlayerModel(to.uuid(), to.playtime(), updatedToCoins, to.gems()));
+    }
+
     private long safeAdd(long current, long delta) {
         if (Long.MAX_VALUE - current < delta) {
             throw new IllegalStateException("Amount overflow");
