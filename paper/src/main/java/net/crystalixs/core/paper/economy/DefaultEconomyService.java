@@ -45,7 +45,7 @@ public final class DefaultEconomyService implements EconomyService {
         store.addCurrency(playerId, currency, amount);
 
         transaction(TransactionType.ADMIN_GIVE, currency, amount, null, playerId, null, "admin_give");
-        auditSuccess("economy.addCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_give");
+        audit("economy.addCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_give");
     }
 
     @Override
@@ -68,7 +68,7 @@ public final class DefaultEconomyService implements EconomyService {
         UUID toPlayerId = amount >= previous ? playerId : null;
 
         transaction(type, currency, delta, fromPlayerId, toPlayerId, null, "admin_set");
-        auditSuccess("economy.setCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_set");
+        audit("economy.setCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_set");
     }
 
     @Override
@@ -84,7 +84,7 @@ public final class DefaultEconomyService implements EconomyService {
         }
 
         transaction(TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take");
-        auditSuccess("economy.takeCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_take");
+        audit("economy.takeCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_take");
     }
 
     @Override
@@ -101,27 +101,15 @@ public final class DefaultEconomyService implements EconomyService {
             throw new IllegalStateException("Insufficient coins");
         }
         transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
-        auditSuccess("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
+        audit("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
     }
 
-    private void auditSuccess(String action, Object... payloadPairs) {
+    private void audit(String action, Object... payloadPairs) {
         audits.create(new AuditModel(0L, action, payload(payloadPairs), "SUCCESS", null));
-    }
-
-    private void auditFailed(String action, String error, Object... payloadPairs) {
-        audits.create(new AuditModel(0, action, payload(concat(payloadPairs, error)), "FAILED", null));
     }
 
     private void transaction(TransactionType type, Currency currency, long amount, UUID fromPlayerId, UUID toPlayerId, UUID actorPlayerId, String reason) {
         transactions.create(new TransactionModel(0L, type, currency, amount, fromPlayerId, toPlayerId, actorPlayerId, reason, null));
-    }
-
-    private Object[] concat(Object[] pairs, Object value) {
-        Object[] merged = new Object[pairs.length + 2];
-        System.arraycopy(pairs, 0, merged, 0, pairs.length);
-        merged[pairs.length] = "error";
-        merged[pairs.length + 1] = value;
-        return merged;
     }
 
     private String payload(Object... pairs) {
@@ -131,13 +119,6 @@ public final class DefaultEconomyService implements EconomyService {
             builder.append(pairs[i]).append("=").append(pairs[i + 1]);
         }
         return builder.toString();
-    }
-
-    private long safeAdd(long current, long delta) {
-        if (Long.MAX_VALUE - current < delta) {
-            throw new IllegalStateException("Amount overflow");
-        }
-        return current + delta;
     }
 
     private PlayerModel getOrCreatePlayer(UUID playerId) {
