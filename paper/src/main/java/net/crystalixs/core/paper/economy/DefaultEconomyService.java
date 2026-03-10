@@ -1,5 +1,6 @@
 package net.crystalixs.core.paper.economy;
 
+import net.crystalixs.core.persistence.model.Currency;
 import net.crystalixs.core.persistence.model.PlayerModel;
 import net.crystalixs.core.persistence.store.PlayerStore;
 
@@ -27,6 +28,70 @@ public final class DefaultEconomyService implements EconomyService {
     @Override
     public long getGems(UUID playerId) {
         return getOrCreatePlayer(playerId).gems();
+    }
+
+    @Override
+    public void addCurrency(UUID playerId, Currency currency, long amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be > 0");
+        }
+
+        PlayerModel model = getOrCreatePlayer(playerId);
+        long coins = model.coins();
+        long gems = model.gems();
+
+        switch (currency) {
+            case COINS -> coins = safeAdd(coins, amount);
+            case GEMS -> gems = safeAdd(gems, amount);
+        }
+        store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
+    }
+
+    @Override
+    public void setCurrency(UUID playerId, Currency currency, long amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("Amount must be >= 0");
+        }
+
+        PlayerModel model = getOrCreatePlayer(playerId);
+        long coins = model.coins();
+        long gems = model.gems();
+
+        switch (currency) {
+            case COINS -> coins = amount;
+            case GEMS -> gems = amount;
+        }
+        store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
+    }
+
+    @Override
+    public void takeCurrency(UUID playerId, Currency currency, long amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be > 0");
+        }
+
+        PlayerModel model = getOrCreatePlayer(playerId);
+        long coins = model.coins();
+        long gems = model.gems();
+
+        switch (currency) {
+            case COINS -> {
+                if (coins < amount) throw new IllegalStateException("Insufficient coins");
+                coins -= amount;
+            }
+            case GEMS -> {
+                if (gems < amount) throw new IllegalStateException("Insufficient gems");
+                gems -= amount;
+            }
+        }
+        store.update(new PlayerModel(playerId, model.playtime(), coins, gems));
+    }
+
+    private long safeAdd(long current, long delta) {
+        if (Long.MAX_VALUE - current < delta) {
+            throw new IllegalStateException("Amount overflow");
+        }
+        return current + delta;
     }
 
     private PlayerModel getOrCreatePlayer(UUID playerId) {
