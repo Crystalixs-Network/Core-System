@@ -8,7 +8,11 @@ CREATE TABLE IF NOT EXISTS economy_transactions
     to_player_id    UUID            NULL,
     actor_player_id UUID            NULL,
     reason          VARCHAR(255)    NULL,
-    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_economy_tx_from_player FOREIGN KEY (from_player_id) REFERENCES player (uuid),
+    CONSTRAINT fk_economy_tx_to_player FOREIGN KEY (to_player_id) REFERENCES player (uuid),
+    CONSTRAINT fk_economy_tx_actor_player FOREIGN KEY (actor_player_id) REFERENCES player (uuid)
 );
 
 CREATE INDEX IF NOT EXISTS idx_eco_tx_from ON economy_transactions (from_player_id, created_at);

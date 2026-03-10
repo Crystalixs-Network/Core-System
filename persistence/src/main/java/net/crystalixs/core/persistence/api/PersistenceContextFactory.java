@@ -2,7 +2,7 @@ package net.crystalixs.core.persistence.api;
 
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.persistence.config.DatabaseCredentials;
-import net.crystalixs.core.persistence.internal.defaults.DefaultPersistenceContext;
+import net.crystalixs.core.persistence.defaults.DefaultPersistenceContext;
 
 public interface PersistenceContextFactory {
 

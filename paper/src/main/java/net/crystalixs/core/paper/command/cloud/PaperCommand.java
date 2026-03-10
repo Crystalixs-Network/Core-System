@@ -1,4 +1,4 @@
-package net.crystalixs.core.paper.command;
+package net.crystalixs.core.paper.command.cloud;
 
 import net.crystalixs.core.common.command.AbstractCommand;
 import net.crystalixs.core.common.logging.StructuredLogger;
