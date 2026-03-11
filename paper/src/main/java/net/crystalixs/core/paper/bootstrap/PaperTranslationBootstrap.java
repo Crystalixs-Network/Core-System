@@ -11,9 +11,11 @@ import java.util.Locale;
 public final class PaperTranslationBootstrap implements AutoCloseable {
 
     private final HotReloadWatcher watcher;
+    private final TranslationProvider provider;
 
-    private PaperTranslationBootstrap(HotReloadWatcher watcher) {
+    private PaperTranslationBootstrap(HotReloadWatcher watcher, TranslationProvider provider) {
         this.watcher = watcher;
+        this.provider = provider;
     }
 
     public static PaperTranslationBootstrap create(PaperPluginRuntime runtime) {
@@ -39,7 +41,15 @@ public final class PaperTranslationBootstrap implements AutoCloseable {
         );
         watcher.start();
 
-        return new PaperTranslationBootstrap(watcher);
+        return new PaperTranslationBootstrap(watcher, provider);
+    }
+
+    public Locale resolveLocale(Locale requested) {
+        return provider.resolveTranslationLocale(requested);
+    }
+
+    public Locale defaultLocale() {
+        return provider.defaultLocale();
     }
 
     @Override

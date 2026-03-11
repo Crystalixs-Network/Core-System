@@ -5,6 +5,8 @@ import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Locale;
+
 public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPluginRuntime> {
 
     private final PaperConfigBootstrap config;
@@ -33,6 +35,14 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
         PaperListenerBootstrap listeners = new PaperListenerBootstrap();
 
         return new PaperPluginBootstrap(runtime, config, persistence, translations, commands, listeners);
+    }
+
+    public Locale resolveTranslationLocale(Locale requested) {
+        return translations.resolveLocale(requested);
+    }
+
+    public Locale defaultTranslationLocale() {
+        return translations.defaultLocale();
     }
 
     @Override
