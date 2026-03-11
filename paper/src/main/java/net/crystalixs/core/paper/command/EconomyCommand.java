@@ -9,6 +9,7 @@ import net.crystalixs.core.paper.economy.EconomyError;
 import net.crystalixs.core.paper.economy.EconomyException;
 import net.crystalixs.core.paper.economy.EconomyService;
 import net.crystalixs.core.persistence.model.Currency;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TranslatableComponent;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -127,10 +128,10 @@ public class EconomyCommand extends PaperCommand {
             sender.sendMessage(translatable(senderSuccessKey).arguments(
                     component("player", target.name()),
                     tagResolver(number("amount", amount)),
-                    component("currency", text(currency.name()))));
+                    component("currency", currencyDisplay(currency))));
             target.sendMessage(translatable(targetSuccessKey).arguments(
                     tagResolver(number("amount", amount)),
-                    component("currency", text(currency.name()))));
+                    component("currency", currencyDisplay(currency))));
 
         } catch (EconomyException exception) {
             if (exception.error() == EconomyError.PLAYER_CREATION_FAILED) {
@@ -155,6 +156,11 @@ public class EconomyCommand extends PaperCommand {
             }
             sender.sendMessage(component);
         }
+    }
+
+    private Component currencyDisplay(Currency currency) {
+        String lower = currency.name().toLowerCase();
+        return text(Character.toUpperCase(lower.charAt(0)) + lower.substring(1));
     }
 
     private Currency parseCurrency(String value) {
