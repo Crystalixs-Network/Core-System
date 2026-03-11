@@ -1,4 +1,4 @@
-package net.crystalixs.core.persistence.internal.defaults;
+package net.crystalixs.core.persistence.defaults;
 
 import com.zaxxer.hikari.HikariDataSource;
 import net.crystalixs.core.common.logging.LogMetadata;
@@ -7,8 +7,10 @@ import net.crystalixs.core.persistence.api.PersistenceContext;
 import net.crystalixs.core.persistence.config.DataSourceFactory;
 import net.crystalixs.core.persistence.config.DatabaseCredentials;
 import net.crystalixs.core.persistence.migration.MigrationRunner;
+import net.crystalixs.core.persistence.store.AuditStore;
 import net.crystalixs.core.persistence.store.HomeStore;
 import net.crystalixs.core.persistence.store.PlayerStore;
+import net.crystalixs.core.persistence.store.TransactionStore;
 
 public final class DefaultPersistenceContext implements PersistenceContext {
 
@@ -16,6 +18,8 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     private final HikariDataSource dataSource;
     private final PlayerStore playerStore;
     private final HomeStore homeStore;
+    private final TransactionStore transactionStore;
+    private final AuditStore auditStore;
 
     public DefaultPersistenceContext(StructuredLogger logger, DatabaseCredentials credentials) {
         this.logger = logger.child("persistence");
@@ -25,10 +29,15 @@ public final class DefaultPersistenceContext implements PersistenceContext {
 
         this.dataSource = DataSourceFactory.create(credentials);
 
+        // Run database migration
         new MigrationRunner().run(dataSource, this.logger.child("migration"));
 
-        this.playerStore = new DefaultPlayerStore(this.logger.child("store").child("player"), dataSource);
-        this.homeStore = new DefaultHomeStore(this.logger.child("store").child("home"), dataSource);
+        // Initialize stores
+        final StructuredLogger storeLogger = this.logger.child("store");
+        this.playerStore = new DefaultPlayerStore(storeLogger.child("player"), dataSource);
+        this.homeStore = new DefaultHomeStore(storeLogger.child("home"), dataSource);
+        this.transactionStore = new DefaultTransactionStore(storeLogger.child("transaction"), dataSource);
+        this.auditStore = new DefaultAuditStore(storeLogger.child("audit"), dataSource);
 
         this.logger.info("initialized", LogMetadata.event("persistence.started"));
     }
@@ -41,6 +50,16 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     @Override
     public HomeStore homes() {
         return homeStore;
+    }
+
+    @Override
+    public TransactionStore transactions() {
+        return transactionStore;
+    }
+
+    @Override
+    public AuditStore audits() {
+        return auditStore;
     }
 
     @Override

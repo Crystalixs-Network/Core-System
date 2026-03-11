@@ -8,9 +8,7 @@ import net.kyori.adventure.text.minimessage.translation.MiniMessageTranslationSt
 import net.kyori.adventure.translation.GlobalTranslator;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public final class TranslationProvider {
 
@@ -75,6 +73,20 @@ public final class TranslationProvider {
                     .and(LogMetadata.Key.BUNDLE, bundleName), exception);
             return false;
         }
+    }
+
+    public Locale resolveTranslationLocale(Locale requested) {
+        if (requested == null || locales == null || locales.length == 0) {
+            return defaultLocale;
+        }
+        return Arrays.stream(locales)
+                .filter(Objects::nonNull)
+                .filter(locale -> locale.toLanguageTag().equalsIgnoreCase(requested.toLanguageTag()))
+                .findFirst().orElse(defaultLocale);
+    }
+
+    public Locale defaultLocale() {
+        return defaultLocale;
     }
 
     public static final class Builder {

@@ -5,6 +5,8 @@ import net.crystalixs.core.paper.bootstrap.PaperPluginBootstrap;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.Locale;
+
 public class CorePlugin extends JavaPlugin {
 
     private PaperPluginBootstrap bootstrap;
@@ -38,5 +40,19 @@ public class CorePlugin extends JavaPlugin {
             throw new IllegalStateException("Plugin bootstrap is not available");
         }
         return bootstrap.persistence();
+    }
+
+    public Locale resolveTranslationLocale(Locale requested) {
+        if (bootstrap == null) {
+            throw new IllegalStateException("Plugin bootstrap is not available");
+        }
+        return bootstrap.resolveTranslationLocale(requested);
+    }
+
+    public Locale defaultTranslationLocale() {
+        if (bootstrap == null) {
+            throw new IllegalStateException("Plugin bootstrap is not available");
+        }
+        return bootstrap.defaultTranslationLocale();
     }
 }
