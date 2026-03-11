@@ -13,6 +13,7 @@
 | Dynamische Tablist    | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen.   |
 | Netzwerk-Commands     | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.         |
 | Konfigurations-Reload | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.     |
+| Economy (Paper)       | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.           |
 
 ---
 <br>
@@ -67,6 +68,18 @@ Unterstützt werden Reloads für:
 
 Wenn Hot-Reloading in der Config aktiv ist, können Sprachdateien zusätzlich automatisch neu eingelesen werden.
 
+### Economy (Paper)
+
+Das Paper-Modul enthält ein Economy-System für Coins und Gems inklusive Transaktionen und Audit-Logging.
+
+Enthalten sind:
+
+- Kontostandabfragen (`/coins`, `/balance`)
+- Coin-Transfers zwischen Spielern (`/pay`)
+- Admin-Verwaltung (`/economy give|set|take`)
+- Zahlendarstellung basierend auf der aufgelösten Translation-Locale
+- Silent logging
+
 ### Logging im Hintergrund
 
 Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und Fehler nachvollziehbar bleiben. Die Details dazu stehen in `LOGGING.md`.
@@ -76,10 +89,12 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 
 ## Projektstruktur
 
-| Modul      | Rolle                                                                       |
-|------------|-----------------------------------------------------------------------------|
-| `velocity` | Zentrale Netzwerkfunktionen wie Commands, MOTD, Join-Kontrolle und Wartung. |
-| `paper`    | Grundlage für Backend-seitige Erweiterungen auf Paper.                      |
+| Modul         | Rolle                                                                       |
+|---------------|-----------------------------------------------------------------------------|
+| `velocity`    | Zentrale Netzwerkfunktionen wie Commands, MOTD, Join-Kontrolle und Wartung. |
+| `paper`       | Backend-seitige Erweiterungen auf Paper inklusive Economy-Commands.         |
+| `persistence` | Datenmodelle, Stores und SQL-Migrationen.                                   |
+| `common`      | Gemeinsame Infrastruktur (Logging, Translation, Bootstrap).                 |
 
 ---
 <br>
@@ -97,6 +112,12 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 | `/global-teleport <player>` oder `/gtp <player>` | Verbindet dich auf den Server des Zielspielers.            | Direktes Wechseln zu einem Spieler           |
 | `/online <server>`                               | Prüft, ob ein registrierter Backend-Server erreichbar ist. | Betriebscheck, Fehlersuche                   |
 | `/proxy-stop`                                    | Stoppt den Proxy kontrolliert.                             | Geplante Eingriffe oder Wartung              |
+| `/coins`                                         | Zeigt den aktuellen Coin-Kontostand.                       | Schnelle Kontostandsprüfung                  |
+| `/balance` oder `/bal`                           | Zeigt Coins und Gems an.                                   | Gesamtübersicht für Spieler                  |
+| `/pay <player> <amount>`                         | Überweist Coins an einen anderen Spieler.                  | Spieler-zu-Spieler-Transfer                  |
+| `/economy give <player> <currency> <amount>`     | Fügt Coins oder Gems hinzu.                                | Admin-Korrekturen, Rewards                   |
+| `/economy set <player> <currency> <amount>`      | Setzt Coins oder Gems auf einen festen Wert.               | Moderation, Datenkorrekturen                 |
+| `/economy take <player> <currency> <amount>`     | Zieht Coins oder Gems ab.                                  | Moderation, Rückabwicklung                   |
 
 ---
 <br>
@@ -112,15 +133,17 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 | `core.command.global-find`     | Erlaubt das Abfragen des aktuellen Servers eines Spielers.           |
 | `core.command.global-teleport` | Erlaubt das Wechseln auf den Server eines anderen Spielers.          |
 | `core.command.online`          | Erlaubt die Prüfung registrierter Backend-Server auf Erreichbarkeit. |
+| `core.command.coins`           | Erlaubt die Abfrage des eigenen Coin-Kontostands.                    |
+| `core.command.balance`         | Erlaubt die Abfrage von Coins und Gems.                              |
+| `core.command.pay`             | Erlaubt das Senden von Coins an andere Spieler.                      |
+| `core.command.economy`         | Erlaubt administrative Economy-Befehle (`give`, `set`, `take`).      |
 
 ---
 <br>
 
 ## Konfiguration
 
-Die wichtigste Runtime-Datei im Velocity-Modul ist `config.json`.
-
-Dort werden unter anderem folgende Bereiche gesteuert:
+Die wichtigste Runtime-Datei im Velocity-Modul ist `config.json`. Dort werden unter anderem folgende Bereiche gesteuert:
 
 - Hot-Reloading für Nachrichten
 - normale MOTD
@@ -128,9 +151,23 @@ Dort werden unter anderem folgende Bereiche gesteuert:
 - Wartungs-MOTD
 - Wartungsscreen inklusive Hinweistext und Link
 
+Im Paper-Modul werden Nachrichten aus `plugins/Core/lang/messages_<locale>.conf` geladen.
+Die Zahlendarstellung in Commands ist an die aufgelöste Translation-Locale gekoppelt.
+
 > [!TIP]
 > Die Texte unterstützen [MiniMessage](https://docs.papermc.io/adventure/minimessage/format/) und lassen sich dadurch flexibel gestalten.
 > Einen Editor für Liveansichten gibt es als [Adventure Text-Editor](https://adventure.kyori.net/).
+
+---
+<br>
+
+## Persistenz und Migrationen
+
+Die SQL-Struktur liegt im Modul `persistence` unter:
+
+- `database/mariadb/<major>/setup.sql`
+- `database/mariadb/<major>/migration.sql`
+- `database/mariadb/<major>/patch_<n>.sql`
 
 ---
 <br>
@@ -148,4 +185,4 @@ Dort werden unter anderem folgende Bereiche gesteuert:
 
 ## Status
 
-Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und bildet eine saubere Grundlage für weitere Systemfunktionen.
+Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und erweitert diese auf Paper um ein persistentes Economy-System mit Commands, Logging und Migrationen.
