@@ -40,8 +40,8 @@ public class BalanceCommand extends PaperCommand {
                     try {
                         Balance balance = service.getBalance(player.getUniqueId());
                         player.sendMessage(translatable("command.balance.success").arguments(
-                                number("coins", balance.coins(), player.locale()),
-                                number("gems", balance.gems(), player.locale())));
+                                number("coins", balance.coins(), player),
+                                number("gems", balance.gems(), player)));
 
                     } catch (EconomyException exception) {
                         logger.warn("balance command failed", LogMetadata

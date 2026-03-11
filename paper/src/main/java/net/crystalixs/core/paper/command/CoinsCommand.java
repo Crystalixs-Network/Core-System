@@ -38,7 +38,7 @@ public final class CoinsCommand extends PaperCommand {
 
                     try {
                         long coins = service.getCoins(player.getUniqueId());
-                        player.sendMessage(translatable("command.coins.success").arguments(number("amount", coins, player.locale())));
+                        player.sendMessage(translatable("command.coins.success").arguments(number("amount", coins, player)));
 
                     } catch (EconomyException exception) {
                         logger.warn("coins command failed", LogMetadata.event("command.coins.failed")

@@ -20,8 +20,6 @@ import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Locale;
-
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
@@ -125,13 +123,12 @@ public class EconomyCommand extends PaperCommand {
         try {
             mutation.apply(target, currency, amount);
 
-            Locale senderLocale = sender instanceof Player player ? player.locale() : Locale.ENGLISH;
             sender.sendMessage(translatable(senderSuccessKey).arguments(
                     component("player", target.name()),
-                    number("amount", amount, senderLocale),
+                    number("amount", amount, sender),
                     component("currency", currencyDisplay(currency))));
             target.sendMessage(translatable(targetSuccessKey).arguments(
-                    number("amount", amount, target.locale()),
+                    number("amount", amount, target),
                     component("currency", currencyDisplay(currency))));
 
         } catch (EconomyException exception) {

@@ -44,14 +44,14 @@ public class PayCommand extends PaperCommand {
                         service.transferCoins(sender.getUniqueId(), target.getUniqueId(), amount);
                         sender.sendMessage(translatable("command.pay.success.actor").arguments(
                                 component("player", target.name()),
-                                number("amount", amount, sender.locale())));
+                                number("amount", amount, sender)));
 
                         // Zielspieler kann zwischen Parsing und Antwort theoretisch disconnecten
                         Player receiver = target.isOnline() ? target : sender.getServer().getPlayer(target.getUniqueId());
                         if (receiver != null) {
                             receiver.sendMessage(translatable("command.pay.success.receiver").arguments(
                                     component("player", sender.name()),
-                                    number("amount", amount, receiver.locale())));
+                                    number("amount", amount, receiver)));
                         }
 
                     } catch (EconomyException exception) {
