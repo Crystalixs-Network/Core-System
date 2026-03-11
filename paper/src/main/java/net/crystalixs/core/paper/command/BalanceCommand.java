@@ -16,8 +16,6 @@ import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.Component.translatable;
-import static net.kyori.adventure.text.minimessage.tag.resolver.Formatter.number;
-import static net.kyori.adventure.text.minimessage.translation.Argument.tagResolver;
 
 public class BalanceCommand extends PaperCommand {
 
@@ -42,8 +40,8 @@ public class BalanceCommand extends PaperCommand {
                     try {
                         Balance balance = service.getBalance(player.getUniqueId());
                         player.sendMessage(translatable("command.balance.success").arguments(
-                                tagResolver(number("coins", balance.coins())),
-                                tagResolver(number("gems", balance.gems()))));
+                                number("coins", balance.coins(), player.locale()),
+                                number("gems", balance.gems(), player.locale())));
 
                     } catch (EconomyException exception) {
                         logger.warn("balance command failed", LogMetadata
