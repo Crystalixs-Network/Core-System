@@ -34,7 +34,7 @@ public final class SitService {
     public void sit(Player player) {
         if (activeSeats.containsKey(player.getUniqueId())) return;
 
-        Location location = player.getLocation().clone().add(0d, 0.05d, 0d);
+        Location location = player.getLocation().clone().subtract(0d, 0.5d, 0d);
         player.getWorld().spawn(location, ArmorStand.class, seat -> {
             seat.setInvisible(true);
             seat.setInvulnerable(true);
