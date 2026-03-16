@@ -166,7 +166,7 @@ Die Zahlendarstellung in Commands ist an die aufgelöste Translation-Locale geko
 Die SQL-Struktur liegt im Modul `persistence` unter:
 
 - `database/mariadb/<major>/setup.sql`
-- `database/mariadb/<major>/migration.sql`
+- `database/mariadb/<major>/migrate.sql`
 - `database/mariadb/<major>/patch_<n>.sql`
 
 ---
