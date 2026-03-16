@@ -25,7 +25,7 @@ public final class SitService {
 
     public void toggle(Player player) {
         if (activeSeats.containsKey(player.getUniqueId()) || player.isInsideVehicle()) {
-            unsit(player);
+            unsit(player, true);
             return;
         }
         sit(player);
@@ -34,15 +34,19 @@ public final class SitService {
     public void sit(Player player) {
         if (activeSeats.containsKey(player.getUniqueId())) return;
 
-        Location location = player.getLocation().clone().subtract(0d, 1.2d, 0d);
+        Location location = player.getLocation().clone().add(0d, 0.05d, 0d);
         player.getWorld().spawn(location, ArmorStand.class, seat -> {
-            seat.setMarker(true);
             seat.setInvisible(true);
             seat.setInvulnerable(true);
             seat.setGravity(false);
-            seat.setPersistent(true);
+            seat.setPersistent(false);
             seat.setSilent(true);
-            seat.setCustomNameVisible(false);
+
+            seat.setMarker(false);
+            seat.setSmall(true);
+            seat.setBasePlate(false);
+            seat.setArms(false);
+
             seat.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, true);
 
             seat.addPassenger(player);
@@ -51,15 +55,28 @@ public final class SitService {
     }
 
     public void unsit(Player player) {
-        UUID seatId = activeSeats.remove(player.getUniqueId());
-        if (seatId == null) {
-            if (player.isInsideVehicle()) player.leaveVehicle();
-            return;
-        }
-        if (player.isInsideVehicle()) player.leaveVehicle();
+        unsit(player, false);
+    }
 
-        Entity entity = findEntity(player, seatId);
-        if (entity != null && !entity.isDead() && isManagedSeat(entity)) entity.remove();
+    public void unsit(Player player, boolean reposition) {
+        UUID seatId = activeSeats.remove(player.getUniqueId());
+        Entity seat = seatId == null ? null : findEntity(player, seatId);
+
+        Location stand = null;
+        if (reposition && seat != null) {
+            stand = seat.getLocation().clone().add(0d, 0.35d, 0d);
+        }
+
+        if (player.isInsideVehicle()) player.leaveVehicle();
+        if (seat != null && !seat.isDead() && isManagedSeat(seat)) seat.remove();
+
+        if (reposition && stand != null) {
+            Location safe = stand;
+            if (!safe.getBlock().isPassable()) {
+                safe = player.getWorld().getHighestBlockAt(stand).getLocation().add(0.5d, 1.0d, 0.5d);
+            }
+            player.teleport(safe);
+        }
     }
 
     public void unsitBySeat(Entity seat) {
