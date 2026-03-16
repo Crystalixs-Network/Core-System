@@ -48,6 +48,7 @@ public final class PaperCommandBootstrap {
         new EnderchestCommand(plugin).registerTo(commandManager);
         new WorkbenchCommand(plugin).registerTo(commandManager);
         new AnvilCommand(plugin).registerTo(commandManager);
+        new RepairCommand(plugin).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
