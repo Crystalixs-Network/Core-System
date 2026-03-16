@@ -45,6 +45,7 @@ public final class PaperCommandBootstrap {
         new EconomyCommand(plugin, service).registerTo(commandManager);
         new HatCommand(plugin).registerTo(commandManager);
         new EnderchestCommand(plugin).registerTo(commandManager);
+        new WorkbenchCommand(plugin).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
