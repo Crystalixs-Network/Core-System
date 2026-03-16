@@ -1,22 +1,37 @@
 package net.crystalixs.core.paper.command.util;
 
+import net.crystalixs.core.paper.CorePlugin;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
 import xyz.xenondevs.invui.window.Window;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static net.kyori.adventure.text.Component.translatable;
 
 public final class TrashSession {
 
+    private final Map<Integer, Integer> slotTaskIds = new ConcurrentHashMap<>();
+    private final Map<Integer, ItemStack> trackedItems = new ConcurrentHashMap<>();
+
+    private final CorePlugin plugin;
+    private final long deleteTicks;
+
+    private final Inventory backingInventory;
     private final ReferencingInventory reference;
 
-    public TrashSession(int size) {
-        Inventory backingInventory = Bukkit.createInventory(null, size);
+    public TrashSession(CorePlugin plugin, int size, long deleteTicks) {
+        this.plugin = plugin;
+        this.deleteTicks = deleteTicks;
+
+        this.backingInventory = Bukkit.createInventory(null, size);
         this.reference = ReferencingInventory.fromContents(backingInventory);
     }
 
@@ -38,5 +53,30 @@ public final class TrashSession {
                 .setViewer(viewer)
                 .setGui(gui)
                 .open(viewer);
+    }
+
+    public void shutdown() {
+        slotTaskIds.values().forEach(Bukkit.getScheduler()::cancelTask);
+        slotTaskIds.clear();
+        trackedItems.clear();
+    }
+
+    private void scheduleTimer(int slot) {
+        cancelTimer(slot);
+
+        int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+            ItemStack current = backingInventory.getItem(slot);
+            if (current != null && !current.getType().isAir()) {
+                backingInventory.clear(slot);
+            }
+
+            slotTaskIds.remove(slot);
+            trackedItems.remove(slot);
+        }, deleteTicks);
+    }
+
+    private void cancelTimer(int slot) {
+        Integer taskId = slotTaskIds.remove(slot);
+        if (taskId != null) Bukkit.getScheduler().cancelTask(taskId);
     }
 }
