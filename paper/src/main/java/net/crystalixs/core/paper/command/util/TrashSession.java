@@ -167,6 +167,7 @@ public final class TrashSession {
 
     private void scheduleTimer(int slot) {
         cancelTimer(slot);
+        lastRenderedSeconds.remove(slot);
         slotExpireAtMillis.put(slot, System.currentTimeMillis() + 60_000L);
 
         int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
@@ -179,6 +180,7 @@ public final class TrashSession {
             slotTaskIds.remove(slot);
             trackedItems.remove(slot);
             slotExpireAtMillis.remove(slot);
+            lastRenderedSeconds.remove(slot);
 
         }, deleteTicks);
 
@@ -191,6 +193,7 @@ public final class TrashSession {
             Bukkit.getScheduler().cancelTask(taskId);
         }
         slotExpireAtMillis.remove(slot);
+        lastRenderedSeconds.remove(slot);
     }
 
     private void cleanupPlayerCarryState(Player player) {
@@ -280,6 +283,8 @@ public final class TrashSession {
     }
 
     private boolean isSame(ItemStack first, ItemStack second) {
+        if (first == null && second == null) return true;
+        if (first == null || second == null) return false;
         return first.isSimilar(second) && first.getAmount() == second.getAmount();
     }
 }
