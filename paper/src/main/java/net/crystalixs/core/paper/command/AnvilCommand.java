@@ -1,4 +1,4 @@
-package net.crystalixs.core.paper.command.util;
+package net.crystalixs.core.paper.command;
 
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.cloud.PaperCommand;
