@@ -35,6 +35,7 @@ public final class TrashSession {
     private final Map<Integer, ItemStack> trackedItems = new ConcurrentHashMap<>();
     private final Map<Integer, Long> slotExpireAtMillis = new ConcurrentHashMap<>();
     private final Map<Integer, Long> lastRenderedSeconds = new ConcurrentHashMap<>();
+    private final Map<Integer, Long> interactionCooldownUntil = new ConcurrentHashMap<>();
 
     private final CorePlugin plugin;
     private final long deleteTicks;
@@ -93,9 +94,11 @@ public final class TrashSession {
         trackedItems.clear();
         slotExpireAtMillis.clear();
         lastRenderedSeconds.clear();
+        interactionCooldownUntil.clear();
     }
 
     private void onPostUpdate(ItemPostUpdateEvent event) {
+        interactionCooldownUntil.put(event.getSlot(), System.currentTimeMillis() + 250L);
         if (!internalLoreUpdate) {
             reconcileTimers();
         }
@@ -146,6 +149,9 @@ public final class TrashSession {
                     lastRenderedSeconds.remove(slot);
                     continue;
                 }
+                Long cooldownUntil = interactionCooldownUntil.get(slot);
+                if (cooldownUntil != null && cooldownUntil > now) continue;
+                interactionCooldownUntil.remove(slot);
 
                 long secondsLeft = Math.max(0L, (expireAt - now + 999L) / 1_000L);
                 Long previousSecond = lastRenderedSeconds.get(slot);
@@ -181,6 +187,7 @@ public final class TrashSession {
             trackedItems.remove(slot);
             slotExpireAtMillis.remove(slot);
             lastRenderedSeconds.remove(slot);
+            interactionCooldownUntil.remove(slot);
 
         }, deleteTicks);
 
@@ -194,6 +201,7 @@ public final class TrashSession {
         }
         slotExpireAtMillis.remove(slot);
         lastRenderedSeconds.remove(slot);
+        interactionCooldownUntil.remove(slot);
     }
 
     private void cleanupPlayerCarryState(Player player) {
