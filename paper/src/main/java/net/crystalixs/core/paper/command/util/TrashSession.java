@@ -17,8 +17,6 @@ import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
 import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent;
-import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason;
-import xyz.xenondevs.invui.inventory.event.UpdateReason;
 import xyz.xenondevs.invui.window.Window;
 
 import java.util.ArrayList;
@@ -95,13 +93,6 @@ public final class TrashSession {
     private void onPostUpdate(ItemPostUpdateEvent event) {
         if (!internalLoreUpdate) {
             reconcileTimers();
-        }
-
-        if (event.isRemove() || event.isSwap()) {
-            UpdateReason reason = event.getUpdateReason();
-            if (reason instanceof PlayerUpdateReason playerReason) {
-                cleanupMarkedItems(playerReason.getPlayer());
-            }
         }
     }
 
