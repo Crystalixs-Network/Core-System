@@ -2,10 +2,7 @@ package net.crystalixs.core.paper.bootstrap;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import net.crystalixs.core.paper.CorePlugin;
-import net.crystalixs.core.paper.command.BalanceCommand;
-import net.crystalixs.core.paper.command.CoinsCommand;
-import net.crystalixs.core.paper.command.EconomyCommand;
-import net.crystalixs.core.paper.command.PayCommand;
+import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
@@ -46,6 +43,7 @@ public final class PaperCommandBootstrap {
         new BalanceCommand(plugin, service).registerTo(commandManager);
         new PayCommand(plugin, service).registerTo(commandManager);
         new EconomyCommand(plugin, service).registerTo(commandManager);
+        new HatCommand(plugin).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
