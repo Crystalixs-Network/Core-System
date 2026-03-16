@@ -1,11 +1,11 @@
 package net.crystalixs.core.paper.command.util;
 
-import net.crystalixs.core.paper.CorePlugin;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
@@ -21,13 +21,13 @@ public final class TrashSession {
     private final Map<Integer, Integer> slotTaskIds = new ConcurrentHashMap<>();
     private final Map<Integer, ItemStack> trackedItems = new ConcurrentHashMap<>();
 
-    private final CorePlugin plugin;
+    private final JavaPlugin plugin;
     private final long deleteTicks;
 
     private final Inventory backingInventory;
     private final ReferencingInventory reference;
 
-    public TrashSession(CorePlugin plugin, int size, long deleteTicks) {
+    public TrashSession(JavaPlugin plugin, int size, long deleteTicks) {
         this.plugin = plugin;
         this.deleteTicks = deleteTicks;
 

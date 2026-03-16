@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.command.util;
 
-import net.crystalixs.core.paper.CorePlugin;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +14,9 @@ public final class TrashService {
 
     private final Map<UUID, TrashSession> sessions = new HashMap<>();
 
-    private final CorePlugin plugin;
+    private final JavaPlugin plugin;
 
-    public TrashService(CorePlugin plugin) {
+    public TrashService(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
@@ -25,4 +25,8 @@ public final class TrashService {
                 .open(player);
     }
 
+    public void shutdown() {
+        sessions.values().forEach(TrashSession::shutdown);
+        sessions.clear();
+    }
 }
