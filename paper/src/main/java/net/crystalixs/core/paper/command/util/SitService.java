@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Map;
 import java.util.UUID;
@@ -13,9 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class SitService {
 
     private final Map<UUID, UUID> activeSeats = new ConcurrentHashMap<>();
-    private final CorePlugin plugin;
+    private final JavaPlugin plugin;
 
-    public SitService(CorePlugin plugin) {
+    public SitService(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 

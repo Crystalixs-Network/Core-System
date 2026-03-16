@@ -5,6 +5,7 @@ import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
+import net.crystalixs.core.paper.command.util.SitService;
 import net.crystalixs.core.paper.command.util.TrashService;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
@@ -22,10 +23,12 @@ public final class PaperCommandBootstrap {
 
     private final PaperPluginRuntime runtime;
     private final TrashService trashService;
+    private final SitService sitService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
         this.trashService = new TrashService(runtime.plugin());
+        this.sitService = new SitService(runtime.plugin());
     }
 
     public void registerCommands() {
@@ -53,11 +56,16 @@ public final class PaperCommandBootstrap {
         new RepairCommand(plugin).registerTo(commandManager);
         new SkullCommand(plugin).registerTo(commandManager);
         new TrashCommand(plugin, trashService).registerTo(commandManager);
-        new SitCommand(plugin).registerTo(commandManager);
+        new SitCommand(plugin, sitService).registerTo(commandManager);
     }
 
     public void shutdown() {
         trashService.shutdown();
+        sitService.shutdown();
+    }
+
+    public SitService sitService() {
+        return sitService;
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
