@@ -57,6 +57,7 @@ public final class PaperCommandBootstrap {
         new SkullCommand(plugin).registerTo(commandManager);
         new TrashCommand(plugin, trashService).registerTo(commandManager);
         new SitCommand(plugin, sitService).registerTo(commandManager);
+        new SignCommand(plugin).registerTo(commandManager);
     }
 
     public void shutdown() {
