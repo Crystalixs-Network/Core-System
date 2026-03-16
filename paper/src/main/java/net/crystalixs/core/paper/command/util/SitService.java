@@ -2,9 +2,7 @@ package net.crystalixs.core.paper.command.util;
 
 import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
-import org.bukkit.entity.ArmorStand;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -34,19 +32,8 @@ public final class SitService {
     public void sit(Player player) {
         if (activeSeats.containsKey(player.getUniqueId())) return;
 
-        Location location = player.getLocation().clone().subtract(0d, 0.5d, 0d);
-        player.getWorld().spawn(location, ArmorStand.class, seat -> {
-            seat.setInvisible(true);
-            seat.setInvulnerable(true);
-            seat.setGravity(false);
-            seat.setPersistent(false);
-            seat.setSilent(true);
-
-            seat.setMarker(false);
-            seat.setSmall(true);
-            seat.setBasePlate(false);
-            seat.setArms(false);
-
+        Location location = player.getLocation().clone();
+        player.getWorld().spawn(location, Interaction.class, seat -> {
             seat.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, true);
 
             seat.addPassenger(player);
