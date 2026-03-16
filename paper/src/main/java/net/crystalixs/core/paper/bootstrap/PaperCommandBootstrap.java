@@ -5,6 +5,7 @@ import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
+import net.crystalixs.core.paper.command.util.AnvilCommand;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -46,6 +47,7 @@ public final class PaperCommandBootstrap {
         new HatCommand(plugin).registerTo(commandManager);
         new EnderchestCommand(plugin).registerTo(commandManager);
         new WorkbenchCommand(plugin).registerTo(commandManager);
+        new AnvilCommand(plugin).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
