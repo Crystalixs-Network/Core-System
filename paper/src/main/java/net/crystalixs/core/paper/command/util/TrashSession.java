@@ -34,6 +34,7 @@ public final class TrashSession {
     private final Map<Integer, Integer> slotTaskIds = new ConcurrentHashMap<>();
     private final Map<Integer, ItemStack> trackedItems = new ConcurrentHashMap<>();
     private final Map<Integer, Long> slotExpireAtMillis = new ConcurrentHashMap<>();
+    private final Map<Integer, Long> lastRenderedSeconds = new ConcurrentHashMap<>();
 
     private final CorePlugin plugin;
     private final long deleteTicks;
@@ -55,7 +56,7 @@ public final class TrashSession {
         this.reference = ReferencingInventory.fromContents(backingInventory);
 
         this.key = new NamespacedKey(plugin, "trash_timer");
-        this.loreTickerTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::tickLore, 20L, 20L);
+        this.loreTickerTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::tickLore, 5L, 5L);
 
         this.reference.setPostUpdateHandler(this::onPostUpdate);
     }
@@ -91,6 +92,7 @@ public final class TrashSession {
         slotTaskIds.clear();
         trackedItems.clear();
         slotExpireAtMillis.clear();
+        lastRenderedSeconds.clear();
     }
 
     private void onPostUpdate(ItemPostUpdateEvent event) {
@@ -128,24 +130,39 @@ public final class TrashSession {
 
     private void tickLore() {
         long now = System.currentTimeMillis();
+        boolean changedAny = false;
 
         internalLoreUpdate = true;
         try {
             for (int slot = 0; slot < backingInventory.getSize(); slot++) {
                 ItemStack current = backingInventory.getItem(slot);
-                if (isEmpty(current)) continue;
+                if (isEmpty(current)) {
+                    lastRenderedSeconds.remove(slot);
+                    continue;
+                }
 
                 Long expireAt = slotExpireAtMillis.get(slot);
-                if (expireAt == null) continue;
+                if (expireAt == null) {
+                    lastRenderedSeconds.remove(slot);
+                    continue;
+                }
 
                 long secondsLeft = Math.max(0L, (expireAt - now + 999L) / 1_000L);
+                Long previousSecond = lastRenderedSeconds.get(slot);
+                if (previousSecond != null && previousSecond == secondsLeft) continue;
+
                 ItemStack withLore = withTimerLore(current.clone(), secondsLeft);
                 reference.setItem(UpdateReason.SUPPRESSED, slot, withLore);
+                lastRenderedSeconds.put(slot, secondsLeft);
+                changedAny = true;
             }
         } finally {
             internalLoreUpdate = false;
         }
-        reference.notifyWindows();
+
+        if (changedAny) {
+            reference.notifyWindows();
+        }
     }
 
     private void scheduleTimer(int slot) {
@@ -186,13 +203,13 @@ public final class TrashSession {
 
         ItemStack mainHand = player.getInventory().getItemInMainHand();
         ItemStack cleanedMainHand = stripTimerLoreIfMarked(mainHand);
-        if(cleanedMainHand != mainHand) {
+        if (cleanedMainHand != mainHand) {
             player.getInventory().setItemInMainHand(cleanedMainHand);
         }
 
         ItemStack offHand = player.getInventory().getItemInOffHand();
         ItemStack cleanedOffHand = stripTimerLoreIfMarked(offHand);
-        if(cleanedOffHand != offHand) {
+        if (cleanedOffHand != offHand) {
             player.getInventory().setItemInOffHand(cleanedOffHand);
         }
     }
