@@ -142,6 +142,7 @@ public final class TrashSession {
         } finally {
             internalLoreUpdate = false;
         }
+        reference.notifyWindows();
     }
 
     private void scheduleTimer(int slot) {
@@ -152,6 +153,7 @@ public final class TrashSession {
             ItemStack current = backingInventory.getItem(slot);
             if (!isEmpty(current)) {
                 backingInventory.clear(slot);
+                reference.notifyWindows();
             }
 
             slotTaskIds.remove(slot);
