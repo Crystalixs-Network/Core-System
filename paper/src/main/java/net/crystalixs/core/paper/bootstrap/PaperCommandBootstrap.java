@@ -49,6 +49,7 @@ public final class PaperCommandBootstrap {
         new WorkbenchCommand(plugin).registerTo(commandManager);
         new AnvilCommand(plugin).registerTo(commandManager);
         new RepairCommand(plugin).registerTo(commandManager);
+        new SkullCommand(plugin).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
