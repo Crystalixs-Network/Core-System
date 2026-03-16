@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":persistence"))
     implementation(libs.bundles.cloudPaper)
     implementation(libs.configurate.hocon)
+    implementation(libs.invui)
 }
 
 tasks {
@@ -23,6 +24,7 @@ tasks {
         val mapping = mapOf(
             libs.cloud.paper to "cloud",
             libs.configurate.hocon to "configurate.hocon",
+            libs.invui to "invui",
         )
 
         val base = "$group.$artifact.paper.libs"
