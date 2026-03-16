@@ -5,7 +5,6 @@ import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
-import net.crystalixs.core.paper.command.AnvilCommand;
 import net.crystalixs.core.paper.command.util.TrashService;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
@@ -54,6 +53,7 @@ public final class PaperCommandBootstrap {
         new RepairCommand(plugin).registerTo(commandManager);
         new SkullCommand(plugin).registerTo(commandManager);
         new TrashCommand(plugin, trashService).registerTo(commandManager);
+        new SitCommand(plugin).registerTo(commandManager);
     }
 
     public void shutdown() {
