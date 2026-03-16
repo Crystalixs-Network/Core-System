@@ -17,6 +17,7 @@ import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
 import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent;
+import xyz.xenondevs.invui.inventory.event.UpdateReason;
 import xyz.xenondevs.invui.window.Window;
 
 import java.util.ArrayList;
@@ -137,7 +138,7 @@ public final class TrashSession {
 
                 long secondsLeft = Math.max(0L, (expireAt - now + 999L) / 1_000L);
                 ItemStack withLore = withTimerLore(current.clone(), secondsLeft);
-                backingInventory.setItem(slot, withLore);
+                reference.setItem(UpdateReason.SUPPRESSED, slot, withLore);
             }
         } finally {
             internalLoreUpdate = false;
@@ -152,7 +153,7 @@ public final class TrashSession {
         int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             ItemStack current = backingInventory.getItem(slot);
             if (!isEmpty(current)) {
-                backingInventory.clear(slot);
+                reference.setItem(UpdateReason.SUPPRESSED, slot, null);
                 reference.notifyWindows();
             }
 
