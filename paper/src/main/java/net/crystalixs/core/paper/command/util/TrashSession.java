@@ -34,7 +34,7 @@ public final class TrashSession {
         this.backingInventory = Bukkit.createInventory(null, size);
         this.reference = ReferencingInventory.fromContents(backingInventory);
 
-        this.reference.setPreUpdateHandler(event -> reconcileTimers());
+        this.reference.setPostUpdateHandler(event -> reconcileTimers());
     }
 
     public void open(Player viewer) {
