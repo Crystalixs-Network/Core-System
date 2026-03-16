@@ -17,6 +17,7 @@ import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
 import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent;
+import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason;
 import xyz.xenondevs.invui.inventory.event.UpdateReason;
 import xyz.xenondevs.invui.window.Window;
 
@@ -101,6 +102,10 @@ public final class TrashSession {
         interactionCooldownUntil.put(event.getSlot(), System.currentTimeMillis() + 250L);
         if (!internalLoreUpdate) {
             reconcileTimers();
+        }
+
+        if ((event.isRemove() || event.isSwap()) && event.getUpdateReason() instanceof PlayerUpdateReason reason) {
+            Bukkit.getScheduler().runTask(plugin, () -> cleanupTakenItems(reason.getPlayer()));
         }
     }
 
@@ -222,6 +227,18 @@ public final class TrashSession {
         ItemStack cleanedOffHand = stripTimerLoreIfMarked(offHand);
         if (cleanedOffHand != offHand) {
             player.getInventory().setItemInOffHand(cleanedOffHand);
+        }
+    }
+
+    private void cleanupTakenItems(Player player) {
+        cleanupPlayerCarryState(player);
+
+        for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
+            ItemStack stack = player.getInventory().getItem(slot);
+            ItemStack cleaned = stripTimerLoreIfMarked(stack);
+            if (cleaned != stack) {
+                player.getInventory().setItem(slot, cleaned);
+            }
         }
     }
 
