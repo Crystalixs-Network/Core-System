@@ -16,7 +16,7 @@ public class TrashCommand extends PaperCommand {
 
     public TrashCommand(CorePlugin plugin) {
         super(plugin);
-        this.service = new TrashService();
+        this.service = new TrashService(plugin);
     }
 
     @Override

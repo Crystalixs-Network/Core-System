@@ -33,6 +33,8 @@ public final class TrashSession {
 
         this.backingInventory = Bukkit.createInventory(null, size);
         this.reference = ReferencingInventory.fromContents(backingInventory);
+
+        this.reference.setPreUpdateHandler(event -> reconcileTimers());
     }
 
     public void open(Player viewer) {
@@ -59,6 +61,39 @@ public final class TrashSession {
         slotTaskIds.values().forEach(Bukkit.getScheduler()::cancelTask);
         slotTaskIds.clear();
         trackedItems.clear();
+    }
+
+    private void reconcileTimers() {
+        for (int slot = 0; slot < backingInventory.getSize(); slot++) {
+            ItemStack current = backingInventory.getItem(slot);
+
+            if (isEmpty(current)) {
+                cancelTimer(slot);
+                trackedItems.remove(slot);
+                continue;
+            }
+
+            ItemStack previous = trackedItems.get(slot);
+            if (previous == null) {
+                trackedItems.put(slot, current.clone());
+                scheduleTimer(slot);
+                continue;
+            }
+
+            if (!isSame(previous, current)) {
+                cancelTimer(slot);
+                trackedItems.put(slot, current.clone());
+                scheduleTimer(slot);
+            }
+        }
+    }
+
+    private boolean isEmpty(ItemStack stack) {
+        return stack == null || stack.getType().isAir();
+    }
+
+    private boolean isSame(ItemStack first, ItemStack second) {
+        return first.isSimilar(second) && first.getAmount() == second.getAmount();
     }
 
     private void scheduleTimer(int slot) {
