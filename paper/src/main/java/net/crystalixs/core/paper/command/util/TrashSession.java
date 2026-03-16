@@ -108,6 +108,8 @@ public final class TrashSession {
             slotTaskIds.remove(slot);
             trackedItems.remove(slot);
         }, deleteTicks);
+
+        slotTaskIds.put(slot, taskId);
     }
 
     private void cancelTimer(int slot) {
