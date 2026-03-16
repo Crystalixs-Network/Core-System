@@ -6,6 +6,7 @@ import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.AnvilCommand;
+import net.crystalixs.core.paper.command.util.TrashService;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,9 +22,11 @@ import static net.kyori.adventure.text.Component.translatable;
 public final class PaperCommandBootstrap {
 
     private final PaperPluginRuntime runtime;
+    private final TrashService trashService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
+        this.trashService = new TrashService(runtime.plugin());
     }
 
     public void registerCommands() {
@@ -38,18 +41,23 @@ public final class PaperCommandBootstrap {
 
         CorePlugin plugin = (CorePlugin) runtime.plugin();
         var persistence = plugin.persistence();
-        var service = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
+        var economyService = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
 
-        new CoinsCommand(plugin, service).registerTo(commandManager);
-        new BalanceCommand(plugin, service).registerTo(commandManager);
-        new PayCommand(plugin, service).registerTo(commandManager);
-        new EconomyCommand(plugin, service).registerTo(commandManager);
+        new CoinsCommand(plugin, economyService).registerTo(commandManager);
+        new BalanceCommand(plugin, economyService).registerTo(commandManager);
+        new PayCommand(plugin, economyService).registerTo(commandManager);
+        new EconomyCommand(plugin, economyService).registerTo(commandManager);
         new HatCommand(plugin).registerTo(commandManager);
         new EnderchestCommand(plugin).registerTo(commandManager);
         new WorkbenchCommand(plugin).registerTo(commandManager);
         new AnvilCommand(plugin).registerTo(commandManager);
         new RepairCommand(plugin).registerTo(commandManager);
         new SkullCommand(plugin).registerTo(commandManager);
+        new TrashCommand(plugin, trashService).registerTo(commandManager);
+    }
+
+    public void shutdown() {
+        trashService.shutdown();
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {

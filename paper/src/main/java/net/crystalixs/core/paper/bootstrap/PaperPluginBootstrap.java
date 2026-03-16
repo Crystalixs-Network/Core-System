@@ -60,6 +60,7 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     protected void disableInternal() {
         try {
             translations.close();
+            commands.shutdown();
         } finally {
             try {
                 if (persistenceContext != null) {
