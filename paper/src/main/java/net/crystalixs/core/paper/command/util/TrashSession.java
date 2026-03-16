@@ -64,6 +64,8 @@ public final class TrashSession {
         Locale requested = viewer.locale();
         this.locale = plugin.resolveTranslationLocale(requested);
 
+        cleanupPlayerCarryState(viewer);
+
         Gui gui = Gui.normal()
                 .setStructure(
                         "x x x x x x x x x",
@@ -174,25 +176,24 @@ public final class TrashSession {
         slotExpireAtMillis.remove(slot);
     }
 
-    private void cleanupMarkedItems(Player player) {
-        for (int slot = 0; slot < player.getInventory().getSize(); slot++) {
-            ItemStack itemStack = player.getInventory().getItem(slot);
-            ItemStack cleaned = stripTimerLoreIfMarked(itemStack);
-            if (cleaned != itemStack) {
-                player.getInventory().setItem(slot, cleaned);
-            }
-        }
-
-        ItemStack offhand = player.getInventory().getItemInOffHand();
-        ItemStack cleanedOffhand = stripTimerLoreIfMarked(offhand);
-        if (cleanedOffhand != offhand) {
-            player.getInventory().setItemInOffHand(cleanedOffhand);
-        }
-
+    private void cleanupPlayerCarryState(Player player) {
         ItemStack cursor = player.getItemOnCursor();
         ItemStack cleanedCursor = stripTimerLoreIfMarked(cursor);
+
         if (cleanedCursor != cursor) {
             player.setItemOnCursor(cleanedCursor);
+        }
+
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
+        ItemStack cleanedMainHand = stripTimerLoreIfMarked(mainHand);
+        if(cleanedMainHand != mainHand) {
+            player.getInventory().setItemInMainHand(cleanedMainHand);
+        }
+
+        ItemStack offHand = player.getInventory().getItemInOffHand();
+        ItemStack cleanedOffHand = stripTimerLoreIfMarked(offHand);
+        if(cleanedOffHand != offHand) {
+            player.getInventory().setItemInOffHand(cleanedOffHand);
         }
     }
 
