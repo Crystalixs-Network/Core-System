@@ -21,7 +21,7 @@ public final class TrashService {
     }
 
     public void open(Player player) {
-        sessions.computeIfAbsent(player.getUniqueId(), uuid -> new TrashSession(plugin, SIZE, DELETE_TICKS))
+        sessions.computeIfAbsent(player.getUniqueId(), uuid -> new TrashSession(plugin, uuid, SIZE, DELETE_TICKS))
                 .open(player);
     }
 

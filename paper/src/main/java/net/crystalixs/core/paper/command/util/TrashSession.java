@@ -23,10 +23,7 @@ import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason;
 import xyz.xenondevs.invui.inventory.event.UpdateReason;
 import xyz.xenondevs.invui.window.Window;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static net.kyori.adventure.text.Component.*;
@@ -41,6 +38,7 @@ public final class TrashSession {
     private final Map<Integer, Long> interactionCooldownUntil = new ConcurrentHashMap<>();
 
     private final CorePlugin plugin;
+    private final UUID ownerId;
     private final long deleteTicks;
 
     private final Inventory backingInventory;
@@ -53,10 +51,11 @@ public final class TrashSession {
 
     private final StructuredLogger logger;
 
-    public TrashSession(JavaPlugin plugin, int size, long deleteTicks) {
+    public TrashSession(JavaPlugin plugin, UUID ownerId,int size, long deleteTicks) {
         this.plugin = (CorePlugin) plugin;
         this.logger = this.plugin.commandLogger("trash");
 
+        this.ownerId = ownerId;
         this.deleteTicks = deleteTicks;
         this.locale = this.plugin.defaultTranslationLocale();
 
@@ -195,8 +194,8 @@ public final class TrashSession {
                 logger.info("trash item auto-deleted", LogMetadata
                         .event("command.trash.inventory.delete")
                         .and(LogMetadata.Key.ACTOR, "system")
-                        .and(LogMetadata.Key.SUBJECT, "slot=" + slot)
-                        .and(LogMetadata.Key.DESCRIPTION, "type=" + stripped.getType() + ", amount=" + stripped.getAmount())
+                        .and(LogMetadata.Key.SUBJECT, ownerId.toString())
+                        .and(LogMetadata.Key.DESCRIPTION, "slot=" + slot + ", type=" + stripped.getType() + ", amount=" + stripped.getAmount())
                         .and(LogMetadata.Key.COMMAND, "trash"));
 
                 reference.setItem(UpdateReason.SUPPRESSED, slot, null);
