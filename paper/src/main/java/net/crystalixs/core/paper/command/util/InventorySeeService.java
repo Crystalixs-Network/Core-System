@@ -186,13 +186,27 @@ public final class InventorySeeService {
     private void logModifyUpdate(UUID targetId, ItemPostUpdateEvent event) {
         if (!(event.getUpdateReason() instanceof PlayerUpdateReason reason)) return;
 
-        String action = event.isAdd() ? "add" : event.isRemove() ? "remove" : event.isSwap() ? "swap" : "update";
+        String oldFingerprint = fingerprint(event.getPreviousItem());
+        String newFingerprint = fingerprint(event.getNewItem());
+        if (oldFingerprint.equals(newFingerprint)) {
+            return;
+        }
 
+        String action = event.isAdd() ? "add" : event.isRemove() ? "remove" : event.isSwap() ? "swap" : "update";
         logger.info("invsee inventory modified", LogMetadata
                 .event("command.invsee.inventory.modify")
                 .and(LogMetadata.Key.ACTOR, reason.getPlayer().getName())
                 .and(LogMetadata.Key.SUBJECT, targetId.toString())
-                .and(LogMetadata.Key.DESCRIPTION, "slot=" + event.getSlot() + ", action=" + action)
+                .and(LogMetadata.Key.DESCRIPTION, "slot=" + event.getSlot() + ", action=" + action + ", old=" + oldFingerprint + ", new=" + newFingerprint)
                 .and(LogMetadata.Key.COMMAND, "invsee"));
+    }
+
+    private String fingerprint(ItemStack item) {
+        if (item == null || item.getType().isAir()) {
+            return "air";
+        }
+
+        String meta = item.hasItemMeta() ? item.getItemMeta().getAsString() : "no-meta";
+        return item.getType() + "x" + item.getAmount() + "|" + meta;
     }
 }
