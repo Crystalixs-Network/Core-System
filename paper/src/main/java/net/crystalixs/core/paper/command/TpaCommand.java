@@ -6,7 +6,6 @@ import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.TeleportRequestService;
 import net.crystalixs.core.paper.command.util.TeleportRequestService.RequestType;
-import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
