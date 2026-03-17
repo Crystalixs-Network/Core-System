@@ -34,7 +34,7 @@ public final class EnderchestCommand extends PaperCommand {
         commandManager.command(commandManager.commandBuilder("enderchest", "ec")
                 .commandDescription(RichDescription.translatable("command.enderchest.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
-                .permission(Permission.of("core.command.enderchest"))
+                .permission(Permission.of("core.command.enderchest.other"))
                 .required("player", playerParser(), RichDescription.translatable("command.enderchest.description.player"))
                 .handler(this::openOther));
     }
@@ -47,7 +47,7 @@ public final class EnderchestCommand extends PaperCommand {
     private void openOther(CommandContext<PaperPlayerCommandSource> context) {
         Player sender = context.sender().player();
         Player target = context.get("player");
-        boolean canInteract = sender.hasPermission("core.bypass.enderchest");
+        boolean canInteract = sender.hasPermission("core.bypass.enderchest.other");
 
         service.open(sender, target, canInteract);
     }
