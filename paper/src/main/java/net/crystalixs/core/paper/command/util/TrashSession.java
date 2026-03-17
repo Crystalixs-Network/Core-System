@@ -1,5 +1,7 @@
 package net.crystalixs.core.paper.command.util;
 
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
@@ -49,8 +51,12 @@ public final class TrashSession {
     private volatile boolean internalLoreUpdate = false;
     private volatile Locale locale;
 
+    private final StructuredLogger logger;
+
     public TrashSession(JavaPlugin plugin, int size, long deleteTicks) {
         this.plugin = (CorePlugin) plugin;
+        this.logger = this.plugin.commandLogger("trash");
+
         this.deleteTicks = deleteTicks;
         this.locale = this.plugin.defaultTranslationLocale();
 
@@ -184,6 +190,15 @@ public final class TrashSession {
         int taskId = Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
             ItemStack current = backingInventory.getItem(slot);
             if (!isEmpty(current)) {
+                ItemStack stripped = stripTimerLore(current.clone());
+
+                logger.info("trash item auto-deleted", LogMetadata
+                        .event("command.trash.inventory.delete")
+                        .and(LogMetadata.Key.ACTOR, "system")
+                        .and(LogMetadata.Key.SUBJECT, "slot=" + slot)
+                        .and(LogMetadata.Key.DESCRIPTION, "type=" + stripped.getType() + ", amount=" + stripped.getAmount())
+                        .and(LogMetadata.Key.COMMAND, "trash"));
+
                 reference.setItem(UpdateReason.SUPPRESSED, slot, null);
                 reference.notifyWindows();
             }
