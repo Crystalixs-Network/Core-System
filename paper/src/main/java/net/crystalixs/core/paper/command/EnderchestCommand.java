@@ -20,7 +20,7 @@ public final class EnderchestCommand extends PaperCommand {
 
     public EnderchestCommand(CorePlugin plugin) {
         super(plugin);
-        this.service = new EnderchestViewService();
+        this.service = new EnderchestViewService(plugin);
     }
 
     @Override
