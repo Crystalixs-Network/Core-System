@@ -66,10 +66,10 @@ public final class PaperCommandBootstrap {
         new SignCommand(plugin).registerTo(commandManager);
         new MessageCommand(plugin, messageService).registerTo(commandManager);
         new ReplyCommand(plugin, messageService).registerTo(commandManager);
-        new TeleportCommand(plugin, teleportService).registerTo(commandManager);
-        new TeleportHereCommand(plugin, teleportService).registerTo(commandManager);
-        new TeleportAcceptCommand(plugin, teleportService).registerTo(commandManager);
-        new TeleportDenyCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportRequestCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportRequestHereCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportRequestAcceptCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportRequestDenyCommand(plugin, teleportService).registerTo(commandManager);
         new TeleportOverrideCommand(plugin).registerTo(commandManager);
         new TeleportOverrideHereCommand(plugin).registerTo(commandManager);
     }

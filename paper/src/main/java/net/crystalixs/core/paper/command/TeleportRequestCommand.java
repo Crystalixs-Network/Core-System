@@ -16,22 +16,22 @@ import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
-public class TeleportHereCommand extends PaperCommand {
+public class TeleportRequestCommand extends PaperCommand {
 
     private final TeleportRequestService service;
 
-    public TeleportHereCommand(CorePlugin plugin, TeleportRequestService service) {
+    public TeleportRequestCommand(CorePlugin plugin, TeleportRequestService service) {
         super(plugin);
         this.service = service;
     }
 
     @Override
     public void registerTo(@NotNull CommandManager<PaperCommandSource> commandManager) {
-        commandManager.command(commandManager.commandBuilder("tpahere")
-                .commandDescription(RichDescription.translatable("command.tpahere.description.main"))
+        commandManager.command(commandManager.commandBuilder("tpa")
+                .commandDescription(RichDescription.translatable("command.tpa.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
-                .permission(Permission.of("core.command.tpahere"))
-                .required("player", playerParser(), RichDescription.translatable("command.tpahere.description.player"))
+                .permission(Permission.of("core.command.tpa"))
+                .required("player", playerParser(), RichDescription.translatable("command.tpa.description.player"))
                 .handler(context -> {
                     Player requester = context.sender().player();
                     Player target = context.get("player");
@@ -41,10 +41,10 @@ public class TeleportHereCommand extends PaperCommand {
                         return;
                     }
 
-                    service.create(requester, target, RequestType.TPA_HERE);
+                    service.create(requester, target, RequestType.TPA);
 
-                    requester.sendMessage(translatable("command.tpahere.sent").arguments(component("player", target.name())));
-                    target.sendMessage(translatable("command.tpahere.received").arguments(component("player", requester.name())));
+                    requester.sendMessage(translatable("command.tpa.sent").arguments(component("player", target.name())));
+                    target.sendMessage(translatable("command.tpa.received").arguments(component("player", requester.name())));
                 }));
     }
 }
