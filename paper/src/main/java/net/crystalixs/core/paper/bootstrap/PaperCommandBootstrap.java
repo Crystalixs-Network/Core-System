@@ -7,6 +7,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.PrivateMessageService;
 import net.crystalixs.core.paper.command.util.SitService;
+import net.crystalixs.core.paper.command.util.TeleportRequestService;
 import net.crystalixs.core.paper.command.util.TrashService;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
@@ -26,12 +27,14 @@ public final class PaperCommandBootstrap {
     private final TrashService trashService;
     private final SitService sitService;
     private final PrivateMessageService messageService;
+    private final TeleportRequestService teleportService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
         this.trashService = new TrashService(runtime.plugin());
         this.sitService = new SitService(runtime.plugin());
         this.messageService = new PrivateMessageService();
+        this.teleportService = new TeleportRequestService(runtime.plugin());
     }
 
     public void registerCommands() {
@@ -63,12 +66,19 @@ public final class PaperCommandBootstrap {
         new SignCommand(plugin).registerTo(commandManager);
         new MessageCommand(plugin, messageService).registerTo(commandManager);
         new ReplyCommand(plugin, messageService).registerTo(commandManager);
+        new TeleportRequestCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportRequestHereCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportRequestAcceptCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportRequestDenyCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportOverrideCommand(plugin).registerTo(commandManager);
+        new TeleportOverrideHereCommand(plugin).registerTo(commandManager);
     }
 
     public void shutdown() {
         trashService.shutdown();
         sitService.shutdown();
         messageService.shutdown();
+        teleportService.shutdown();
     }
 
     public SitService sitService() {
