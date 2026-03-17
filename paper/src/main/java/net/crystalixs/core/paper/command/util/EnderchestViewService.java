@@ -29,8 +29,9 @@ public final class EnderchestViewService {
 
         if (!canInteract) {
             reference.setPreUpdateHandler(event -> event.setCancelled(true));
-        } else {
-            reference.setPostUpdateHandler(event -> logUpdate(event, target));
+
+        } else if (!viewer.getUniqueId().equals(target.getUniqueId())) {
+            reference.setPostUpdateHandler(event -> logUpdate(event, viewer, target));
         }
 
         String translationKey = viewer.equals(target) ? "command.enderchest.view.self" : "command.enderchest.view.other";
@@ -52,13 +53,13 @@ public final class EnderchestViewService {
                 .open(viewer);
     }
 
-    private void logUpdate(ItemPostUpdateEvent event, Player chestOwner) {
-        if (!(event.getUpdateReason() instanceof PlayerUpdateReason reason)) return;
+    private void logUpdate(ItemPostUpdateEvent event, Player actor, Player chestOwner) {
+        if (!(event.getUpdateReason() instanceof PlayerUpdateReason)) return;
 
         String action = event.isAdd() ? "add" : event.isRemove() ? "remove" : event.isSwap() ? "swap" : "update";
-        logger.info("enderchest inventory updated", LogMetadata
+        logger.info("other enderchest inventory updated", LogMetadata
                 .event("command.enderchest.inventory.update")
-                .and(LogMetadata.Key.ACTOR, reason.getPlayer().getName())
+                .and(LogMetadata.Key.ACTOR, actor.getName())
                 .and(LogMetadata.Key.SUBJECT, chestOwner.getUniqueId().toString())
                 .and(LogMetadata.Key.DESCRIPTION, "slot=" + event.getSlot() + ", action=" + action)
                 .and(LogMetadata.Key.COMMAND, "enderchest"));
