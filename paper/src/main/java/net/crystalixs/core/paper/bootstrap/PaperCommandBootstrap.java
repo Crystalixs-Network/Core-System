@@ -85,6 +85,10 @@ public final class PaperCommandBootstrap {
         return sitService;
     }
 
+    public InventorySeeService inventorySeeService() {
+        return inventorySeeService;
+    }
+
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
         return SenderMapper.create(commandSourceStack -> {
             CommandSender sender = commandSourceStack.getSender();

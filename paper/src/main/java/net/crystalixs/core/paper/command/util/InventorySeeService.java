@@ -71,6 +71,13 @@ public final class InventorySeeService {
                 .open(viewer);
     }
 
+    public void refresh(UUID targetId) {
+        Session session = sessions.get(targetId);
+        if (session == null) return;
+
+        session.notifyAllWindows();
+    }
+
     private Session createSession(Player target) {
         PlayerInventory inventory = target.getInventory();
 
