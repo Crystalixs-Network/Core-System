@@ -14,7 +14,7 @@ import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
-public class TeleportOverrideCommand extends PaperCommand {
+public final class TeleportOverrideCommand extends PaperCommand {
 
     public TeleportOverrideCommand(CorePlugin plugin) {
         super(plugin);

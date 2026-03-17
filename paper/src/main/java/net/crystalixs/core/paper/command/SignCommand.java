@@ -27,7 +27,7 @@ import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static net.kyori.adventure.text.minimessage.translation.Argument.tagResolver;
 
-public class SignCommand extends PaperCommand {
+public final class SignCommand extends PaperCommand {
 
     private final NamespacedKey key;
 

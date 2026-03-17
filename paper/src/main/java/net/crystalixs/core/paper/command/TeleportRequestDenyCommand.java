@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
-public class TeleportRequestDenyCommand extends PaperCommand {
+public final class TeleportRequestDenyCommand extends PaperCommand {
 
     private final TeleportRequestService service;
 

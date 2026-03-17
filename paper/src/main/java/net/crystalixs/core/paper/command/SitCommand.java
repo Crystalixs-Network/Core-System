@@ -10,7 +10,7 @@ import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
-public class SitCommand extends PaperCommand {
+public final class SitCommand extends PaperCommand {
 
     private final SitService service;
 

@@ -28,7 +28,7 @@ import static org.incendo.cloud.parser.standard.LongParser.longParser;
 import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 import static org.incendo.cloud.suggestion.SuggestionProvider.noSuggestions;
 
-public class EconomyCommand extends PaperCommand {
+public final class EconomyCommand extends PaperCommand {
 
     private final EconomyService service;
     private final StructuredLogger logger;

@@ -18,7 +18,7 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.string;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
-public class MessageCommand extends PaperCommand {
+public final class MessageCommand extends PaperCommand {
 
     private final PrivateMessageService service;
 

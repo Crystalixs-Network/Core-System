@@ -11,7 +11,7 @@ import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
-public class WorkbenchCommand extends PaperCommand {
+public final class WorkbenchCommand extends PaperCommand {
 
     public WorkbenchCommand(CorePlugin plugin) {
         super(plugin);

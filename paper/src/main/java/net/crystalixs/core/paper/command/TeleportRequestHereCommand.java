@@ -16,7 +16,7 @@ import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
-public class TeleportRequestHereCommand extends PaperCommand {
+public final class TeleportRequestHereCommand extends PaperCommand {
 
     private final TeleportRequestService service;
 

@@ -14,7 +14,7 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder;
 
 import static net.kyori.adventure.text.Component.translatable;
 
-public class RepairCommand extends PaperCommand {
+public final class RepairCommand extends PaperCommand {
 
     public RepairCommand(CorePlugin plugin) {
         super(plugin);
