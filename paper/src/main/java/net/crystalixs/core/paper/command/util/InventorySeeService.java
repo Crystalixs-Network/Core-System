@@ -1,5 +1,8 @@
 package net.crystalixs.core.paper.command.util;
 
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
+import net.crystalixs.core.paper.CorePlugin;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -9,6 +12,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
+import xyz.xenondevs.invui.inventory.event.ItemPostUpdateEvent;
+import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.window.Window;
@@ -17,6 +22,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.translatable;
@@ -24,11 +30,11 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 
 public final class InventorySeeService {
 
-    private final JavaPlugin plugin;
     private final Map<UUID, TargetSessions> sessions = new ConcurrentHashMap<>();
+    private final StructuredLogger logger;
 
     public InventorySeeService(JavaPlugin plugin) {
-        this.plugin = plugin;
+        this.logger = ((CorePlugin) plugin).commandLogger("invsee");
     }
 
     public void open(Player viewer, Player target, boolean canModify) {
@@ -81,8 +87,12 @@ public final class InventorySeeService {
         Session readOnly = createSession(inventory);
         readOnly.setReadOnly();
 
-        TargetSessions targetSessions = new TargetSessions(modify, readOnly);
-        modify.setPostUpdateNotify(targetSessions::notifyAllWindows);
+        TargetSessions targetSessions = new TargetSessions(target.getUniqueId(), modify, readOnly);
+        modify.setPostUpdateNotify(event -> {
+            logModifyUpdate(targetSessions.targetId, event);
+            targetSessions.notifyAllWindows();
+        });
+
         return targetSessions;
     }
 
@@ -91,6 +101,7 @@ public final class InventorySeeService {
         var offhand = ofSection(inventory, 40);
         var hotbar = ofSection(inventory, 0, 1, 2, 3, 4, 5, 6, 7, 8);
         var storage = ofSection(inventory, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
+
         return new Session(armor, offhand, hotbar, storage);
     }
 
@@ -134,11 +145,11 @@ public final class InventorySeeService {
             storage.setPreUpdateHandler(event -> event.setCancelled(true));
         }
 
-        private void setPostUpdateNotify(Runnable notify) {
-            armor.setPostUpdateHandler(event -> notify.run());
-            offhand.setPostUpdateHandler(event -> notify.run());
-            hotbar.setPostUpdateHandler(event -> notify.run());
-            storage.setPostUpdateHandler(event -> notify.run());
+        private void setPostUpdateNotify(Consumer<ItemPostUpdateEvent> notify) {
+            armor.setPostUpdateHandler(notify);
+            offhand.setPostUpdateHandler(notify);
+            hotbar.setPostUpdateHandler(notify);
+            storage.setPostUpdateHandler(notify);
         }
 
         private void notifyAllWindows() {
@@ -150,10 +161,12 @@ public final class InventorySeeService {
     }
 
     private final class TargetSessions {
+        private final UUID targetId;
         private final Session modify;
         private final Session readOnly;
 
-        private TargetSessions(Session modify, Session readOnly) {
+        private TargetSessions(UUID targetId, Session modify, Session readOnly) {
+            this.targetId = targetId;
             this.modify = modify;
             this.readOnly = readOnly;
         }
@@ -168,5 +181,18 @@ public final class InventorySeeService {
                 sessions.remove(targetId, this);
             }
         }
+    }
+
+    private void logModifyUpdate(UUID targetId, ItemPostUpdateEvent event) {
+        if (!(event.getUpdateReason() instanceof PlayerUpdateReason reason)) return;
+
+        String action = event.isAdd() ? "add" : event.isRemove() ? "remove" : event.isSwap() ? "swap" : "update";
+
+        logger.info("invsee inventory modified", LogMetadata
+                .event("command.invsee.inventory.modify")
+                .and(LogMetadata.Key.ACTOR, reason.getPlayer().getName())
+                .and(LogMetadata.Key.SUBJECT, targetId.toString())
+                .and(LogMetadata.Key.DESCRIPTION, "slot=" + event.getSlot() + ", action=" + action)
+                .and(LogMetadata.Key.COMMAND, "invsee"));
     }
 }
