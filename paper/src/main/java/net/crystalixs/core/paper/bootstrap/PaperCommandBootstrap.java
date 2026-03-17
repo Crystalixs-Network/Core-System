@@ -9,6 +9,7 @@ import net.crystalixs.core.paper.command.util.PrivateMessageService;
 import net.crystalixs.core.paper.command.util.SitService;
 import net.crystalixs.core.paper.command.util.TeleportRequestService;
 import net.crystalixs.core.paper.command.util.TrashService;
+import net.crystalixs.core.paper.command.util.VanishService;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -28,6 +29,7 @@ public final class PaperCommandBootstrap {
     private final SitService sitService;
     private final PrivateMessageService messageService;
     private final TeleportRequestService teleportService;
+    private final VanishService vanishService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
@@ -35,6 +37,7 @@ public final class PaperCommandBootstrap {
         this.sitService = new SitService(runtime.plugin());
         this.messageService = new PrivateMessageService();
         this.teleportService = new TeleportRequestService(runtime.plugin());
+        this.vanishService = new VanishService(runtime.plugin());
     }
 
     public void registerCommands() {
@@ -72,6 +75,7 @@ public final class PaperCommandBootstrap {
         new TeleportRequestDenyCommand(plugin, teleportService).registerTo(commandManager);
         new TeleportOverrideCommand(plugin).registerTo(commandManager);
         new TeleportOverrideHereCommand(plugin).registerTo(commandManager);
+        new VanishCommand(plugin, vanishService).registerTo(commandManager);
     }
 
     public void shutdown() {
@@ -83,6 +87,10 @@ public final class PaperCommandBootstrap {
 
     public SitService sitService() {
         return sitService;
+    }
+
+    public VanishService vanishService() {
+        return vanishService;
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
