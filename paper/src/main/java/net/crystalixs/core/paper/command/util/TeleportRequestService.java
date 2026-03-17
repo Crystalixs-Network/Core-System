@@ -40,6 +40,12 @@ public class TeleportRequestService {
         return request;
     }
 
+    public TeleportRequest consumeTarget(Player target) {
+        TeleportRequest request = openRequests.remove(target.getUniqueId());
+        if (request == null) return null;
+        return isExpired(request) ? null : request;
+    }
+
     public TeleportRequest latestRequest(Player target) {
         TeleportRequest request = openRequests.get(target.getUniqueId());
         if (request == null) return null;
