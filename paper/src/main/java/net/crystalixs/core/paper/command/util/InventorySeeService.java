@@ -9,6 +9,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
+import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason;
+import xyz.xenondevs.invui.inventory.event.UpdateReason;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.window.Window;
@@ -16,6 +18,7 @@ import xyz.xenondevs.invui.window.Window;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.translatable;
@@ -23,30 +26,19 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 
 public final class InventorySeeService {
 
-    private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
     private final JavaPlugin plugin;
+    private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
 
     public InventorySeeService(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
     public void open(Player viewer, Player target, boolean canModify) {
-        Session session = sessions.computeIfAbsent(target.getUniqueId(), uuid -> Session.create(target));
+        Session session = sessions.computeIfAbsent(target.getUniqueId(), id -> createSession(target));
+        session.viewerCount.incrementAndGet();
 
-        if (!canModify) {
-            session.armor().setPreUpdateHandler(event -> event.setCancelled(true));
-            session.offhand().setPreUpdateHandler(event -> event.setCancelled(true));
-            session.hotbar().setPreUpdateHandler(event -> event.setCancelled(true));
-            session.storage().setPreUpdateHandler(event -> event.setCancelled(true));
-
-        } else {
-            session.armor().setPreUpdateHandler(null);
-            session.offhand().setPreUpdateHandler(null);
-            session.hotbar().setPreUpdateHandler(null);
-            session.storage().setPreUpdateHandler(null);
-        }
-
-        ItemProvider divider = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName(new AdventureComponentWrapper(empty()));
+        ItemProvider divider = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE)
+                .setDisplayName(new AdventureComponentWrapper(empty()));
 
         Gui gui = Gui.normal()
                 .setStructure(
@@ -57,10 +49,10 @@ public final class InventorySeeService {
                         "# # # # # # # # #",
                         "h h h h h h h h h"
                 )
-                .addIngredient('a', session.armor())
-                .addIngredient('o', session.offhand())
-                .addIngredient('x', session.storage())
-                .addIngredient('h', session.hotbar())
+                .addIngredient('a', session.armor)
+                .addIngredient('o', session.offhand)
+                .addIngredient('x', session.storage)
+                .addIngredient('h', session.hotbar)
                 .addIngredient('#', divider)
                 .build();
 
@@ -71,49 +63,91 @@ public final class InventorySeeService {
                 .setViewer(viewer)
                 .setGui(gui)
                 .setTitle(new AdventureComponentWrapper(renderedTitle))
+                .addCloseHandler(() -> {
+                    if (session.viewerCount.decrementAndGet() <= 0) {
+                        sessions.remove(target.getUniqueId(), session);
+                    }
+                })
                 .open(viewer);
     }
 
-    private record Session(ReferencingInventory armor, ReferencingInventory offhand, ReferencingInventory hotbar, ReferencingInventory storage) {
-        static Session create(Player target) {
-            PlayerInventory inventory = target.getInventory();
+    private Session createSession(Player target) {
+        PlayerInventory inventory = target.getInventory();
 
-            var armor = ofSection(inventory, 39, 38, 37, 36);
-            var offhand = ofSection(inventory, 40);
-            var hotbar = ofSection(inventory, 0, 1, 2, 3, 4, 5, 6, 7, 8);
-            var storage = ofSection(inventory, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
+        var armor = ofSection(inventory, 39, 38, 37, 36);
+        var offhand = ofSection(inventory, 40);
+        var hotbar = ofSection(inventory, 0, 1, 2, 3, 4, 5, 6, 7, 8);
+        var storage = ofSection(inventory, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
 
-            Runnable refreshAll = () -> {
-                armor.notifyWindows();
-                offhand.notifyWindows();
-                hotbar.notifyWindows();
-                storage.notifyWindows();
-            };
+        Session session = new Session(target.getUniqueId(), armor, offhand, hotbar, storage);
+        session.registerHooks();
+        return session;
+    }
 
-            armor.setPostUpdateHandler(event -> refreshAll.run());
-            offhand.setPostUpdateHandler(event -> refreshAll.run());
-            hotbar.setPostUpdateHandler(event -> refreshAll.run());
-            storage.setPostUpdateHandler(event -> refreshAll.run());
+    private ReferencingInventory ofSection(PlayerInventory inventory, int... slots) {
+        return new ReferencingInventory(
+                inventory,
+                inv -> {
+                    ItemStack[] result = new ItemStack[slots.length];
+                    for (int i = 0; i < slots.length; i++) {
+                        ItemStack item = inv.getItem(slots[i]);
+                        result[i] = item == null ? null : item.clone();
+                    }
+                    return result;
+                },
+                (inv, index) -> {
+                    ItemStack item = inv.getItem(slots[index]);
+                    return item == null ? null : item.clone();
+                },
+                (inv, index, item) -> inv.setItem(slots[index], item == null ? null : item.clone())
+        );
+    }
 
-            return new Session(armor, offhand, hotbar, storage);
+    private static final class Session {
+        private final UUID targetId;
+        private final ReferencingInventory armor;
+        private final ReferencingInventory offhand;
+        private final ReferencingInventory hotbar;
+        private final ReferencingInventory storage;
+        private final AtomicInteger viewerCount = new AtomicInteger(0);
+
+        private Session(UUID targetId, ReferencingInventory armor, ReferencingInventory offhand, ReferencingInventory hotbar, ReferencingInventory storage) {
+            this.targetId = targetId;
+            this.armor = armor;
+            this.offhand = offhand;
+            this.hotbar = hotbar;
+            this.storage = storage;
         }
 
-        private static ReferencingInventory ofSection(PlayerInventory inventory, int... slots) {
-            return new ReferencingInventory(
-                    inventory,
-                    inv -> {
-                        ItemStack[] result = new ItemStack[slots.length];
-                        for (int i = 0; i < slots.length; i++) {
-                            ItemStack item = inv.getItem(slots[i]);
-                            result[i] = item == null ? null : item.clone();
-                        }
-                        return result;
-                    },
-                    (inv, index) -> {
-                        ItemStack item = inv.getItem(slots[index]);
-                        return item == null ? null : item.clone();
-                    },
-                    (inv, index, item) -> inv.setItem(slots[index], item == null ? null : item.clone()));
+        private void registerHooks() {
+            armor.setPreUpdateHandler(event -> event.setCancelled(canNotModify(event.getUpdateReason())));
+            offhand.setPreUpdateHandler(event -> event.setCancelled(canNotModify(event.getUpdateReason())));
+            hotbar.setPreUpdateHandler(event -> event.setCancelled(canNotModify(event.getUpdateReason())));
+            storage.setPreUpdateHandler(event -> event.setCancelled(canNotModify(event.getUpdateReason())));
+
+            armor.setPostUpdateHandler(event -> notifyAllWindows());
+            offhand.setPostUpdateHandler(event -> notifyAllWindows());
+            hotbar.setPostUpdateHandler(event -> notifyAllWindows());
+            storage.setPostUpdateHandler(event -> notifyAllWindows());
+        }
+
+        private boolean canNotModify(UpdateReason reason) {
+            if (!(reason instanceof PlayerUpdateReason playerReason)) {
+                return true;
+            }
+
+            Player actor = playerReason.getPlayer();
+            if (actor.getUniqueId().equals(targetId)) {
+                return false;
+            }
+            return !actor.hasPermission("core.command.invsee.modify");
+        }
+
+        private void notifyAllWindows() {
+            armor.notifyWindows();
+            offhand.notifyWindows();
+            hotbar.notifyWindows();
+            storage.notifyWindows();
         }
     }
 }
