@@ -34,7 +34,7 @@ public final class EnderchestCommand extends PaperCommand {
         commandManager.command(commandManager.commandBuilder("enderchest", "ec")
                 .commandDescription(RichDescription.translatable("command.enderchest.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
-                .permission(Permission.of("core.command.enderchest"))
+                .permission(Permission.of("core.command.enderchest.other"))
                 .required("player", playerParser(), RichDescription.translatable("command.enderchest.description.player"))
                 .handler(this::openOther));
     }
