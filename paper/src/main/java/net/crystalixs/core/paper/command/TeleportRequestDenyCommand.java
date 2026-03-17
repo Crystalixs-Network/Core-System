@@ -45,7 +45,7 @@ public class TeleportRequestDenyCommand extends PaperCommand {
                         target.sendMessage(translatable("command.tpdeny.success.target.offline"));
                         return;
                     }
-                    target.sendMessage(translatable("command.tpdeny.success.target").arguments(component("player", requester.name())));
+                    target.sendMessage(translatable("command.tpdeny.success.target.online").arguments(component("player", requester.name())));
                     requester.sendMessage(translatable("command.tpdeny.success.requester").arguments(component("player", target.name())));
                 }));
     }
