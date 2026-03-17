@@ -30,7 +30,7 @@ public class TeleportDenyCommand extends PaperCommand {
         commandManager.command(commandManager.commandBuilder("tpdeny")
                 .commandDescription(RichDescription.translatable("command.tpdeny.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
-                .permission(Permission.of("core.command.tpa.deny"))
+                .permission(Permission.of("core.command.tpdeny"))
                 .handler(context -> {
                     Player target = context.sender().player();
                     TeleportRequest request = service.consumeTarget(target);

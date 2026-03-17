@@ -31,7 +31,7 @@ public class TeleportAcceptCommand extends PaperCommand {
         commandManager.command(commandManager.commandBuilder("tpaccept")
                 .commandDescription(RichDescription.translatable("command.tpaccept.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
-                .permission(Permission.of("core.command.tpa.accept"))
+                .permission(Permission.of("core.command.tpaccept"))
                 .handler(context -> {
                     Player target = context.sender().player();
                     TeleportRequest request = service.consumeTarget(target);
