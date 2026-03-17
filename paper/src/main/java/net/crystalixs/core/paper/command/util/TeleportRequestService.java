@@ -46,16 +46,6 @@ public class TeleportRequestService {
         return isExpired(request) ? null : request;
     }
 
-    public TeleportRequest latestRequest(Player target) {
-        TeleportRequest request = openRequests.get(target.getUniqueId());
-        if (request == null) return null;
-        if (isExpired(request)) {
-            cancelRequest(target);
-            return null;
-        }
-        return request;
-    }
-
     public void cancelRequest(Player target) {
         openRequests.remove(target.getUniqueId());
     }
