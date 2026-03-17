@@ -10,7 +10,7 @@ import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
-public class TrashCommand extends PaperCommand {
+public final class TrashCommand extends PaperCommand {
 
     private final TrashService service;
 

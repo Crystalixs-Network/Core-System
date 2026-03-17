@@ -11,7 +11,7 @@ import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
-public class AnvilCommand extends PaperCommand {
+public final class AnvilCommand extends PaperCommand {
 
     public AnvilCommand(CorePlugin plugin) {
         super(plugin);

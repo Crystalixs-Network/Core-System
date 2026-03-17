@@ -16,7 +16,7 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 import static net.kyori.adventure.text.minimessage.translation.Argument.string;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
-public class ReplyCommand extends PaperCommand {
+public final class ReplyCommand extends PaperCommand {
 
     private final PrivateMessageService service;
 

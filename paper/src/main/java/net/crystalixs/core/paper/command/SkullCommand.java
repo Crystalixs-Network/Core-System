@@ -21,7 +21,7 @@ import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
-public class SkullCommand extends PaperCommand {
+public final class SkullCommand extends PaperCommand {
 
     private final SkullTextureService service;
 
