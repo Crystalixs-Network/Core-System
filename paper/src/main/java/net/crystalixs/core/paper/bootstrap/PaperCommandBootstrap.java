@@ -62,6 +62,7 @@ public final class PaperCommandBootstrap {
         new SitCommand(plugin, sitService).registerTo(commandManager);
         new SignCommand(plugin).registerTo(commandManager);
         new MessageCommand(plugin, messageService).registerTo(commandManager);
+        new ReplyCommand(plugin, messageService).registerTo(commandManager);
     }
 
     public void shutdown() {

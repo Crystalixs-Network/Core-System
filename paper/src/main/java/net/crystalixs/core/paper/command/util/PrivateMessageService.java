@@ -1,5 +1,6 @@
 package net.crystalixs.core.paper.command.util;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -13,6 +14,11 @@ public final class PrivateMessageService {
     public void rememberConversation(Player sender, Player receiver) {
         lastMessagedBySender.put(sender.getUniqueId(), receiver.getUniqueId());
         lastMessagedBySender.put(receiver.getUniqueId(), sender.getUniqueId());
+    }
+
+    public Player lastRecipient(Player sender) {
+        UUID targetUuid = lastMessagedBySender.get(sender.getUniqueId());
+        return targetUuid == null ? null : Bukkit.getPlayer(targetUuid);
     }
 
     public void shutdown() {
