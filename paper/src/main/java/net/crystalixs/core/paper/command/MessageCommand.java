@@ -4,16 +4,13 @@ import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
+import net.crystalixs.core.paper.command.util.PrivateMessageService;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
@@ -23,10 +20,11 @@ import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public class MessageCommand extends PaperCommand {
 
-    private final Map<UUID, UUID> lastMessageBySender = new HashMap<>();
+    private final PrivateMessageService service;
 
-    public MessageCommand(CorePlugin plugin) {
+    public MessageCommand(CorePlugin plugin, PrivateMessageService service) {
         super(plugin);
+        this.service = service;
     }
 
     @Override
@@ -57,7 +55,6 @@ public class MessageCommand extends PaperCommand {
                 component("player", sender.name()),
                 string("message", message)));
 
-        lastMessageBySender.put(sender.getUniqueId(), receiver.getUniqueId());
-        lastMessageBySender.put(receiver.getUniqueId(), sender.getUniqueId());
+        service.rememberConversation(sender, receiver);
     }
 }

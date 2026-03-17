@@ -5,6 +5,7 @@ import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
+import net.crystalixs.core.paper.command.util.PrivateMessageService;
 import net.crystalixs.core.paper.command.util.SitService;
 import net.crystalixs.core.paper.command.util.TrashService;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
@@ -24,11 +25,13 @@ public final class PaperCommandBootstrap {
     private final PaperPluginRuntime runtime;
     private final TrashService trashService;
     private final SitService sitService;
+    private final PrivateMessageService messageService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
         this.trashService = new TrashService(runtime.plugin());
         this.sitService = new SitService(runtime.plugin());
+        this.messageService = new PrivateMessageService();
     }
 
     public void registerCommands() {
@@ -58,12 +61,13 @@ public final class PaperCommandBootstrap {
         new TrashCommand(plugin, trashService).registerTo(commandManager);
         new SitCommand(plugin, sitService).registerTo(commandManager);
         new SignCommand(plugin).registerTo(commandManager);
-        new MessageCommand(plugin).registerTo(commandManager);
+        new MessageCommand(plugin, messageService).registerTo(commandManager);
     }
 
     public void shutdown() {
         trashService.shutdown();
         sitService.shutdown();
+        messageService.shutdown();
     }
 
     public SitService sitService() {
