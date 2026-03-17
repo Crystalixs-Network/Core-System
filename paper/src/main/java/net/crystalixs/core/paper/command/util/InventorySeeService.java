@@ -9,8 +9,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
-import xyz.xenondevs.invui.inventory.event.PlayerUpdateReason;
-import xyz.xenondevs.invui.inventory.event.UpdateReason;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.window.Window;
@@ -37,9 +35,19 @@ public final class InventorySeeService {
         Session session = sessions.computeIfAbsent(target.getUniqueId(), id -> createSession(target));
         session.viewerCount.incrementAndGet();
 
-        ItemProvider divider = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE)
-                .setDisplayName(new AdventureComponentWrapper(empty()));
+        if (!canModify) {
+            session.armor.setPreUpdateHandler(event -> event.setCancelled(true));
+            session.offhand.setPreUpdateHandler(event -> event.setCancelled(true));
+            session.hotbar.setPreUpdateHandler(event -> event.setCancelled(true));
+            session.storage.setPreUpdateHandler(event -> event.setCancelled(true));
+        } else {
+            session.armor.setPreUpdateHandler(null);
+            session.offhand.setPreUpdateHandler(null);
+            session.hotbar.setPreUpdateHandler(null);
+            session.storage.setPreUpdateHandler(null);
+        }
 
+        ItemProvider divider = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName(new AdventureComponentWrapper(empty()));
         Gui gui = Gui.normal()
                 .setStructure(
                         "a a a a # o # # #",
@@ -86,7 +94,7 @@ public final class InventorySeeService {
         var hotbar = ofSection(inventory, 0, 1, 2, 3, 4, 5, 6, 7, 8);
         var storage = ofSection(inventory, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
 
-        Session session = new Session(target.getUniqueId(), armor, offhand, hotbar, storage);
+        Session session = new Session(armor, offhand, hotbar, storage);
         session.registerHooks();
         return session;
     }
@@ -111,15 +119,13 @@ public final class InventorySeeService {
     }
 
     private static final class Session {
-        private final UUID targetId;
         private final ReferencingInventory armor;
         private final ReferencingInventory offhand;
         private final ReferencingInventory hotbar;
         private final ReferencingInventory storage;
         private final AtomicInteger viewerCount = new AtomicInteger(0);
 
-        private Session(UUID targetId, ReferencingInventory armor, ReferencingInventory offhand, ReferencingInventory hotbar, ReferencingInventory storage) {
-            this.targetId = targetId;
+        private Session(ReferencingInventory armor, ReferencingInventory offhand, ReferencingInventory hotbar, ReferencingInventory storage) {
             this.armor = armor;
             this.offhand = offhand;
             this.hotbar = hotbar;
@@ -127,27 +133,10 @@ public final class InventorySeeService {
         }
 
         private void registerHooks() {
-            armor.setPreUpdateHandler(event -> event.setCancelled(canNotModify(event.getUpdateReason())));
-            offhand.setPreUpdateHandler(event -> event.setCancelled(canNotModify(event.getUpdateReason())));
-            hotbar.setPreUpdateHandler(event -> event.setCancelled(canNotModify(event.getUpdateReason())));
-            storage.setPreUpdateHandler(event -> event.setCancelled(canNotModify(event.getUpdateReason())));
-
             armor.setPostUpdateHandler(event -> notifyAllWindows());
             offhand.setPostUpdateHandler(event -> notifyAllWindows());
             hotbar.setPostUpdateHandler(event -> notifyAllWindows());
             storage.setPostUpdateHandler(event -> notifyAllWindows());
-        }
-
-        private boolean canNotModify(UpdateReason reason) {
-            if (!(reason instanceof PlayerUpdateReason playerReason)) {
-                return true;
-            }
-
-            Player actor = playerReason.getPlayer();
-            if (actor.getUniqueId().equals(targetId)) {
-                return false;
-            }
-            return !actor.hasPermission("core.command.invsee.modify");
         }
 
         private void notifyAllWindows() {
