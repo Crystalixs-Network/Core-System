@@ -19,10 +19,8 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 public final class EnderchestViewService {
 
     private final StructuredLogger logger;
-    private final CorePlugin plugin;
 
     public EnderchestViewService(CorePlugin plugin) {
-        this.plugin = plugin;
         this.logger = plugin.commandLogger("enderchest");
     }
 
