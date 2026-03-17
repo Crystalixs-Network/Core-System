@@ -25,27 +25,16 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 public final class InventorySeeService {
 
     private final JavaPlugin plugin;
-    private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
+    private final Map<UUID, TargetSessions> sessions = new ConcurrentHashMap<>();
 
     public InventorySeeService(JavaPlugin plugin) {
         this.plugin = plugin;
     }
 
     public void open(Player viewer, Player target, boolean canModify) {
-        Session session = sessions.computeIfAbsent(target.getUniqueId(), id -> createSession(target));
+        TargetSessions targetSessions = sessions.computeIfAbsent(target.getUniqueId(), id -> createSessions(target));
+        Session session = canModify ? targetSessions.modify : targetSessions.readOnly;
         session.viewerCount.incrementAndGet();
-
-        if (!canModify) {
-            session.armor.setPreUpdateHandler(event -> event.setCancelled(true));
-            session.offhand.setPreUpdateHandler(event -> event.setCancelled(true));
-            session.hotbar.setPreUpdateHandler(event -> event.setCancelled(true));
-            session.storage.setPreUpdateHandler(event -> event.setCancelled(true));
-        } else {
-            session.armor.setPreUpdateHandler(null);
-            session.offhand.setPreUpdateHandler(null);
-            session.hotbar.setPreUpdateHandler(null);
-            session.storage.setPreUpdateHandler(null);
-        }
 
         ItemProvider divider = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName(new AdventureComponentWrapper(empty()));
         Gui gui = Gui.normal()
@@ -73,30 +62,36 @@ public final class InventorySeeService {
                 .setTitle(new AdventureComponentWrapper(renderedTitle))
                 .addCloseHandler(() -> {
                     if (session.viewerCount.decrementAndGet() <= 0) {
-                        sessions.remove(target.getUniqueId(), session);
+                        targetSessions.removeIfUnused(target.getUniqueId());
                     }
                 })
                 .open(viewer);
     }
 
     public void refresh(UUID targetId) {
-        Session session = sessions.get(targetId);
-        if (session == null) return;
-
-        session.notifyAllWindows();
+        TargetSessions targetSessions = sessions.get(targetId);
+        if (targetSessions == null) return;
+        targetSessions.notifyAllWindows();
     }
 
-    private Session createSession(Player target) {
+    private TargetSessions createSessions(Player target) {
         PlayerInventory inventory = target.getInventory();
 
+        Session modify = createSession(inventory);
+        Session readOnly = createSession(inventory);
+        readOnly.setReadOnly();
+
+        TargetSessions targetSessions = new TargetSessions(modify, readOnly);
+        modify.setPostUpdateNotify(targetSessions::notifyAllWindows);
+        return targetSessions;
+    }
+
+    private Session createSession(PlayerInventory inventory) {
         var armor = ofSection(inventory, 39, 38, 37, 36);
         var offhand = ofSection(inventory, 40);
         var hotbar = ofSection(inventory, 0, 1, 2, 3, 4, 5, 6, 7, 8);
         var storage = ofSection(inventory, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35);
-
-        Session session = new Session(armor, offhand, hotbar, storage);
-        session.registerHooks();
-        return session;
+        return new Session(armor, offhand, hotbar, storage);
     }
 
     private ReferencingInventory ofSection(PlayerInventory inventory, int... slots) {
@@ -132,11 +127,18 @@ public final class InventorySeeService {
             this.storage = storage;
         }
 
-        private void registerHooks() {
-            armor.setPostUpdateHandler(event -> notifyAllWindows());
-            offhand.setPostUpdateHandler(event -> notifyAllWindows());
-            hotbar.setPostUpdateHandler(event -> notifyAllWindows());
-            storage.setPostUpdateHandler(event -> notifyAllWindows());
+        private void setReadOnly() {
+            armor.setPreUpdateHandler(event -> event.setCancelled(true));
+            offhand.setPreUpdateHandler(event -> event.setCancelled(true));
+            hotbar.setPreUpdateHandler(event -> event.setCancelled(true));
+            storage.setPreUpdateHandler(event -> event.setCancelled(true));
+        }
+
+        private void setPostUpdateNotify(Runnable notify) {
+            armor.setPostUpdateHandler(event -> notify.run());
+            offhand.setPostUpdateHandler(event -> notify.run());
+            hotbar.setPostUpdateHandler(event -> notify.run());
+            storage.setPostUpdateHandler(event -> notify.run());
         }
 
         private void notifyAllWindows() {
@@ -144,6 +146,27 @@ public final class InventorySeeService {
             offhand.notifyWindows();
             hotbar.notifyWindows();
             storage.notifyWindows();
+        }
+    }
+
+    private final class TargetSessions {
+        private final Session modify;
+        private final Session readOnly;
+
+        private TargetSessions(Session modify, Session readOnly) {
+            this.modify = modify;
+            this.readOnly = readOnly;
+        }
+
+        private void notifyAllWindows() {
+            modify.notifyAllWindows();
+            readOnly.notifyAllWindows();
+        }
+
+        private void removeIfUnused(UUID targetId) {
+            if (modify.viewerCount.get() <= 0 && readOnly.viewerCount.get() <= 0) {
+                sessions.remove(targetId, this);
+            }
         }
     }
 }
