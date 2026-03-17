@@ -28,7 +28,7 @@ public class TeleportRequestService {
 
     public TeleportRequest create(Player requester, Player target, RequestType type) {
         TeleportRequest request = new TeleportRequest(requester.getUniqueId(), target.getUniqueId(), type, System.currentTimeMillis() + EXPIRE_MILLIS);
-        openRequests.put(requester.getUniqueId(), request);
+        openRequests.put(target.getUniqueId(), request);
 
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             TeleportRequest current = openRequests.get(target.getUniqueId());
