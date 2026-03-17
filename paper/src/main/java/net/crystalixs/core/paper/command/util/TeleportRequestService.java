@@ -33,7 +33,7 @@ public class TeleportRequestService {
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             TeleportRequest current = openRequests.get(target.getUniqueId());
             if (current != null && current.equals(request) && isExpired(current)) {
-                cancelRequest(target);
+                openRequests.remove(target.getUniqueId());
             }
         }, EXPIRE_TICKS);
 
@@ -44,10 +44,6 @@ public class TeleportRequestService {
         TeleportRequest request = openRequests.remove(target.getUniqueId());
         if (request == null) return null;
         return isExpired(request) ? null : request;
-    }
-
-    public void cancelRequest(Player target) {
-        openRequests.remove(target.getUniqueId());
     }
 
     public void shutdown() {
