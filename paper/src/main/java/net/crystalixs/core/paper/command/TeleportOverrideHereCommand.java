@@ -1,5 +1,7 @@
 package net.crystalixs.core.paper.command;
 
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
@@ -16,8 +18,11 @@ import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
 public final class TeleportOverrideHereCommand extends PaperCommand {
 
+    private final StructuredLogger logger;
+
     public TeleportOverrideHereCommand(CorePlugin plugin) {
         super(plugin);
+        this.logger = commandLogger("tpohere");
     }
 
     @Override
@@ -39,6 +44,12 @@ public final class TeleportOverrideHereCommand extends PaperCommand {
                     target.teleport(sender.getLocation());
                     sender.sendMessage(translatable("command.tpohere.success.sender").arguments(component("player", target.name())));
                     target.sendMessage(translatable("command.tpohere.success.target").arguments(component("player", sender.name())));
+
+                    logger.info("direct summon teleport executed", LogMetadata
+                            .event("command.tpohere.teleport")
+                            .and(LogMetadata.Key.ACTOR, sender.getName())
+                            .and(LogMetadata.Key.SUBJECT, target.getUniqueId().toString())
+                            .and(LogMetadata.Key.COMMAND, "tpohere"));
                 }));
     }
 }

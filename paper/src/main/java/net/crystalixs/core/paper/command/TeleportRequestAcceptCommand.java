@@ -1,5 +1,7 @@
 package net.crystalixs.core.paper.command;
 
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
@@ -20,10 +22,12 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 public final class TeleportRequestAcceptCommand extends PaperCommand {
 
     private final TeleportRequestService service;
+    private final StructuredLogger logger;
 
     public TeleportRequestAcceptCommand(CorePlugin plugin, TeleportRequestService service) {
         super(plugin);
         this.service = service;
+        this.logger = commandLogger("tpaccept");
     }
 
     @Override
@@ -55,6 +59,13 @@ public final class TeleportRequestAcceptCommand extends PaperCommand {
 
                     target.sendMessage(translatable("command.tpaccept.success.target").arguments(component("player", requester.name())));
                     requester.sendMessage(translatable("command.tpaccept.success.requester").arguments(component("player", target.name())));
+
+                    logger.info("teleport request accepted", LogMetadata
+                            .event("command.tpaccept.teleport")
+                            .and(LogMetadata.Key.ACTOR, target.getName())
+                            .and(LogMetadata.Key.SUBJECT, requester.getUniqueId().toString())
+                            .and(LogMetadata.Key.COMMAND, "tpaccept")
+                            .and(LogMetadata.Key.DESCRIPTION, request.type().name().toLowerCase()));
                 }));
     }
 }
