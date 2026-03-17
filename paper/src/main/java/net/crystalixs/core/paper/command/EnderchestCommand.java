@@ -47,7 +47,7 @@ public final class EnderchestCommand extends PaperCommand {
     private void openOther(CommandContext<PaperPlayerCommandSource> context) {
         Player sender = context.sender().player();
         Player target = context.get("player");
-        boolean canInteract = sender.hasPermission("core.bypass.enderchest.other");
+        boolean canInteract = sender.hasPermission("core.command.enderchest.other.interact");
 
         service.open(sender, target, canInteract);
     }
