@@ -16,11 +16,11 @@ import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
-public class TpaHereCommand extends PaperCommand {
+public class TeleportHereCommand extends PaperCommand {
 
     private final TeleportRequestService service;
 
-    public TpaHereCommand(CorePlugin plugin, TeleportRequestService service) {
+    public TeleportHereCommand(CorePlugin plugin, TeleportRequestService service) {
         super(plugin);
         this.service = service;
     }

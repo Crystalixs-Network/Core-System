@@ -66,8 +66,8 @@ public final class PaperCommandBootstrap {
         new SignCommand(plugin).registerTo(commandManager);
         new MessageCommand(plugin, messageService).registerTo(commandManager);
         new ReplyCommand(plugin, messageService).registerTo(commandManager);
-        new TpaCommand(plugin, teleportService).registerTo(commandManager);
-        new TpaHereCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportHereCommand(plugin, teleportService).registerTo(commandManager);
     }
 
     public void shutdown() {
