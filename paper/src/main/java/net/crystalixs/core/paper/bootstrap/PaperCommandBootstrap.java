@@ -69,6 +69,7 @@ public final class PaperCommandBootstrap {
         new TeleportCommand(plugin, teleportService).registerTo(commandManager);
         new TeleportHereCommand(plugin, teleportService).registerTo(commandManager);
         new TeleportAcceptCommand(plugin, teleportService).registerTo(commandManager);
+        new TeleportDenyCommand(plugin, teleportService).registerTo(commandManager);
     }
 
     public void shutdown() {
