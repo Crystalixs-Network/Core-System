@@ -2,13 +2,11 @@ package net.crystalixs.core.paper.command.util;
 
 import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
-import net.crystalixs.core.paper.CorePlugin;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.inventory.ReferencingInventory;
@@ -33,8 +31,8 @@ public final class InventorySeeService {
     private final Map<UUID, TargetSessions> sessions = new ConcurrentHashMap<>();
     private final StructuredLogger logger;
 
-    public InventorySeeService(JavaPlugin plugin) {
-        this.logger = ((CorePlugin) plugin).commandLogger("invsee");
+    public InventorySeeService(StructuredLogger logger) {
+        this.logger = logger;
     }
 
     public void open(Player viewer, Player target, boolean canModify) {
