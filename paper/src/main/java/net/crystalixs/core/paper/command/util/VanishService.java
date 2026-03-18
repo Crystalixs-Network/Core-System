@@ -21,12 +21,13 @@ public final class VanishService {
         return vanishedPlayers.contains(player.getUniqueId());
     }
 
-    public void toggleVanish(Player target) {
+    public boolean toggleVanish(Player target) {
         if (isVanished(target)) {
             unvanish(target);
-        } else {
-            vanish(target);
+            return false;
         }
+        vanish(target);
+        return true;
     }
 
     public void vanish(Player target) {

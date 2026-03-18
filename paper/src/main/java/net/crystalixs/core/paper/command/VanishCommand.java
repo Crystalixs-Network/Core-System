@@ -30,9 +30,9 @@ public final class VanishCommand extends PaperCommand {
                 .permission(Permission.of("core.command.vanish"))
                 .handler(context -> {
                     Player player = context.sender().player();
-                    vanishService.toggleVanish(player);
-                    boolean vanished = vanishService.isVanished(player);
-                    player.sendMessage(vanished ? "§aDu bist jetzt im Vanish." : "§cDu bist nicht mehr im Vanish.");
+
+                    boolean isVanished = vanishService.toggleVanish(player);
+                    player.sendMessage(isVanished ? "§aDu bist jetzt im Vanish." : "§cDu bist nicht mehr im Vanish.");
                 }));
 
         commandManager.command(commandManager.commandBuilder("vanish", "v")
@@ -44,15 +44,14 @@ public final class VanishCommand extends PaperCommand {
                     Player sender = context.sender().player();
                     Player target = context.get("player");
 
-                    vanishService.toggleVanish(target);
-                    boolean vanished = vanishService.isVanished(target);
+                    boolean isVanished = vanishService.toggleVanish(target);
 
-                    sender.sendMessage(vanished
+                    sender.sendMessage(isVanished
                             ? "§aSpieler ist jetzt im Vanish."
                             : "§cSpieler ist nicht mehr im Vanish.");
 
                     if (!sender.equals(target)) {
-                        target.sendMessage(vanished
+                        target.sendMessage(isVanished
                                 ? "§7Du bist jetzt im Vanish."
                                 : "§7Du bist nicht mehr im Vanish.");
                     }
