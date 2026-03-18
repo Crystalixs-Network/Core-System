@@ -5,12 +5,14 @@ import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.VanishService;
+import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
+import static net.kyori.adventure.text.Component.translatable;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
 public final class VanishCommand extends PaperCommand {
@@ -32,7 +34,7 @@ public final class VanishCommand extends PaperCommand {
                     Player player = context.sender().player();
 
                     boolean isVanished = vanishService.toggleVanish(player);
-                    player.sendMessage(isVanished ? "§aDu bist jetzt im Vanish." : "§cDu bist nicht mehr im Vanish.");
+                    player.sendMessage(translatable(isVanished ? "command.vanish.enter.self" : "command.vanish.leave.self"));
                 }));
 
         commandManager.command(commandManager.commandBuilder("vanish", "v")
@@ -45,16 +47,10 @@ public final class VanishCommand extends PaperCommand {
                     Player target = context.get("player");
 
                     boolean isVanished = vanishService.toggleVanish(target);
-
-                    sender.sendMessage(isVanished
-                            ? "§aSpieler ist jetzt im Vanish."
-                            : "§cSpieler ist nicht mehr im Vanish.");
-
                     if (!sender.equals(target)) {
-                        target.sendMessage(isVanished
-                                ? "§7Du bist jetzt im Vanish."
-                                : "§7Du bist nicht mehr im Vanish.");
+                        target.sendMessage(translatable(isVanished ? "command.vanish.enter.self" : "command.vanish.leave.self"));
                     }
+                    sender.sendMessage(translatable(isVanished ? "command.vanish.enter.other" : "command.vanish.leave.other"));
                 }));
     }
 }
