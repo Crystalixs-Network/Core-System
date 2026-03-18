@@ -40,7 +40,7 @@ public final class VelocityCommandBootstrap {
         new ProxyStopCommand(plugin, runtime.server()).registerTo(commandManager);
         new CoreCommand(plugin, configUpdater, provider).registerTo(commandManager);
         new MaintenanceCommand(plugin, configUpdater, runtime.server(), runtime.miniMessage()).registerTo(commandManager);
-        new HelpCommand(plugin).registerTo(commandManager);
+        new HelpCommand(plugin, backendHelpCache).registerTo(commandManager);
         new GlobalFindCommand(plugin).registerTo(commandManager);
         new GlobalTeleportCommand(plugin).registerTo(commandManager);
         new OnlineCommand(plugin).registerTo(commandManager);
