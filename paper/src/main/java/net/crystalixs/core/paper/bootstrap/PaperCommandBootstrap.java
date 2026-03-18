@@ -5,6 +5,7 @@ import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
+import net.crystalixs.core.paper.command.util.*;
 import net.crystalixs.core.paper.command.util.PrivateMessageService;
 import net.crystalixs.core.paper.command.util.SitService;
 import net.crystalixs.core.paper.command.util.TeleportRequestService;
@@ -29,6 +30,7 @@ public final class PaperCommandBootstrap {
     private final SitService sitService;
     private final PrivateMessageService messageService;
     private final TeleportRequestService teleportService;
+    private final InventorySeeService inventorySeeService;
     private final VanishService vanishService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
@@ -37,6 +39,7 @@ public final class PaperCommandBootstrap {
         this.sitService = new SitService(runtime.plugin());
         this.messageService = new PrivateMessageService();
         this.teleportService = new TeleportRequestService(runtime.plugin());
+        this.inventorySeeService = new InventorySeeService(runtime.plugin());
         this.vanishService = new VanishService(runtime.plugin());
     }
 
@@ -75,6 +78,7 @@ public final class PaperCommandBootstrap {
         new TeleportRequestDenyCommand(plugin, teleportService).registerTo(commandManager);
         new TeleportOverrideCommand(plugin).registerTo(commandManager);
         new TeleportOverrideHereCommand(plugin).registerTo(commandManager);
+        new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
     }
 
@@ -87,6 +91,10 @@ public final class PaperCommandBootstrap {
 
     public SitService sitService() {
         return sitService;
+    }
+
+    public InventorySeeService inventorySeeService() {
+        return inventorySeeService;
     }
 
     public VanishService vanishService() {

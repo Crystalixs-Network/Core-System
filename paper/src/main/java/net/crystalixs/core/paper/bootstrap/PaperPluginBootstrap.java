@@ -50,8 +50,8 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     protected void enableInternal() {
         configUpdater = config.load(runtime());
         persistenceContext = persistence.create(runtime(), configUpdater);
-        listeners.register(runtime(), commands.sitService(), commands.vanishService());
-        commands.registerCommands();
+        listeners.register(runtime(), commands.sitService(), commands.inventorySeeService(), commands.vanishService());
+         commands.registerCommands();
 
         InvUI.getInstance().setPlugin(runtime().plugin());
     }
