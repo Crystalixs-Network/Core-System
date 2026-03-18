@@ -1,7 +1,7 @@
-package net.crystalixs.core.common.command;
+package net.crystalixs.core.common.command.help;
 
-import net.crystalixs.core.common.command.NetworkHelpCatalog.Entry;
-import net.crystalixs.core.common.command.NetworkHelpCatalog.SourceType;
+import net.crystalixs.core.common.command.help.NetworkHelpCatalog.Entry;
+import net.crystalixs.core.common.command.help.NetworkHelpCatalog.SourceType;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;

@@ -1,4 +1,4 @@
-package net.crystalixs.core.common.command;
+package net.crystalixs.core.common.command.help;
 
 import org.jetbrains.annotations.NotNull;
 
