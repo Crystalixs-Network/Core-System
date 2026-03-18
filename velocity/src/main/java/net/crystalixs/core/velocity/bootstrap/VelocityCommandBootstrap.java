@@ -4,16 +4,11 @@ import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.Player;
 import net.crystalixs.core.common.translation.TranslationProvider;
 import net.crystalixs.core.velocity.CorePlugin;
-import net.crystalixs.core.velocity.command.CoreCommand;
-import net.crystalixs.core.velocity.command.GlobalFindCommand;
-import net.crystalixs.core.velocity.command.GlobalTeleportCommand;
-import net.crystalixs.core.velocity.command.HelpCommand;
-import net.crystalixs.core.velocity.command.MaintenanceCommand;
-import net.crystalixs.core.velocity.command.OnlineCommand;
-import net.crystalixs.core.velocity.command.ProxyStopCommand;
+import net.crystalixs.core.velocity.command.*;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.platform.VelocityConfigUpdater;
+import net.crystalixs.core.velocity.help.BackendHelpCatalogCache;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
@@ -25,7 +20,11 @@ import static net.kyori.adventure.text.Component.translatable;
 
 public final class VelocityCommandBootstrap {
 
+    private final BackendHelpCatalogCache backendHelpCache = new BackendHelpCatalogCache();
+
     public void register(CorePlugin plugin, VelocityPluginRuntime runtime, VelocityConfigUpdater configUpdater, TranslationProvider provider) {
+        backendHelpCache.loadPreviewSample(); // POC seed, bis Transport steht
+
         final VelocityCommandManager<VelocityCommandSource> commandManager = new VelocityCommandManager<>(
                 runtime.pluginContainer(),
                 runtime.server(),
@@ -45,6 +44,8 @@ public final class VelocityCommandBootstrap {
         new GlobalFindCommand(plugin).registerTo(commandManager);
         new GlobalTeleportCommand(plugin).registerTo(commandManager);
         new OnlineCommand(plugin).registerTo(commandManager);
+
+        new NetworkHelpCommand(plugin, backendHelpCache).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {
