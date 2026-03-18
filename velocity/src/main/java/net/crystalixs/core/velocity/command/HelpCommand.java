@@ -37,8 +37,8 @@ public class HelpCommand extends VelocityCommand {
         commandManager.command(commandManager.commandBuilder("help-page")
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
-                .optional("query", stringParser())
                 .optional("page", integerParser(1), translatable("command.help.description.page"))
+                .optional("query", stringParser())
                 .handler(context -> {
                     int page = context.getOrDefault("page", 1);
                     String encoded = context.getOrDefault("query", "");
