@@ -13,7 +13,7 @@ paper = { group = "io.papermc.paper", name = "paper-api", version = "1.21.11-R0.
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 
 # Datasource
-mariadb = {group="org.mariadb.jdbc", name="mariadb-java-client", version="3.4.1"}
+mariadb = { group = "org.mariadb.jdbc", name = "mariadb-java-client", version = "3.4.1" }
 sadu-mariadb = { group = "de.chojo.sadu", name = "sadu-mariadb", version.ref = "sadu" }
 sadu-datasource = { group = "de.chojo.sadu", name = "sadu-datasource", version.ref = "sadu" }
 sadu-queries = { group = "de.chojo.sadu", name = "sadu-queries", version.ref = "sadu" }
@@ -34,6 +34,9 @@ slf4j-api = { group = "org.slf4j", name = "slf4j-api", version = "2.0.17" }
 # Utility
 adventure-api = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
+
+# UI
+invui = { group = "xyz.xenondevs.invui", name = "invui", version = "1.49" }
 
 [plugins]
 bukkitConvention = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourceFactory" }

@@ -6,14 +6,15 @@
 
 ## Überblick
 
-| Bereich               | Nutzen                                                                       |
-|-----------------------|------------------------------------------------------------------------------|
-| Wartungsmodus         | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch. |
-| MOTD-Steuerung        | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.   |
-| Dynamische Tablist    | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen.   |
-| Netzwerk-Commands     | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.         |
-| Konfigurations-Reload | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.     |
-| Economy (Paper)       | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.           |
+| Bereich                  | Nutzen                                                                                                |
+|--------------------------|-------------------------------------------------------------------------------------------------------|
+| Wartungsmodus            | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch.                          |
+| MOTD-Steuerung           | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.                            |
+| Dynamische Tablist       | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen.                            |
+| Netzwerk-Commands        | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.                                  |
+| Konfigurations-Reload    | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.                              |
+| Economy (Paper)          | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.                                    |
+| Utility Commands (Paper) | Stellt QoL-Commands wie Hat, Enderchest, Trash, Sit, Sign, Skull, Invsee, Vanish und Teleport bereit. |
 
 ---
 <br>
@@ -101,42 +102,87 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 
 ## Commands
 
-| Command                                          | Zweck                                                      | Typischer Einsatz                            |
-|--------------------------------------------------|------------------------------------------------------------|----------------------------------------------|
-| `/maintenance <true\|false>`                     | Aktiviert oder deaktiviert den Wartungsmodus.              | Updates, Tests, Notfallarbeiten              |
-| `/core reload --config`                          | Lädt nur die Konfiguration neu.                            | Nach Änderungen an `config.json`             |
-| `/core reload --messages`                        | Lädt nur die Nachrichten neu.                              | Nach Änderungen an Texten oder Übersetzungen |
-| `/core reload --all`                             | Lädt Config und Nachrichten gemeinsam neu.                 | Nach größeren inhaltlichen Anpassungen       |
-| `/help` oder `/?`                                | Zeigt das Hilfemenü.                                       | Zum Nachschlagen verfügbarer Befehle         |
-| `/global-find <player>` oder `/gfind <player>`   | Zeigt, auf welchem Server ein Spieler ist.                 | Support, Moderation, Teamarbeit              |
-| `/global-teleport <player>` oder `/gtp <player>` | Verbindet dich auf den Server des Zielspielers.            | Direktes Wechseln zu einem Spieler           |
-| `/online <server>`                               | Prüft, ob ein registrierter Backend-Server erreichbar ist. | Betriebscheck, Fehlersuche                   |
-| `/proxy-stop`                                    | Stoppt den Proxy kontrolliert.                             | Geplante Eingriffe oder Wartung              |
-| `/coins`                                         | Zeigt den aktuellen Coin-Kontostand.                       | Schnelle Kontostandsprüfung                  |
-| `/balance` oder `/bal`                           | Zeigt Coins und Gems an.                                   | Gesamtübersicht für Spieler                  |
-| `/pay <player> <amount>`                         | Überweist Coins an einen anderen Spieler.                  | Spieler-zu-Spieler-Transfer                  |
-| `/economy give <player> <currency> <amount>`     | Fügt Coins oder Gems hinzu.                                | Admin-Korrekturen, Rewards                   |
-| `/economy set <player> <currency> <amount>`      | Setzt Coins oder Gems auf einen festen Wert.               | Moderation, Datenkorrekturen                 |
-| `/economy take <player> <currency> <amount>`     | Zieht Coins oder Gems ab.                                  | Moderation, Rückabwicklung                   |
+| Command                                          | Zweck                                                       | Typischer Einsatz                            |
+|--------------------------------------------------|-------------------------------------------------------------|----------------------------------------------|
+| `/maintenance <true\|false>`                     | Aktiviert oder deaktiviert den Wartungsmodus.               | Updates, Tests, Notfallarbeiten              |
+| `/core reload --config`                          | Lädt nur die Konfiguration neu.                             | Nach Änderungen an `config.json`             |
+| `/core reload --messages`                        | Lädt nur die Nachrichten neu.                               | Nach Änderungen an Texten oder Übersetzungen |
+| `/core reload --all`                             | Lädt Config und Nachrichten gemeinsam neu.                  | Nach größeren inhaltlichen Anpassungen       |
+| `/help` oder `/?`                                | Zeigt das Hilfemenü.                                        | Zum Nachschlagen verfügbarer Befehle         |
+| `/global-find <player>` oder `/gfind <player>`   | Zeigt, auf welchem Server ein Spieler ist.                  | Support, Moderation, Teamarbeit              |
+| `/global-teleport <player>` oder `/gtp <player>` | Verbindet dich auf den Server des Zielspielers.             | Direktes Wechseln zu einem Spieler           |
+| `/online <server>`                               | Prüft, ob ein registrierter Backend-Server erreichbar ist.  | Betriebscheck, Fehlersuche                   |
+| `/proxy-stop`                                    | Stoppt den Proxy kontrolliert.                              | Geplante Eingriffe oder Wartung              |
+| `/coins`                                         | Zeigt den aktuellen Coin-Kontostand.                        | Schnelle Kontostandsprüfung                  |
+| `/balance` oder `/bal`                           | Zeigt Coins und Gems an.                                    | Gesamtübersicht für Spieler                  |
+| `/pay <player> <amount>`                         | Überweist Coins an einen anderen Spieler.                   | Spieler-zu-Spieler-Transfer                  |
+| `/economy give <player> <currency> <amount>`     | Fügt Coins oder Gems hinzu.                                 | Admin-Korrekturen, Rewards                   |
+| `/economy set <player> <currency> <amount>`      | Setzt Coins oder Gems auf einen festen Wert.                | Moderation, Datenkorrekturen                 |
+| `/economy take <player> <currency> <amount>`     | Zieht Coins oder Gems ab.                                   | Moderation, Rückabwicklung                   |
+| `/hat`                                           | Setzt das Item in der Hand als Helm.                        | Cosmetic/QoL                                 |
+| `/enderchest` oder `/ec`                         | Öffnet die eigene Enderchest.                               | Schneller Zugriff                            |
+| `/enderchest <player>` oder `/ec <player>`       | Öffnet die Enderchest eines anderen Spielers.               | Moderation/Support                           |
+| `/workbench` oder `/wb`                          | Öffnet eine mobile Werkbank.                                | Crafting ohne Block                          |
+| `/anvil`                                         | Öffnet einen mobilen Amboss.                                | Umbenennen/Reparieren                        |
+| `/repair`                                        | Repariert das Item in der Haupthand.                        | Admin-/Team-QoL                              |
+| `/skull <player>`                                | Gibt den Kopf eines (auch offline) Spielers.                | Build/Decoration                             |
+| `/trash`                                         | Öffnet den Mülleimer (Items werden zeitgesteuert gelöscht). | Inventar aufräumen                           |
+| `/sit`                                           | Setzt den Spieler auf den Boden.                            | Roleplay/QoL                                 |
+| `/sign`                                          | Signiert das Item in der Haupthand einmalig.                | Item-Historie                                |
+| `/message <player> <text>`                       | Sendet eine private Nachricht.                              | Direkte Kommunikation                        |
+| `/reply <text>`                                  | Antwortet auf die letzte private Nachricht.                 | Direkte Kommunikation                        |
+| `/tpa <player>`                                  | Sendet Teleport-Anfrage zu einem Spieler.                   | Spieler-zu-Spieler-Teleport                  |
+| `/tpahere <player>`                              | Sendet Teleport-Anfrage, damit der Spieler zu dir kommt.    | Spieler-zu-Spieler-Teleport                  |
+| `/tpaccept`                                      | Nimmt die letzte Teleport-Anfrage an.                       | Abschluss Teleport-Request                   |
+| `/tpdeny`                                        | Lehnt die letzte Teleport-Anfrage ab.                       | Ablehnen Teleport-Request                    |
+| `/tpo <player>`                                  | Teleportiert dich direkt zu einem Spieler.                  | Team-/Admin-Moderation                       |
+| `/tpohere <player>`                              | Teleportiert einen Spieler direkt zu dir.                   | Team-/Admin-Moderation                       |
+| `/invsee <player>`                               | Öffnet das Inventar eines Spielers (read-only/modify).      | Moderation/Support                           |
+| `/vanish` oder `/v`                              | Aktiviert/Deaktiviert Vanish für dich.                      | Moderation                                   |
+| `/vanish <player>` oder `/v <player>`            | Schaltet Vanish für einen anderen Spieler.                  | Team-Management                              |
 
 ---
 <br>
 
 ## Permissions
 
-| Permission                     | Bedeutung                                                            |
-|--------------------------------|----------------------------------------------------------------------|
-| `core.command.maintenance`     | Erlaubt das Ein- und Ausschalten des Wartungsmodus.                  |
-| `core.bypass.maintenance`      | Erlaubt den Beitritt trotz aktivem Wartungsmodus.                    |
-| `core.command.core`            | Erlaubt Reload-Befehle für Config und Nachrichten.                   |
-| `core.command.proxy-stop`      | Erlaubt das kontrollierte Stoppen des Proxy.                         |
-| `core.command.global-find`     | Erlaubt das Abfragen des aktuellen Servers eines Spielers.           |
-| `core.command.global-teleport` | Erlaubt das Wechseln auf den Server eines anderen Spielers.          |
-| `core.command.online`          | Erlaubt die Prüfung registrierter Backend-Server auf Erreichbarkeit. |
-| `core.command.coins`           | Erlaubt die Abfrage des eigenen Coin-Kontostands.                    |
-| `core.command.balance`         | Erlaubt die Abfrage von Coins und Gems.                              |
-| `core.command.pay`             | Erlaubt das Senden von Coins an andere Spieler.                      |
-| `core.command.economy`         | Erlaubt administrative Economy-Befehle (`give`, `set`, `take`).      |
+| Permission                               | Bedeutung                                                            |
+|------------------------------------------|----------------------------------------------------------------------|
+| `core.command.maintenance`               | Erlaubt das Ein- und Ausschalten des Wartungsmodus.                  |
+| `core.bypass.maintenance`                | Erlaubt den Beitritt trotz aktivem Wartungsmodus.                    |
+| `core.command.core`                      | Erlaubt Reload-Befehle für Config und Nachrichten.                   |
+| `core.command.proxy-stop`                | Erlaubt das kontrollierte Stoppen des Proxy.                         |
+| `core.command.global-find`               | Erlaubt das Abfragen des aktuellen Servers eines Spielers.           |
+| `core.command.global-teleport`           | Erlaubt das Wechseln auf den Server eines anderen Spielers.          |
+| `core.command.online`                    | Erlaubt die Prüfung registrierter Backend-Server auf Erreichbarkeit. |
+| `core.command.coins`                     | Erlaubt die Abfrage des eigenen Coin-Kontostands.                    |
+| `core.command.balance`                   | Erlaubt die Abfrage von Coins und Gems.                              |
+| `core.command.pay`                       | Erlaubt das Senden von Coins an andere Spieler.                      |
+| `core.command.economy`                   | Erlaubt administrative Economy-Befehle (`give`, `set`, `take`).      |
+| `core.command.hat`                       | Erlaubt `/hat`.                                                      |
+| `core.command.enderchest`                | Erlaubt das Öffnen der eigenen Enderchest (`/ec`).                   |
+| `core.command.enderchest.other`          | Erlaubt das Öffnen fremder Enderchests.                              |
+| `core.command.enderchest.other.interact` | Erlaubt das Bearbeiten fremder Enderchests im geöffneten View.       |
+| `core.command.workbench`                 | Erlaubt `/workbench` (`/wb`).                                        |
+| `core.command.anvil`                     | Erlaubt `/anvil`.                                                    |
+| `core.command.repair`                    | Erlaubt `/repair`.                                                   |
+| `core.command.skull`                     | Erlaubt `/skull <player>`.                                           |
+| `core.command.trash`                     | Erlaubt `/trash`.                                                    |
+| `core.command.sit`                       | Erlaubt `/sit`.                                                      |
+| `core.command.sign`                      | Erlaubt `/sign`.                                                     |
+| `core.command.message`                   | Erlaubt `/message`.                                                  |
+| `core.command.reply`                     | Erlaubt `/reply`.                                                    |
+| `core.command.tpa`                       | Erlaubt `/tpa`.                                                      |
+| `core.command.tpahere`                   | Erlaubt `/tpahere`.                                                  |
+| `core.command.tpaccept`                  | Erlaubt `/tpaccept`.                                                 |
+| `core.command.tpdeny`                    | Erlaubt `/tpdeny`.                                                   |
+| `core.command.tpo`                       | Erlaubt `/tpo`.                                                      |
+| `core.command.tpohere`                   | Erlaubt `/tpohere`.                                                  |
+| `core.command.invsee`                    | Erlaubt `/invsee <player>`.                                          |
+| `core.command.invsee.modify`             | Erlaubt Bearbeitung im InvSee-View.                                  |
+| `core.command.vanish`                    | Erlaubt `/vanish` für sich selbst.                                   |
+| `core.command.vanish.other`              | Erlaubt `/vanish <player>`.                                          |
+| `core.bypass.vanish`                     | Spieler mit dieser Permission sehen vanished Spieler weiterhin.      |
 
 ---
 <br>
@@ -185,4 +231,4 @@ Die SQL-Struktur liegt im Modul `persistence` unter:
 
 ## Status
 
-Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und erweitert diese auf Paper um ein persistentes Economy-System mit Commands, Logging und Migrationen.
+Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und erweitert diese auf Paper um ein Economy-System und Utility-Commands.

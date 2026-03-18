@@ -4,6 +4,7 @@ import net.crystalixs.core.common.bootstrap.AbstractPluginBootstrap;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.plugin.java.JavaPlugin;
+import xyz.xenondevs.invui.InvUI;
 
 import java.util.Locale;
 
@@ -49,14 +50,17 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     protected void enableInternal() {
         configUpdater = config.load(runtime());
         persistenceContext = persistence.create(runtime(), configUpdater);
-        listeners.register(runtime(), persistenceContext);
-        commands.registerCommands();
+        listeners.register(runtime(), commands.sitService(), commands.inventorySeeService(), commands.vanishService());
+         commands.registerCommands();
+
+        InvUI.getInstance().setPlugin(runtime().plugin());
     }
 
     @Override
     protected void disableInternal() {
         try {
             translations.close();
+            commands.shutdown();
         } finally {
             try {
                 if (persistenceContext != null) {

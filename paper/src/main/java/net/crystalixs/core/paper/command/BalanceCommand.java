@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static net.kyori.adventure.text.Component.translatable;
 
-public class BalanceCommand extends PaperCommand {
+public final class BalanceCommand extends PaperCommand {
 
     private final EconomyService service;
     private final StructuredLogger logger;

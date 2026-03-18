@@ -18,7 +18,7 @@ import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 import static org.incendo.cloud.parser.standard.LongParser.longParser;
 import static org.incendo.cloud.suggestion.SuggestionProvider.noSuggestions;
 
-public class PayCommand extends PaperCommand {
+public final class PayCommand extends PaperCommand {
 
     private final EconomyService service;
 
