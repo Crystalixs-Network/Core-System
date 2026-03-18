@@ -15,21 +15,26 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 public final class StyledHelpRenderer {
 
     private final Function<String, String> queryEncoder;
+    private final Function<UnifiedHelpEntry, String> detailsCommandBuilder;
 
-    public StyledHelpRenderer(Function<String, String> queryEncoder) {
+    public StyledHelpRenderer(
+            Function<String, String> queryEncoder,
+            Function<UnifiedHelpEntry, String> detailsCommandBuilder
+    ) {
         this.queryEncoder = queryEncoder;
+        this.detailsCommandBuilder = detailsCommandBuilder;
     }
 
     public List<Component> render(String query, int page, int pages, List<UnifiedHelpEntry> pageEntries) {
-        Component top = text("───────── ", DARK_GRAY)
+        Component top = text("--------- ", DARK_GRAY)
                 .append(text("Hilfe", GREEN))
                 .append(text(" (" + page + "/" + pages + ")", GOLD))
-                .append(text("───────── ", DARK_GRAY));
+                .append(text(" --------- ", DARK_GRAY));
 
-        Component info = text("Zeige Suchergebnisse für Query; ", GRAY)
+        Component info = text("Zeige Suchergebnisse fuer Query: ", GRAY)
                 .append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
 
-        Component head = text("└─", DARK_GRAY).append(text("Verfügbare Befehle:", GOLD));
+        Component head = text("`- ", DARK_GRAY).append(text("Verfuegbare Befehle:", GOLD));
 
         var rows = pageEntries.stream().map(this::commandRow).toList();
         Component navigation = navigation(query, page, pages);
@@ -43,10 +48,10 @@ public final class StyledHelpRenderer {
     }
 
     private Component commandRow(UnifiedHelpEntry entry) {
-        return text("  ├─ ", DARK_GRAY)
+        return text("  |- ", DARK_GRAY)
                 .append(text(entry.syntax(), GREEN)
                         .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE)))
-                        .clickEvent(ClickEvent.suggestCommand(entry.syntax())))
+                        .clickEvent(ClickEvent.runCommand(detailsCommandBuilder.apply(entry))))
                 .append(text(" - ", DARK_GRAY))
                 .append(text(entry.description(), GRAY));
     }
@@ -57,13 +62,13 @@ public final class StyledHelpRenderer {
         String next = q.isBlank() ? "/help-page " + (page + 1) : "/help-page " + (page + 1) + " " + q;
 
         Component left = page > 1
-                ? text("[←]", GOLD).clickEvent(ClickEvent.runCommand(previous))
-                : text("[←]", DARK_GRAY);
+                ? text("[<-]", GOLD).clickEvent(ClickEvent.runCommand(previous))
+                : text("[<-]", DARK_GRAY);
 
         Component right = page < pages
-                ? text("[→]", GOLD).clickEvent(ClickEvent.runCommand(next))
-                : text("[→]", DARK_GRAY);
+                ? text("[->]", GOLD).clickEvent(ClickEvent.runCommand(next))
+                : text("[->]", DARK_GRAY);
 
-        return text("└─ ", DARK_GRAY).append(left).append(text(" ", GRAY)).append(right);
+        return text("`- ", DARK_GRAY).append(left).append(text(" ", GRAY)).append(right);
     }
 }
