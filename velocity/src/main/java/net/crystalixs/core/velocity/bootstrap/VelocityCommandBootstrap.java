@@ -47,8 +47,6 @@ public final class VelocityCommandBootstrap {
         new GlobalFindCommand(plugin).registerTo(commandManager);
         new GlobalTeleportCommand(plugin).registerTo(commandManager);
         new OnlineCommand(plugin).registerTo(commandManager);
-
-        new NetworkHelpCommand(plugin, backendHelpCache).registerTo(commandManager);
     }
 
     private @NotNull SenderMapper<CommandSource, VelocityCommandSource> senderMapper() {
