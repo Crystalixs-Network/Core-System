@@ -6,11 +6,6 @@ import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.*;
-import net.crystalixs.core.paper.command.util.PrivateMessageService;
-import net.crystalixs.core.paper.command.util.SitService;
-import net.crystalixs.core.paper.command.util.TeleportRequestService;
-import net.crystalixs.core.paper.command.util.TrashService;
-import net.crystalixs.core.paper.command.util.VanishService;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -39,7 +34,7 @@ public final class PaperCommandBootstrap {
         this.sitService = new SitService(runtime.plugin());
         this.messageService = new PrivateMessageService();
         this.teleportService = new TeleportRequestService(runtime.plugin());
-        this.inventorySeeService = new InventorySeeService(runtime.plugin());
+        this.inventorySeeService = new InventorySeeService(runtime.componentLogger("commands").child("invsee"));
         this.vanishService = new VanishService(runtime.plugin());
     }
 
