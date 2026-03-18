@@ -14,10 +14,10 @@ import static net.kyori.adventure.text.format.NamedTextColor.*;
 public final class StyledHelpRenderer {
 
     public List<Component> render(String query, int page, int pages, List<UnifiedHelpEntry> pageEntries) {
-        Component top = text("─────────────────────────────────────────────", DARK_GRAY)
+        Component top = text("───────── ", DARK_GRAY)
                 .append(text("Hilfe", GREEN))
                 .append(text(" (" + page + "/" + pages + ")", GOLD))
-                .append(text("─────────────────────────────────────────────", DARK_GRAY));
+                .append(text("───────── ", DARK_GRAY));
 
         Component info = text("Zeige Suchergebnisse für Query; ", GRAY)
                 .append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
