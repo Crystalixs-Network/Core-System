@@ -1,7 +1,6 @@
 package net.crystalixs.core.paper.listener;
 
 import net.crystalixs.core.paper.command.util.SitService;
-import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,7 +37,6 @@ public class SitListener implements Listener {
     @EventHandler
     public void onDismount(EntityDismountEvent event) {
         Entity dismounted = event.getDismounted();
-        if (!(dismounted instanceof ArmorStand)) return;
         if (!(event.getEntity() instanceof Player)) return;
 
         service.unsitBySeat(dismounted);
