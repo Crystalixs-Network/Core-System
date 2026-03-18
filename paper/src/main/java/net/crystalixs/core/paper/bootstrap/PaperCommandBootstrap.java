@@ -76,8 +76,10 @@ public final class PaperCommandBootstrap {
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
 
-        // POC: Snapshot erzeugen und vorerst nur loggen
-        new PaperHelpCatalogPublisher(plugin).publishPreview(commandManager);
+        PaperHelpCatalogPublisher publisher = new PaperHelpCatalogPublisher(plugin);
+        PaperHelpCatalogTransport transport = new PaperHelpCatalogTransport(plugin, publisher);
+        transport.registerChannel();
+        transport.publish(commandManager);
     }
 
     public void shutdown() {
