@@ -58,12 +58,12 @@ public final class StyledHelpRenderer {
         String next = q.isBlank() ? "/help-page " + (page + 1) : "/help-page " + (page + 1) + " " + q;
 
         Component left = page > 1
-                ? text("[<-]", GOLD).clickEvent(ClickEvent.runCommand(previous))
-                : text("[<-]", DARK_GRAY);
+                ? text("[←]", GOLD).clickEvent(ClickEvent.runCommand(previous))
+                : text("[←]", DARK_GRAY);
 
         Component right = page < pages
-                ? text("[->]", GOLD).clickEvent(ClickEvent.runCommand(next))
-                : text("[->]", DARK_GRAY);
+                ? text("[→]", GOLD).clickEvent(ClickEvent.runCommand(next))
+                : text("[→]", DARK_GRAY);
 
         return text("└─ ", DARK_GRAY).append(left).append(text(" ", GRAY)).append(right);
     }
