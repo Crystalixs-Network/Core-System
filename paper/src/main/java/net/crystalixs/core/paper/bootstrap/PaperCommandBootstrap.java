@@ -6,11 +6,6 @@ import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.*;
-import net.crystalixs.core.paper.command.util.PrivateMessageService;
-import net.crystalixs.core.paper.command.util.SitService;
-import net.crystalixs.core.paper.command.util.TeleportRequestService;
-import net.crystalixs.core.paper.command.util.TrashService;
-import net.crystalixs.core.paper.command.util.VanishService;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -80,6 +75,9 @@ public final class PaperCommandBootstrap {
         new TeleportOverrideHereCommand(plugin).registerTo(commandManager);
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
+
+        // POC: Snapshot erzeugen und vorerst nur loggen
+        new PaperHelpCatalogPublisher(plugin).publishPreview(commandManager);
     }
 
     public void shutdown() {
