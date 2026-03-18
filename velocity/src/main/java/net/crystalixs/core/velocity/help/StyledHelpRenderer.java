@@ -47,9 +47,8 @@ public final class StyledHelpRenderer {
                 .append(text(entry.syntax(), GREEN)
                         .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE)))
                         .clickEvent(ClickEvent.suggestCommand(entry.syntax())))
-                .append(text(" ", GRAY))
-                .append(text("[" + entry.sourceLabel() + "]", GOLD)
-                        .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE))));
+                .append(text(" - ", DARK_GRAY))
+                .append(text(entry.description(), GRAY));
     }
 
     private Component navigation(String query, int page, int pages) {
@@ -66,9 +65,5 @@ public final class StyledHelpRenderer {
                 : text("[→]", DARK_GRAY);
 
         return text("└─ ", DARK_GRAY).append(left).append(text(" ", GRAY)).append(right);
-    }
-
-    private String safeQuery(String query) {
-        return query == null || query.isBlank() ? "\"\"" : "\"" + query.replace("\"", "") + "\"";
     }
 }
