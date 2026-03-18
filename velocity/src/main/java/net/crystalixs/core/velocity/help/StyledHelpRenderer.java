@@ -52,16 +52,16 @@ public final class StyledHelpRenderer {
 
     private Component navigation(String query, int page, int pages) {
         Component left = page > 1
-                ? text("[<-]", GOLD)
+                ? text("[←]", GOLD)
                 .hoverEvent(HoverEvent.showText(text("Previous page", GRAY)))
                 .clickEvent(ClickEvent.runCommand("/help " + safeQuery(query) + " --page " + (page - 1)))
-                : text("[<-]", DARK_GRAY);
+                : text("[←]", DARK_GRAY);
 
         Component right = page < pages
-                ? text("[->]", GOLD)
+                ? text("[→]", GOLD)
                 .hoverEvent(HoverEvent.showText(text("Next page", GRAY)))
                 .clickEvent(ClickEvent.runCommand("/help " + safeQuery(query) + " --page " + (page + 1)))
-                : text("[->]", DARK_GRAY);
+                : text("[→]", DARK_GRAY);
 
         return text("└─ ", DARK_GRAY).append(left).append(text(" ", GRAY)).append(right);
     }
