@@ -6,14 +6,15 @@
 
 ## Überblick
 
-| Bereich               | Nutzen                                                                       |
-|-----------------------|------------------------------------------------------------------------------|
-| Wartungsmodus         | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch. |
-| MOTD-Steuerung        | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.   |
-| Dynamische Tablist    | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen.   |
-| Netzwerk-Commands     | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.         |
-| Konfigurations-Reload | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.     |
-| Economy (Paper)       | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.           |
+| Bereich                  | Nutzen                                                                                                |
+|--------------------------|-------------------------------------------------------------------------------------------------------|
+| Wartungsmodus            | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch.                          |
+| MOTD-Steuerung           | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.                            |
+| Dynamische Tablist       | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen.                            |
+| Netzwerk-Commands        | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.                                  |
+| Konfigurations-Reload    | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.                              |
+| Economy (Paper)          | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.                                    |
+| Utility Commands (Paper) | Stellt QoL-Commands wie Hat, Enderchest, Trash, Sit, Sign, Skull, Invsee, Vanish und Teleport bereit. |
 
 ---
 <br>
@@ -185,4 +186,4 @@ Die SQL-Struktur liegt im Modul `persistence` unter:
 
 ## Status
 
-Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und erweitert diese auf Paper um ein persistentes Economy-System mit Commands, Logging und Migrationen.
+Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und erweitert diese auf Paper um ein Economy-System und Utility-Commands.
