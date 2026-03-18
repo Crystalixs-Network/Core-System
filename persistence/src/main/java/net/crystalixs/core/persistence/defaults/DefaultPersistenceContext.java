@@ -4,7 +4,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.persistence.api.PersistenceContext;
-import net.crystalixs.core.persistence.config.DataSourceFactory;
 import net.crystalixs.core.persistence.config.DatabaseCredentials;
 import net.crystalixs.core.persistence.migration.MigrationRunner;
 import net.crystalixs.core.persistence.store.AuditStore;
@@ -27,10 +26,9 @@ public final class DefaultPersistenceContext implements PersistenceContext {
                 .event("persistence.init")
                 .and(LogMetadata.Key.CREDENTIALS, credentials.host() + ":" + credentials.port() + "/" + credentials.database()));
 
-        this.dataSource = DataSourceFactory.create(credentials);
-
-        // Run database migration
-        new MigrationRunner().run(dataSource, this.logger.child("migration"));
+        // Establish a connection to the database and run migrations.
+        // If the configured database does not exist, it will be created.
+        this.dataSource = new MigrationRunner().migrate(credentials, this.logger.child("migration"));
 
         // Initialize stores
         final StructuredLogger storeLogger = this.logger.child("store");
