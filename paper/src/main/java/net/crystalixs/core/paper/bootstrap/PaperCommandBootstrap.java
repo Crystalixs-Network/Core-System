@@ -6,6 +6,11 @@ import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.*;
+import net.crystalixs.core.paper.command.util.PrivateMessageService;
+import net.crystalixs.core.paper.command.util.SitService;
+import net.crystalixs.core.paper.command.util.TeleportRequestService;
+import net.crystalixs.core.paper.command.util.TrashService;
+import net.crystalixs.core.paper.command.util.VanishService;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -26,6 +31,7 @@ public final class PaperCommandBootstrap {
     private final PrivateMessageService messageService;
     private final TeleportRequestService teleportService;
     private final InventorySeeService inventorySeeService;
+    private final VanishService vanishService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
@@ -34,6 +40,7 @@ public final class PaperCommandBootstrap {
         this.messageService = new PrivateMessageService();
         this.teleportService = new TeleportRequestService(runtime.plugin());
         this.inventorySeeService = new InventorySeeService(runtime.plugin());
+        this.vanishService = new VanishService(runtime.plugin());
     }
 
     public void registerCommands() {
@@ -72,6 +79,7 @@ public final class PaperCommandBootstrap {
         new TeleportOverrideCommand(plugin).registerTo(commandManager);
         new TeleportOverrideHereCommand(plugin).registerTo(commandManager);
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
+        new VanishCommand(plugin, vanishService).registerTo(commandManager);
     }
 
     public void shutdown() {
@@ -87,6 +95,10 @@ public final class PaperCommandBootstrap {
 
     public InventorySeeService inventorySeeService() {
         return inventorySeeService;
+    }
+
+    public VanishService vanishService() {
+        return vanishService;
     }
 
     private @NotNull SenderMapper<CommandSourceStack, PaperCommandSource> senderMapper() {
