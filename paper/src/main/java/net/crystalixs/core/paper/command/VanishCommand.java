@@ -5,13 +5,13 @@ import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.VanishService;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
-import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
+
+import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
 public final class VanishCommand extends PaperCommand {
 
@@ -39,16 +39,10 @@ public final class VanishCommand extends PaperCommand {
                 .commandDescription(RichDescription.translatable("command.vanish.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
                 .permission(Permission.of("core.command.vanish.other"))
-                .required("target", StringParser.stringParser())
+                .required("player", playerParser())
                 .handler(context -> {
                     Player sender = context.sender().player();
-                    String targetName = context.get("target");
-                    Player target = Bukkit.getPlayerExact(targetName);
-
-                    if (target == null) {
-                        sender.sendMessage("§cSpieler nicht gefunden.");
-                        return;
-                    }
+                    Player target = context.get("player");
 
                     vanishService.toggleVanish(target);
                     boolean vanished = vanishService.isVanished(target);
