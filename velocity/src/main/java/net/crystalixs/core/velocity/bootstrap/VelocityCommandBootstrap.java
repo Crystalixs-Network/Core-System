@@ -9,6 +9,7 @@ import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.config.platform.VelocityConfigUpdater;
 import net.crystalixs.core.velocity.help.BackendHelpCatalogCache;
+import net.crystalixs.core.velocity.help.UnifiedHelpService;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
@@ -37,10 +38,12 @@ public final class VelocityCommandBootstrap {
                 .defaultHandlers()
                 .registerTo(commandManager);
 
+        final UnifiedHelpService helpService = new UnifiedHelpService(commandManager, backendHelpCache);
+
         new ProxyStopCommand(plugin, runtime.server()).registerTo(commandManager);
         new CoreCommand(plugin, configUpdater, provider).registerTo(commandManager);
         new MaintenanceCommand(plugin, configUpdater, runtime.server(), runtime.miniMessage()).registerTo(commandManager);
-        new HelpCommand(plugin, backendHelpCache).registerTo(commandManager);
+        new HelpCommand(plugin, helpService).registerTo(commandManager);
         new GlobalFindCommand(plugin).registerTo(commandManager);
         new GlobalTeleportCommand(plugin).registerTo(commandManager);
         new OnlineCommand(plugin).registerTo(commandManager);
