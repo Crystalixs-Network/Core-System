@@ -36,7 +36,7 @@ public final class VanishCommand extends PaperCommand {
                 }));
 
         commandManager.command(commandManager.commandBuilder("vanish", "v")
-                .commandDescription(RichDescription.translatable("command.vanish.description.other"))
+                .commandDescription(RichDescription.translatable("command.vanish.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
                 .permission(Permission.of("core.command.vanish.other"))
                 .required("target", StringParser.stringParser())
