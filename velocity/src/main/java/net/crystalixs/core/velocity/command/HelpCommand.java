@@ -7,12 +7,7 @@ import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.help.StyledHelpRenderer;
 import net.crystalixs.core.velocity.help.UnifiedHelpService;
 import org.incendo.cloud.CommandManager;
-import org.incendo.cloud.help.result.CommandEntry;
-import org.incendo.cloud.suggestion.Suggestion;
-import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.jspecify.annotations.NonNull;
-
-import java.util.stream.Collectors;
 
 import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
@@ -31,29 +26,28 @@ public class HelpCommand extends VelocityCommand {
         commandManager.command(commandManager.commandBuilder("help", "?")
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
-                .optional("query", greedyStringParser(), translatable("command.help.description.query"),
-                        SuggestionProvider.blocking(((context, input) -> commandManager.createHelpHandler()
-                                .queryRootIndex(context.sender())
-                                .entries()
-                                .stream()
-                                .map(CommandEntry::syntax)
-                                .map(Suggestion::suggestion)
-                                .collect(Collectors.toList()))))
-                .handler(context -> {
-                    String query = context.getOrDefault("query", "");
-                    int requestedPage = context.getOrDefault("page", 1);
+                .optional("query", greedyStringParser(), translatable("command.help.description.query"))
+                .handler(context -> renderPage(context.sender(), context.getOrDefault("query", ""), 1)));
 
-                    var all = service.query(context.sender(), query);
-                    int pageSize = 8;
-                    int pages = Math.max(1, (int) Math.ceil((double) all.size() / pageSize));
-                    int page = Math.min(Math.max(1, requestedPage), pages);
+        commandManager.command(commandManager.commandBuilder("help-page")
+                .commandDescription(translatable("command.help.description.main"))
+                .senderType(VelocityPlayerCommandSource.class)
+                .optional("query", greedyStringParser(), translatable("command.help.description.query"))
+                .handler(context -> renderPage(context.sender(), context.getOrDefault("query", ""), context.get("page"))));
+    }
 
-                    int from = (page - 1) * pageSize;
-                    int to = Math.min(from + pageSize, all.size());
-                    var pageEntries = all.subList(from, to);
+    private void renderPage(VelocityCommandSource sender, String query, int requestedPage) {
+        var all = service.query(sender, query);
 
-                    StyledHelpRenderer renderer = new StyledHelpRenderer();
-                    renderer.render(query, page, pages, pageEntries).forEach(component -> context.sender().plattformSender().sendMessage(component));
-                }));
+        int pageSize = 8;
+        int pages = Math.max(1, (int) Math.ceil((double) all.size() / pageSize));
+        int page = Math.min(Math.max(1, requestedPage), pages); // hard clamp
+
+        int from = Math.min((page - 1) * pageSize, all.size());
+        int to = Math.min(from + pageSize, all.size());
+        var pageEntries = all.subList(from, to);
+
+        StyledHelpRenderer renderer = new StyledHelpRenderer();
+        renderer.render(query, page, pages, pageEntries).forEach(sender.plattformSender()::sendMessage);
     }
 }

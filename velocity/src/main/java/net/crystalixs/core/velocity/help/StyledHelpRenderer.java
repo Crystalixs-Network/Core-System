@@ -36,14 +36,9 @@ public final class StyledHelpRenderer {
     }
 
     private Component commandRow(UnifiedHelpEntry entry) {
-        String click = entry.isProxyCommand() ? entry.syntax() : "/server " + entry.sourceLabel().toLowerCase(); // POC fallback
         return text("  ├─ ", DARK_GRAY)
                 .append(text(entry.syntax(), GREEN)
-                        .hoverEvent(HoverEvent.showText(
-                                text("Source: ", GRAY).append(text(entry.sourceLabel(), GOLD))
-                                        .append(text("\nDescription: ", GRAY)).append(text(entry.description(), WHITE))
-                                        .append(text("\nClick: ", GRAY)).append(text(click, GREEN))
-                        ))
+                        .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE)))
                         .clickEvent(ClickEvent.suggestCommand(entry.syntax())))
                 .append(text(" ", GRAY))
                 .append(text("[" + entry.sourceLabel() + "]", GOLD)
@@ -54,13 +49,13 @@ public final class StyledHelpRenderer {
         Component left = page > 1
                 ? text("[←]", GOLD)
                 .hoverEvent(HoverEvent.showText(text("Previous page", GRAY)))
-                .clickEvent(ClickEvent.runCommand("/help " + safeQuery(query) + " --page " + (page - 1)))
+                .clickEvent(ClickEvent.runCommand("/help-page " + (page - 1) + " " + safeQuery(query)))
                 : text("[←]", DARK_GRAY);
 
         Component right = page < pages
                 ? text("[→]", GOLD)
                 .hoverEvent(HoverEvent.showText(text("Next page", GRAY)))
-                .clickEvent(ClickEvent.runCommand("/help " + safeQuery(query) + " --page " + (page + 1)))
+                .clickEvent(ClickEvent.runCommand("/help-page " + (page + 1) + " " + safeQuery(query)))
                 : text("[→]", DARK_GRAY);
 
         return text("└─ ", DARK_GRAY).append(left).append(text(" ", GRAY)).append(right);
