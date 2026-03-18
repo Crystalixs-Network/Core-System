@@ -10,6 +10,7 @@ import org.incendo.cloud.CommandManager;
 import org.jspecify.annotations.NonNull;
 
 import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
+import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public class HelpCommand extends VelocityCommand {
@@ -33,7 +34,8 @@ public class HelpCommand extends VelocityCommand {
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
                 .optional("query", greedyStringParser(), translatable("command.help.description.query"))
-                .handler(context -> renderPage(context.sender(), context.getOrDefault("query", ""), context.get("page"))));
+                .optional("page", integerParser(1), translatable("command.help.description.page"))
+                .handler(context -> renderPage(context.sender(), context.getOrDefault("query", ""), context.getOrDefault("page", 1))));
     }
 
     private void renderPage(VelocityCommandSource sender, String query, int requestedPage) {
