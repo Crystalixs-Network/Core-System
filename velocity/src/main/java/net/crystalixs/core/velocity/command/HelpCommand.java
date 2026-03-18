@@ -9,9 +9,13 @@ import net.crystalixs.core.velocity.help.UnifiedHelpService;
 import org.incendo.cloud.CommandManager;
 import org.jspecify.annotations.NonNull;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
 import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
+import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
 public class HelpCommand extends VelocityCommand {
 
@@ -33,9 +37,14 @@ public class HelpCommand extends VelocityCommand {
         commandManager.command(commandManager.commandBuilder("help-page")
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
-                .optional("query", greedyStringParser(), translatable("command.help.description.query"))
+                .optional("query", stringParser())
                 .optional("page", integerParser(1), translatable("command.help.description.page"))
-                .handler(context -> renderPage(context.sender(), context.getOrDefault("query", ""), context.getOrDefault("page", 1))));
+                .handler(context -> {
+                    int page = context.getOrDefault("page", 1);
+                    String encoded = context.getOrDefault("query", "");
+                    String query = decodeQuery(encoded);
+                    renderPage(context.sender(), query, page);
+                }));
     }
 
     private void renderPage(VelocityCommandSource sender, String query, int requestedPage) {
@@ -49,7 +58,21 @@ public class HelpCommand extends VelocityCommand {
         int to = Math.min(from + pageSize, all.size());
         var pageEntries = all.subList(from, to);
 
-        StyledHelpRenderer renderer = new StyledHelpRenderer();
+        StyledHelpRenderer renderer = new StyledHelpRenderer(this::encodeQuery);
         renderer.render(query, page, pages, pageEntries).forEach(sender.plattformSender()::sendMessage);
+    }
+
+    private String encodeQuery(String query) {
+        if (query == null || query.isBlank()) return "";
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(query.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private String decodeQuery(String encoded) {
+        if (encoded == null || encoded.isBlank()) return "";
+        try {
+            return new String(Base64.getUrlDecoder().decode(encoded), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException exception) {
+            return "";
+        }
     }
 }

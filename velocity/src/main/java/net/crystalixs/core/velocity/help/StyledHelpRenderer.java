@@ -5,6 +5,7 @@ import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -12,6 +13,12 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 
 public final class StyledHelpRenderer {
+
+    private final Function<String, String> queryEncoder;
+
+    public StyledHelpRenderer(Function<String, String> queryEncoder) {
+        this.queryEncoder = queryEncoder;
+    }
 
     public List<Component> render(String query, int page, int pages, List<UnifiedHelpEntry> pageEntries) {
         Component top = text("───────── ", DARK_GRAY)
@@ -46,17 +53,17 @@ public final class StyledHelpRenderer {
     }
 
     private Component navigation(String query, int page, int pages) {
+        String q = queryEncoder.apply(query);
+        String previous = q.isBlank() ? "/help-page " + (page - 1) : "/help-page " + (page - 1) + " " + q;
+        String next = q.isBlank() ? "/help-page " + (page + 1) : "/help-page " + (page + 1) + " " + q;
+
         Component left = page > 1
-                ? text("[←]", GOLD)
-                .hoverEvent(HoverEvent.showText(text("Previous page", GRAY)))
-                .clickEvent(ClickEvent.runCommand("/help-page " + (page - 1) + " " + safeQuery(query)))
-                : text("[←]", DARK_GRAY);
+                ? text("[<-]", GOLD).clickEvent(ClickEvent.runCommand(previous))
+                : text("[<-]", DARK_GRAY);
 
         Component right = page < pages
-                ? text("[→]", GOLD)
-                .hoverEvent(HoverEvent.showText(text("Next page", GRAY)))
-                .clickEvent(ClickEvent.runCommand("/help-page " + (page + 1) + " " + safeQuery(query)))
-                : text("[→]", DARK_GRAY);
+                ? text("[->]", GOLD).clickEvent(ClickEvent.runCommand(next))
+                : text("[->]", DARK_GRAY);
 
         return text("└─ ", DARK_GRAY).append(left).append(text(" ", GRAY)).append(right);
     }
