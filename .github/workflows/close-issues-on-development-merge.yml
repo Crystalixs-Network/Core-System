@@ -1,0 +1,47 @@
+name: Close Issues On Development Merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [development]
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: write
+
+jobs:
+  close_linked_issues:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Close referenced issues from PR body
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -euo pipefail
+
+          body="${PR_BODY:-}"
+          issue_numbers="$(
+            printf '%s' "$body" \
+            | perl -nle 'while (/\b(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)\b/ig) { print $1 }' \
+            | sort -u
+          )"
+
+          if [ -z "$issue_numbers" ]; then
+            echo "No closing keywords with issue references found in PR body."
+            exit 0
+          fi
+
+          for issue in $issue_numbers; do
+            echo "Closing issue #$issue"
+            curl -sS \
+              -X PATCH \
+              -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/repos/$REPOSITORY/issues/$issue" \
+              -d '{"state":"closed"}' > /dev/null
+          done
