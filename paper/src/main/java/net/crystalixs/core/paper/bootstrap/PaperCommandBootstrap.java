@@ -34,7 +34,7 @@ public final class PaperCommandBootstrap {
         this.sitService = new SitService(runtime.plugin());
         this.messageService = new PrivateMessageService();
         this.teleportService = new TeleportRequestService(runtime.plugin());
-        this.inventorySeeService = new InventorySeeService(runtime.plugin());
+        this.inventorySeeService = new InventorySeeService(runtime.componentLogger("commands").child("invsee"));
         this.vanishService = new VanishService(runtime.plugin());
     }
 
