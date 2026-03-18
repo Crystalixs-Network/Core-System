@@ -13,7 +13,7 @@ import org.incendo.cloud.parser.standard.StringParser;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
-public class VanishCommand extends PaperCommand {
+public final class VanishCommand extends PaperCommand {
 
     private final VanishService vanishService;
 
