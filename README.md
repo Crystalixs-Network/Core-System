@@ -146,19 +146,43 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 
 ## Permissions
 
-| Permission                     | Bedeutung                                                            |
-|--------------------------------|----------------------------------------------------------------------|
-| `core.command.maintenance`     | Erlaubt das Ein- und Ausschalten des Wartungsmodus.                  |
-| `core.bypass.maintenance`      | Erlaubt den Beitritt trotz aktivem Wartungsmodus.                    |
-| `core.command.core`            | Erlaubt Reload-Befehle für Config und Nachrichten.                   |
-| `core.command.proxy-stop`      | Erlaubt das kontrollierte Stoppen des Proxy.                         |
-| `core.command.global-find`     | Erlaubt das Abfragen des aktuellen Servers eines Spielers.           |
-| `core.command.global-teleport` | Erlaubt das Wechseln auf den Server eines anderen Spielers.          |
-| `core.command.online`          | Erlaubt die Prüfung registrierter Backend-Server auf Erreichbarkeit. |
-| `core.command.coins`           | Erlaubt die Abfrage des eigenen Coin-Kontostands.                    |
-| `core.command.balance`         | Erlaubt die Abfrage von Coins und Gems.                              |
-| `core.command.pay`             | Erlaubt das Senden von Coins an andere Spieler.                      |
-| `core.command.economy`         | Erlaubt administrative Economy-Befehle (`give`, `set`, `take`).      |
+| Permission                               | Bedeutung                                                            |
+|------------------------------------------|----------------------------------------------------------------------|
+| `core.command.maintenance`               | Erlaubt das Ein- und Ausschalten des Wartungsmodus.                  |
+| `core.bypass.maintenance`                | Erlaubt den Beitritt trotz aktivem Wartungsmodus.                    |
+| `core.command.core`                      | Erlaubt Reload-Befehle für Config und Nachrichten.                   |
+| `core.command.proxy-stop`                | Erlaubt das kontrollierte Stoppen des Proxy.                         |
+| `core.command.global-find`               | Erlaubt das Abfragen des aktuellen Servers eines Spielers.           |
+| `core.command.global-teleport`           | Erlaubt das Wechseln auf den Server eines anderen Spielers.          |
+| `core.command.online`                    | Erlaubt die Prüfung registrierter Backend-Server auf Erreichbarkeit. |
+| `core.command.coins`                     | Erlaubt die Abfrage des eigenen Coin-Kontostands.                    |
+| `core.command.balance`                   | Erlaubt die Abfrage von Coins und Gems.                              |
+| `core.command.pay`                       | Erlaubt das Senden von Coins an andere Spieler.                      |
+| `core.command.economy`                   | Erlaubt administrative Economy-Befehle (`give`, `set`, `take`).      |
+| `core.command.hat`                       | Erlaubt `/hat`.                                                      |
+| `core.command.enderchest`                | Erlaubt das Öffnen der eigenen Enderchest (`/ec`).                   |
+| `core.command.enderchest.other`          | Erlaubt das Öffnen fremder Enderchests.                              |
+| `core.command.enderchest.other.interact` | Erlaubt das Bearbeiten fremder Enderchests im geöffneten View.       |
+| `core.command.workbench`                 | Erlaubt `/workbench` (`/wb`).                                        |
+| `core.command.anvil`                     | Erlaubt `/anvil`.                                                    |
+| `core.command.repair`                    | Erlaubt `/repair`.                                                   |
+| `core.command.skull`                     | Erlaubt `/skull <player>`.                                           |
+| `core.command.trash`                     | Erlaubt `/trash`.                                                    |
+| `core.command.sit`                       | Erlaubt `/sit`.                                                      |
+| `core.command.sign`                      | Erlaubt `/sign`.                                                     |
+| `core.command.message`                   | Erlaubt `/message`.                                                  |
+| `core.command.reply`                     | Erlaubt `/reply`.                                                    |
+| `core.command.tpa`                       | Erlaubt `/tpa`.                                                      |
+| `core.command.tpahere`                   | Erlaubt `/tpahere`.                                                  |
+| `core.command.tpaccept`                  | Erlaubt `/tpaccept`.                                                 |
+| `core.command.tpdeny`                    | Erlaubt `/tpdeny`.                                                   |
+| `core.command.tpo`                       | Erlaubt `/tpo`.                                                      |
+| `core.command.tpohere`                   | Erlaubt `/tpohere`.                                                  |
+| `core.command.invsee`                    | Erlaubt `/invsee <player>`.                                          |
+| `core.command.invsee.modify`             | Erlaubt Bearbeitung im InvSee-View.                                  |
+| `core.command.vanish`                    | Erlaubt `/vanish` für sich selbst.                                   |
+| `core.command.vanish.other`              | Erlaubt `/vanish <player>`.                                          |
+| `core.bypass.vanish`                     | Spieler mit dieser Permission sehen vanished Spieler weiterhin.      |
 
 ---
 <br>
