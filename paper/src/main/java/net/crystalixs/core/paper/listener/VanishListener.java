@@ -28,7 +28,7 @@ public class VanishListener implements Listener {
             Player vanished = Bukkit.getPlayer(uuid);
             if (vanished == null) continue;
 
-            if (!player.hasPermission("core.vanish.see")) {
+            if (!player.hasPermission("core.bypass.vanish")) {
                 player.hidePlayer(plugin, vanished);
             }
         }

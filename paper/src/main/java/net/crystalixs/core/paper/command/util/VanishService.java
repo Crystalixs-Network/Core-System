@@ -38,7 +38,7 @@ public final class VanishService {
             if (online.equals(target)) continue;
 
             // optional: vanish bypass permission
-            if (online.hasPermission("core.vanish.see")) continue;
+            if (online.hasPermission("core.bypass.vanish")) continue;
 
             online.hidePlayer(plugin, target);
         }
