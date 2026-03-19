@@ -6,9 +6,9 @@ import net.crystalixs.core.velocity.command.cloud.VelocityCommand;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import net.crystalixs.core.velocity.help.StyledHelpRenderer;
-import net.crystalixs.core.velocity.help.UnifiedHelpEntry;
 import net.crystalixs.core.velocity.help.UnifiedHelpService;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.component.CommandComponent;
 import org.incendo.cloud.help.HelpQuery;
@@ -62,23 +62,6 @@ public class HelpCommand extends VelocityCommand {
                     String query = decodeQuery(encoded);
                     renderPage(context.sender(), query, page);
                 }));
-
-        commandManager.command(commandManager.commandBuilder("help-show")
-                .commandDescription(translatable("command.help.description.main"))
-                .senderType(VelocityPlayerCommandSource.class)
-                .required("source", stringParser())
-                .required("query", stringParser())
-                .handler(context -> {
-                    String source = decodeQuery(context.get("source"));
-                    String detailQuery = decodeQuery(context.get("query"));
-
-                    if ("proxy".equalsIgnoreCase(source)) {
-                        renderProxyDetails(context.sender(), detailQuery);
-                        return;
-                    }
-
-                    renderBackendDetails(context.sender(), source, detailQuery);
-                }));
     }
 
     private void renderPage(VelocityCommandSource sender, String query, int requestedPage) {
@@ -92,19 +75,23 @@ public class HelpCommand extends VelocityCommand {
         int to = Math.min(from + pageSize, all.size());
         var pageEntries = all.subList(from, to);
 
-        StyledHelpRenderer renderer = new StyledHelpRenderer(this::encodeQuery, this::detailsCommand);
-        renderer.render(query, page, pages, pageEntries).forEach(sender.plattformSender()::sendMessage);
+        createRenderer(sender).render(query, page, pages, pageEntries).forEach(sender.plattformSender()::sendMessage);
     }
 
-    private String detailsCommand(UnifiedHelpEntry entry) {
-        String source = entry.isProxyCommand() ? "proxy" : entry.sourceLabel();
-        return "/help-show " + encodeQuery(source) + " " + encodeQuery(entry.detailsQuery());
+    private StyledHelpRenderer createRenderer(VelocityCommandSource sender) {
+        return new StyledHelpRenderer(this::encodeQuery, entry -> ClickEvent.callback(audience -> {
+            if (entry.isProxyCommand()) {
+                renderProxyDetails(sender, entry.detailsQuery());
+                return;
+            }
+            renderBackendDetails(sender, entry.sourceLabel(), entry.detailsQuery());
+        }));
     }
 
     private void renderProxyDetails(VelocityCommandSource sender, String detailsQuery) {
         String query = detailsQuery.startsWith("/") ? detailsQuery.substring(1) : detailsQuery;
         HelpQueryResult<VelocityCommandSource> result = commandManager.createHelpHandler().query(HelpQuery.of(sender, query));
-        StyledHelpRenderer renderer = new StyledHelpRenderer(this::encodeQuery, this::detailsCommand);
+        StyledHelpRenderer renderer = createRenderer(sender);
 
         switch (result) {
             case VerboseCommandResult<VelocityCommandSource> verbose -> {
@@ -151,20 +138,18 @@ public class HelpCommand extends VelocityCommand {
                 sender.plattformSender().sendMessage(renderer.detailHeader());
                 sender.plattformSender().sendMessage(renderer.detailQueryLine("/" + query));
                 sender.plattformSender().sendMessage(renderer.detailLine("Available Commands:", "", false));
-                multiple.childSuggestions().forEach(suggestion -> {
-                    String command = "/help-show " + encodeQuery("proxy") + " " + encodeQuery(suggestion);
-                    sender.plattformSender().sendMessage(renderer.commandSuggestionRow(suggestion, command));
-                });
+                multiple.childSuggestions().forEach(suggestion -> sender.plattformSender().sendMessage(
+                        renderer.commandSuggestionRow(suggestion, ClickEvent.callback(audience -> renderProxyDetails(sender, suggestion)))
+                ));
                 return;
             }
             case IndexCommandResult<VelocityCommandSource> index when !index.entries().isEmpty() -> {
                 sender.plattformSender().sendMessage(renderer.detailHeader());
                 sender.plattformSender().sendMessage(renderer.detailQueryLine("/" + query));
                 sender.plattformSender().sendMessage(renderer.detailLine("Available Commands:", "", false));
-                index.entries().forEach(entry -> {
-                    String command = "/help-show " + encodeQuery("proxy") + " " + encodeQuery(entry.syntax());
-                    sender.plattformSender().sendMessage(renderer.commandSuggestionRow(entry.syntax(), command));
-                });
+                index.entries().forEach(entry -> sender.plattformSender().sendMessage(
+                        renderer.commandSuggestionRow(entry.syntax(), ClickEvent.callback(audience -> renderProxyDetails(sender, entry.syntax())))
+                ));
                 return;
             }
             default -> {
@@ -177,7 +162,7 @@ public class HelpCommand extends VelocityCommand {
     }
 
     private void renderBackendDetails(VelocityCommandSource sender, String sourceId, String detailsQuery) {
-        StyledHelpRenderer renderer = new StyledHelpRenderer(this::encodeQuery, this::detailsCommand);
+        StyledHelpRenderer renderer = createRenderer(sender);
         NetworkHelpCatalog.Entry entry = service.findBackendEntry(sourceId, detailsQuery);
         if (entry == null) {
             sender.plattformSender().sendMessage(renderer.detailHeader());

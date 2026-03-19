@@ -17,14 +17,14 @@ import static net.kyori.adventure.text.format.TextDecoration.STRIKETHROUGH;
 public final class StyledHelpRenderer {
 
     private final Function<String, String> queryEncoder;
-    private final Function<UnifiedHelpEntry, String> detailsCommandBuilder;
+    private final Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder;
 
     public StyledHelpRenderer(
             Function<String, String> queryEncoder,
-            Function<UnifiedHelpEntry, String> detailsCommandBuilder
+            Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder
     ) {
         this.queryEncoder = queryEncoder;
-        this.detailsCommandBuilder = detailsCommandBuilder;
+        this.detailsClickBuilder = detailsClickBuilder;
     }
 
     public List<Component> render(String query, int page, int pages, List<UnifiedHelpEntry> pageEntries) {
@@ -80,11 +80,11 @@ public final class StyledHelpRenderer {
                 : base.append(text(value, GRAY));
     }
 
-    public Component commandSuggestionRow(String syntax, String command) {
+    public Component commandSuggestionRow(String syntax, ClickEvent clickEvent) {
         return text()
                 .append(text("   |- ", DARK_GRAY))
                 .append(text("/" + syntax, GREEN)
-                        .clickEvent(ClickEvent.runCommand(command))
+                        .clickEvent(clickEvent)
                         .append(text(" - Details anzeigen", GRAY)))
                 .build();
     }
@@ -112,7 +112,7 @@ public final class StyledHelpRenderer {
                 .append(text("   |- ", DARK_GRAY))
                 .append(colorizedSyntax(entry.syntax())
                         .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE)))
-                        .clickEvent(ClickEvent.runCommand(detailsCommandBuilder.apply(entry))))
+                        .clickEvent(detailsClickBuilder.apply(entry)))
                 .append(text(" - ", DARK_GRAY))
                 .append(text(entry.description(), GRAY))
                 .build();
