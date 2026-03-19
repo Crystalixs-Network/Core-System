@@ -11,7 +11,7 @@ import java.util.Objects;
 public final class NetworkHelpSyncProtocol {
 
     public static final @NotNull String REDIS_TOPIC = "core:help_sync:catalog";
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
 
     private NetworkHelpSyncProtocol() {
     }
@@ -25,22 +25,50 @@ public final class NetworkHelpSyncProtocol {
 
         public static @NotNull SnapshotPayload fromCatalog(@NotNull NetworkHelpCatalog catalog) {
             return new SnapshotPayload(VERSION, catalog.sourceId(), catalog.sourceType(), catalog.generatedAt().toEpochMilli(), catalog.entries().stream()
-                    .map(entry -> new EntryPayload(entry.syntax(), entry.description(), entry.permission(), entry.command()))
+                    .map(entry -> new EntryPayload(
+                            entry.syntax(),
+                            entry.description(),
+                            entry.permission(),
+                            entry.command(),
+                            entry.arguments().stream()
+                                    .map(argument -> new ArgumentPayload(argument.syntax(), argument.optional(), argument.description()))
+                                    .toList()))
                     .toList());
         }
 
         public @NotNull NetworkHelpCatalog toCatalog() {
             return new NetworkHelpCatalog(sourceId, sourceType, Instant.ofEpochMilli(generatedAtEpochMilli), entries.stream()
-                    .map(entry -> new Entry(entry.syntax(), entry.description(), entry.permission(), entry.command()))
+                    .map(entry -> new Entry(
+                            entry.syntax(),
+                            entry.description(),
+                            entry.permission(),
+                            entry.command(),
+                            entry.arguments().stream()
+                                    .map(argument -> new NetworkHelpCatalog.Argument(argument.syntax(), argument.optional(), argument.description()))
+                                    .toList()))
                     .toList());
         }
     }
 
-    public record EntryPayload(@NotNull String syntax, @NotNull String description, String permission, @NotNull String command) {
+    public record EntryPayload(
+            @NotNull String syntax,
+            @NotNull String description,
+            String permission,
+            @NotNull String command,
+            @NotNull List<ArgumentPayload> arguments
+    ) {
         public EntryPayload {
             Objects.requireNonNull(syntax, "syntax");
             Objects.requireNonNull(description, "description");
             Objects.requireNonNull(command, "command");
+            arguments = List.copyOf(Objects.requireNonNull(arguments, "arguments"));
+        }
+    }
+
+    public record ArgumentPayload(@NotNull String syntax, boolean optional, @NotNull String description) {
+        public ArgumentPayload {
+            Objects.requireNonNull(syntax, "syntax");
+            Objects.requireNonNull(description, "description");
         }
     }
 }

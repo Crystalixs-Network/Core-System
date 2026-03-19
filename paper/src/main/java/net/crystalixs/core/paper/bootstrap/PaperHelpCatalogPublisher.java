@@ -11,6 +11,8 @@ import org.incendo.cloud.component.CommandComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.StringJoiner;
 
@@ -43,8 +45,10 @@ public final class PaperHelpCatalogPublisher {
         if (description.isBlank()) {
             description = "-";
         }
+
+        List<NetworkHelpCatalog.Argument> arguments = extractArguments(command);
         String commandKey = syntax.startsWith("/") ? syntax.substring(1) : syntax;
-        return new Entry(syntax, description, null, commandKey.toLowerCase(Locale.ROOT));
+        return new Entry(syntax, description, null, commandKey.toLowerCase(Locale.ROOT), arguments);
     }
 
     private String buildSyntax(@NotNull Command<PaperCommandSource> command) {
@@ -65,5 +69,23 @@ public final class PaperHelpCatalogPublisher {
             return "[" + variable + "]";
         }
         return "<" + variable + ">";
+    }
+
+    private List<NetworkHelpCatalog.Argument> extractArguments(@NotNull Command<PaperCommandSource> command) {
+        List<NetworkHelpCatalog.Argument> arguments = new ArrayList<>();
+        List<CommandComponent<PaperCommandSource>> components = command.components();
+        for (int i = 1; i < components.size(); i++) {
+            CommandComponent<PaperCommandSource> component = components.get(i);
+            String argumentDescription = component.description().textDescription();
+            if (argumentDescription.isBlank()) {
+                argumentDescription = "-";
+            }
+            arguments.add(new NetworkHelpCatalog.Argument(
+                    formatComponent(component),
+                    component.optional(),
+                    argumentDescription
+            ));
+        }
+        return arguments;
     }
 }

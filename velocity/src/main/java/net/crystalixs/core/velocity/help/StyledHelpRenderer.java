@@ -87,7 +87,7 @@ public final class StyledHelpRenderer {
     }
 
     public List<Component> renderBackendDetails(String detailsQuery, NetworkHelpCatalog.Entry entry) {
-        List<Component> argumentContents = parseBackendArguments(entry.syntax());
+        List<Component> argumentContents = parseBackendArguments(entry);
         return renderVerboseDetails("/" + detailsQuery, entry.syntax(), entry.description(), argumentContents);
     }
 
@@ -180,7 +180,18 @@ public final class StyledHelpRenderer {
         return output;
     }
 
-    private List<Component> parseBackendArguments(String syntax) {
+    private List<Component> parseBackendArguments(NetworkHelpCatalog.Entry entry) {
+        if (!entry.arguments().isEmpty()) {
+            List<Component> lines = new ArrayList<>();
+            for (NetworkHelpCatalog.Argument argument : entry.arguments()) {
+                lines.add(buildArgumentContent(argument.syntax(), argument.optional(), argument.description()));
+            }
+            return lines;
+        }
+        return parseBackendArgumentsFromSyntax(entry.syntax());
+    }
+
+    private List<Component> parseBackendArgumentsFromSyntax(String syntax) {
         String normalized = syntax.startsWith("/") ? syntax.substring(1) : syntax;
         List<String> tokens = splitSyntaxTokens(normalized);
         if (tokens.size() <= 1) {

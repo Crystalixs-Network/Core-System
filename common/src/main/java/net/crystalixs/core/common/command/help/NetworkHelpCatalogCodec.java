@@ -31,6 +31,13 @@ public final class NetworkHelpCatalogCodec {
                 if (entry.permission() != null) out.writeUTF(entry.permission());
 
                 out.writeUTF(entry.command());
+
+                out.writeInt(entry.arguments().size());
+                for (var argument : entry.arguments()) {
+                    out.writeUTF(argument.syntax());
+                    out.writeBoolean(argument.optional());
+                    out.writeUTF(argument.description());
+                }
             }
             out.flush();
             return outputStream.toByteArray();
@@ -61,8 +68,16 @@ public final class NetworkHelpCatalogCodec {
                 String description = in.readUTF();
                 String permission = in.readBoolean() ? in.readUTF() : null;
                 String command = in.readUTF();
+                int argumentSize = in.readInt();
+                var arguments = new ArrayList<NetworkHelpCatalog.Argument>(argumentSize);
+                for (int j = 0; j < argumentSize; j++) {
+                    String argumentSyntax = in.readUTF();
+                    boolean optional = in.readBoolean();
+                    String argumentDescription = in.readUTF();
+                    arguments.add(new NetworkHelpCatalog.Argument(argumentSyntax, optional, argumentDescription));
+                }
 
-                entries.add(new Entry(syntax, description, permission, command));
+                entries.add(new Entry(syntax, description, permission, command, arguments));
             }
             return new NetworkHelpCatalog(sourceId, sourceType, generatedAt, entries);
 

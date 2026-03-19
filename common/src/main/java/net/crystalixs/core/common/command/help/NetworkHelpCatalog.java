@@ -19,11 +19,25 @@ public record NetworkHelpCatalog(@NotNull String sourceId, @NotNull SourceType s
         PROXY, BACKEND
     }
 
-    public record Entry(@NotNull String syntax, @NotNull String description, String permission, @NotNull String command) {
+    public record Entry(
+            @NotNull String syntax,
+            @NotNull String description,
+            String permission,
+            @NotNull String command,
+            @NotNull List<Argument> arguments
+    ) {
         public Entry {
             Objects.requireNonNull(syntax, "syntax");
             Objects.requireNonNull(description, "description");
             Objects.requireNonNull(command, "command");
+            arguments = List.copyOf(Objects.requireNonNull(arguments, "arguments"));
+        }
+    }
+
+    public record Argument(@NotNull String syntax, boolean optional, @NotNull String description) {
+        public Argument {
+            Objects.requireNonNull(syntax, "syntax");
+            Objects.requireNonNull(description, "description");
         }
     }
 }
