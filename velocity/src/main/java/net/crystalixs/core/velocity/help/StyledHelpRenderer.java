@@ -27,12 +27,14 @@ public final class StyledHelpRenderer {
     }
 
     public List<Component> render(String query, int page, int pages, List<UnifiedHelpEntry> pageEntries) {
-        Component top = text("-".repeat(15), GOLD, STRIKETHROUGH)
-                .append(text(" ", WHITE).decoration(STRIKETHROUGH, false))
-                .append(text("Hilfe", GREEN).decoration(STRIKETHROUGH, false))
-                .append(text(" (" + page + "/" + pages + ")", GOLD).decoration(STRIKETHROUGH, false))
-                .append(text(" ", WHITE).decoration(STRIKETHROUGH, false))
-                .append(text("-".repeat(15), GOLD, STRIKETHROUGH));
+        Component top = text()
+                .append(text("-".repeat(15), GOLD, STRIKETHROUGH))
+                .append(text(" ", WHITE))
+                .append(text("Hilfe", GREEN))
+                .append(text(" (" + page + "/" + pages + ")", GOLD))
+                .append(text(" ", WHITE))
+                .append(text("-".repeat(15), GOLD, STRIKETHROUGH))
+                .build();
 
         Component info = text("Zeige Suchergebnisse für Query: ", GRAY)
                 .append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
@@ -72,12 +74,14 @@ public final class StyledHelpRenderer {
                 ? text("[→]", GOLD).clickEvent(ClickEvent.runCommand(next))
                 : text("[→]", DARK_GRAY);
 
-        return text("-".repeat(15), GOLD, STRIKETHROUGH)
-                .append(text(" ", WHITE).decoration(STRIKETHROUGH, false))
-                .append(left.decoration(STRIKETHROUGH, false))
-                .append(text("   ", WHITE).decoration(STRIKETHROUGH, false))
-                .append(right.decoration(STRIKETHROUGH, false))
-                .append(text(" ", WHITE).decoration(STRIKETHROUGH, false))
-                .append(text("-".repeat(15), GOLD, STRIKETHROUGH));
+        return text()
+                .append(text("-".repeat(15), GOLD, STRIKETHROUGH))
+                .append(text(" ", WHITE))
+                .append(left)
+                .append(text("   ", WHITE))
+                .append(right)
+                .append(text(" ", WHITE))
+                .append(text("-".repeat(15), GOLD, STRIKETHROUGH))
+                .build();
     }
 }
