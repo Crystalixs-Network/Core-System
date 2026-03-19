@@ -210,7 +210,9 @@ public class HelpCommand extends VelocityCommand {
         if (value == null || value.isBlank()) {
             return base;
         }
-        return base.append(text(value, commandLike ? GREEN : GRAY));
+        return commandLike
+                ? base.append(colorizedSyntax(value))
+                : base.append(text(value, GRAY));
     }
 
     private Component commandSuggestionRow(String syntax) {
@@ -233,6 +235,29 @@ public class HelpCommand extends VelocityCommand {
 
         String text = description.textDescription();
         return text.isBlank() ? "-" : text;
+    }
+
+    private Component colorizedSyntax(String syntax) {
+        var builder = text();
+        int index = 0;
+        while (index < syntax.length()) {
+            int open = syntax.indexOf('[', index);
+            if (open < 0) {
+                builder.append(text(syntax.substring(index), GREEN));
+                break;
+            }
+            if (open > index) {
+                builder.append(text(syntax.substring(index, open), GREEN));
+            }
+            int close = syntax.indexOf(']', open + 1);
+            if (close < 0) {
+                builder.append(text(syntax.substring(open), YELLOW));
+                break;
+            }
+            builder.append(text(syntax.substring(open, close + 1), YELLOW));
+            index = close + 1;
+        }
+        return builder.build();
     }
 
     private Component strikeLine() {
