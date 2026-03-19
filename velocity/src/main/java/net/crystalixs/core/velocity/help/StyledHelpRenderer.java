@@ -24,6 +24,11 @@ import static net.kyori.adventure.text.format.TextDecoration.STRIKETHROUGH;
 
 public final class StyledHelpRenderer {
 
+    private static final String TREE_BRANCH = "├─";
+    private static final String TREE_LAST = "└─";
+    private static final String ARROW_LEFT = "←";
+    private static final String ARROW_RIGHT = "→";
+
     private final Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder;
 
     public StyledHelpRenderer(Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder) {
@@ -40,10 +45,14 @@ public final class StyledHelpRenderer {
                 .append(strikeLine())
                 .build();
 
-        Component info = text("Zeige Suchergebnisse für Query: ", GRAY).append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
-        Component head = text("`- ", DARK_GRAY).append(text("Verfügbare Befehle:", GRAY));
+        Component info = text("Zeige Suchergebnisse für Query: ", GRAY)
+                .append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
+        Component head = prefixedLine(0, true, text("Verfügbare Befehle:", GRAY));
 
-        var rows = pageEntries.stream().map(this::commandRow).toList();
+        List<Component> rows = new ArrayList<>();
+        for (int i = 0; i < pageEntries.size(); i++) {
+            rows.add(commandRow(pageEntries.get(i), i == pageEntries.size() - 1));
+        }
         Component navigation = navigation(query, page, pages);
 
         return Stream.of(top, info, head)
@@ -55,12 +64,13 @@ public final class StyledHelpRenderer {
     }
 
     public List<Component> renderProxyVerboseDetails(VelocityCommandSource sender, CommandManager<VelocityCommandSource> commandManager, String query, VerboseCommandResult<VelocityCommandSource> verbose) {
-        String commandSyntax = commandManager.commandSyntaxFormatter().apply(sender, verbose.entry().command().components(), null);
-        List<Component> argumentLines = new ArrayList<>();
+        String commandSyntax = commandManager.commandSyntaxFormatter()
+                .apply(sender, verbose.entry().command().components(), null);
+
+        List<Component> argumentContents = new ArrayList<>();
         if (verbose.entry().command().components().size() > 1) {
             Iterator<CommandComponent<VelocityCommandSource>> iterator = verbose.entry().command().components().iterator();
             iterator.next();
-            int depth = 0;
 
             while (iterator.hasNext()) {
                 CommandComponent<VelocityCommandSource> component = iterator.next();
@@ -77,46 +87,53 @@ public final class StyledHelpRenderer {
                     line = line.append(text(" - ", GRAY)).append(text(description, GRAY));
                 }
 
-                argumentLines.add(nestedArgumentLine(depth, line));
-                depth++;
+                argumentContents.add(line);
             }
         }
 
-        return renderVerboseDetails("/" + query, "/" + commandSyntax, descriptionText(verbose.entry().command().commandDescription().verboseDescription()), argumentLines, List.of());
+        return renderVerboseDetails("/" + query, "/" + commandSyntax, descriptionText(verbose.entry().command().commandDescription().verboseDescription()), argumentContents);
     }
 
     public List<Component> renderCommandSuggestions(String query, List<String> suggestions, Function<String, ClickEvent> clickBuilder) {
-        List<Component> output = new ArrayList<>();
+        var output = new ArrayList<Component>();
         output.add(detailHeader());
         output.add(detailQueryLine("/" + query));
-        output.add(detailLine("Available Commands:", "", false));
-        suggestions.forEach(syntax -> output.add(commandSuggestionRow(syntax, clickBuilder.apply(syntax))));
+        output.add(prefixedLine(0, true, text("Verfügbare Befehle:", GRAY)));
+
+        for (int i = 0; i < suggestions.size(); i++) {
+            String syntax = suggestions.get(i);
+            output.add(commandSuggestionRow(syntax, clickBuilder.apply(syntax), i == suggestions.size() - 1));
+        }
         return output;
     }
 
     public List<Component> renderBackendDetails(String detailsQuery, NetworkHelpCatalog.Entry entry) {
-        List<Component> argumentLines = parseBackendArguments(entry.syntax());
-        return renderVerboseDetails("/" + detailsQuery, entry.syntax(), entry.description(), argumentLines, List.of());
+        List<Component> argumentContents = parseBackendArguments(entry.syntax());
+        return renderVerboseDetails("/" + detailsQuery, entry.syntax(), entry.description(), argumentContents);
     }
 
     public List<Component> renderNoResults(String query, String message) {
         return List.of(
                 detailHeader(),
                 detailQueryLine("/" + query),
-                detailLine("No Results:", message, false));
+                prefixedKeyValue(0, true, "Keine Ergebnisse:", message, false)
+        );
     }
 
-    private List<Component> renderVerboseDetails(String shownQuery, String commandSyntax, String description, List<Component> argumentLines, List<Component> extraLines) {
-        List<Component> output = new ArrayList<>();
+    private List<Component> renderVerboseDetails(String shownQuery, String commandSyntax, String description, List<Component> argumentContents) {
+        var output = new ArrayList<Component>();
         output.add(detailHeader());
         output.add(detailQueryLine(shownQuery));
-        output.add(detailLine("Command:", commandSyntax, true));
-        output.add(detailLine("Description:", description, false));
-        if (!argumentLines.isEmpty()) {
-            output.add(detailLine("Arguments:", "", false));
-            output.addAll(argumentLines);
+        output.add(prefixedKeyValue(0, true, "Befehl:", commandSyntax, true));
+
+        boolean hasArguments = !argumentContents.isEmpty();
+        output.add(prefixedKeyValue(1, !hasArguments, "Beschreibung:", description, false));
+        if (hasArguments) {
+            output.add(prefixedKeyValue(1, true, "Argumente:", "", false));
+            for (int i = 0; i < argumentContents.size(); i++) {
+                output.add(prefixedLine(2, i == argumentContents.size() - 1, argumentContents.get(i)));
+            }
         }
-        output.addAll(extraLines);
         return output;
     }
 
@@ -128,15 +145,13 @@ public final class StyledHelpRenderer {
         }
 
         List<Component> lines = new ArrayList<>();
-        int depth = 0;
         for (int i = 1; i < tokens.size(); i++) {
             String token = tokens.get(i);
             Component line = text(" ", GRAY).append(syntaxComponent(token));
             if (token.startsWith("[") && token.endsWith("]")) {
                 line = line.append(text(" (Optional)", YELLOW));
             }
-            lines.add(nestedArgumentLine(depth, line));
-            depth++;
+            lines.add(line);
         }
         return lines;
     }
@@ -189,28 +204,10 @@ public final class StyledHelpRenderer {
                 .build();
     }
 
-    public Component detailLine(String key, String value, boolean commandLike) {
-        Component base = text("`- ", DARK_GRAY).append(text(key + " ", GOLD));
-        if (value == null || value.isBlank()) {
-            return base;
-        }
-        return commandLike
-                ? base.append(colorizedSyntax(value))
-                : base.append(text(value, GRAY));
-    }
-
-    public Component commandSuggestionRow(String syntax, ClickEvent clickEvent) {
-        return text()
-                .append(text("   |- ", DARK_GRAY))
-                .append(text("/" + syntax, GREEN)
-                        .clickEvent(clickEvent)
-                        .append(text(" - Details anzeigen", GRAY)))
-                .build();
-    }
-
-    public Component nestedArgumentLine(int depth, Component content) {
-        String indent = "   " + "  ".repeat(Math.max(0, depth));
-        return text(indent + "|- ", DARK_GRAY).append(content);
+    public Component commandSuggestionRow(String syntax, ClickEvent clickEvent, boolean isLast) {
+        return prefixedLine(1, isLast, text("/" + syntax, GREEN)
+                .clickEvent(clickEvent)
+                .append(text(" - Details anzeigen", GRAY)));
     }
 
     public String descriptionText(Description description) {
@@ -226,10 +223,9 @@ public final class StyledHelpRenderer {
         return colorizedSyntax(syntax);
     }
 
-    private Component commandRow(UnifiedHelpEntry entry) {
+    private Component commandRow(UnifiedHelpEntry entry, boolean isLast) {
         return text()
-                .append(text("   |- ", DARK_GRAY))
-                .append(colorizedSyntax(entry.syntax())
+                .append(prefixedLine(1, isLast, colorizedSyntax(entry.syntax()))
                         .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE)))
                         .clickEvent(detailsClickBuilder.apply(entry)))
                 .append(text(" - ", DARK_GRAY))
@@ -243,12 +239,12 @@ public final class StyledHelpRenderer {
         String next = q.isBlank() ? "/help-page " + (page + 1) : "/help-page " + (page + 1) + " " + q;
 
         Component left = page > 1
-                ? text("[←]", GOLD).clickEvent(ClickEvent.runCommand(previous))
-                : text("[←]", DARK_GRAY);
+                ? text("[" + ARROW_LEFT + "]", GOLD).clickEvent(ClickEvent.runCommand(previous))
+                : text("[" + ARROW_LEFT + "]", DARK_GRAY);
 
         Component right = page < pages
-                ? text("[→]", GOLD).clickEvent(ClickEvent.runCommand(next))
-                : text("[→]", DARK_GRAY);
+                ? text("[" + ARROW_RIGHT + "]", GOLD).clickEvent(ClickEvent.runCommand(next))
+                : text("[" + ARROW_RIGHT + "]", DARK_GRAY);
 
         return text()
                 .append(strikeLine())
@@ -263,6 +259,20 @@ public final class StyledHelpRenderer {
 
     private Component strikeLine() {
         return text("-".repeat(15), GOLD, STRIKETHROUGH);
+    }
+
+    private Component prefixedKeyValue(int level, boolean isLast, String key, String value, boolean commandLike) {
+        Component line = text(key + " ", GOLD);
+        if (value != null && !value.isBlank()) {
+            line = line.append(commandLike ? colorizedSyntax(value) : text(value, GRAY));
+        }
+        return prefixedLine(level, isLast, line);
+    }
+
+    private Component prefixedLine(int level, boolean isLast, Component content) {
+        String branch = isLast ? TREE_LAST : TREE_BRANCH;
+        String indent = "   ".repeat(Math.max(0, level));
+        return text(indent + branch + " ", DARK_GRAY).append(content);
     }
 
     private Component colorizedSyntax(String syntax) {
