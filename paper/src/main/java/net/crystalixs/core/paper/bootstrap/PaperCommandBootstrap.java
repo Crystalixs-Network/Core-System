@@ -6,6 +6,7 @@ import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.*;
+import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,6 +28,7 @@ public final class PaperCommandBootstrap {
     private final TeleportRequestService teleportService;
     private final InventorySeeService inventorySeeService;
     private final VanishService vanishService;
+    private PaperHelpCatalogTransport helpCatalogTransport;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
@@ -38,7 +40,7 @@ public final class PaperCommandBootstrap {
         this.vanishService = new VanishService(runtime.plugin());
     }
 
-    public void registerCommands() {
+    public void registerCommands(PaperConfigUpdater configUpdater) {
         final PaperCommandManager<PaperCommandSource> commandManager = PaperCommandManager.builder(senderMapper())
                 .executionCoordinator(ExecutionCoordinator.<PaperCommandSource>builder().build())
                 .buildOnEnable(runtime.plugin());
@@ -77,12 +79,17 @@ public final class PaperCommandBootstrap {
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
 
         PaperHelpCatalogPublisher publisher = new PaperHelpCatalogPublisher(plugin);
-        PaperHelpCatalogTransport transport = new PaperHelpCatalogTransport(plugin, publisher);
-        transport.registerChannel();
-        transport.publish(commandManager);
+        String redisUri = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().uri();
+        this.helpCatalogTransport = new PaperHelpCatalogTransport(runtime.componentLogger("help-sync"), publisher, redisUri);
+        this.helpCatalogTransport.connect();
+        this.helpCatalogTransport.publish(commandManager);
     }
 
     public void shutdown() {
+        if (helpCatalogTransport != null) {
+            helpCatalogTransport.close();
+            helpCatalogTransport = null;
+        }
         trashService.shutdown();
         sitService.shutdown();
         messageService.shutdown();
