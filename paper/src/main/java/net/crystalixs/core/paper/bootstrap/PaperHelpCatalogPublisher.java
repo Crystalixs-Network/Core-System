@@ -18,6 +18,8 @@ import java.util.StringJoiner;
 
 public final class PaperHelpCatalogPublisher {
 
+    private static final String NO_DESCRIPTION = "-";
+
     private final JavaPlugin plugin;
 
     public PaperHelpCatalogPublisher(JavaPlugin plugin) {
@@ -41,10 +43,7 @@ public final class PaperHelpCatalogPublisher {
 
     private @NotNull Entry toEntry(@NotNull Command<PaperCommandSource> command) {
         String syntax = buildSyntax(command);
-        String description = command.commandDescription().description().textDescription();
-        if (description.isBlank()) {
-            description = "-";
-        }
+        String description = normalizedDescription(command.commandDescription().description().textDescription());
 
         List<NetworkHelpCatalog.Argument> arguments = extractArguments(command);
         String commandKey = syntax.startsWith("/") ? syntax.substring(1) : syntax;
@@ -76,10 +75,7 @@ public final class PaperHelpCatalogPublisher {
         List<CommandComponent<PaperCommandSource>> components = command.components();
         for (int i = 1; i < components.size(); i++) {
             CommandComponent<PaperCommandSource> component = components.get(i);
-            String argumentDescription = component.description().textDescription();
-            if (argumentDescription.isBlank()) {
-                argumentDescription = "-";
-            }
+            String argumentDescription = normalizedDescription(component.description().textDescription());
             arguments.add(new NetworkHelpCatalog.Argument(
                     formatComponent(component),
                     component.optional(),
@@ -87,5 +83,12 @@ public final class PaperHelpCatalogPublisher {
             ));
         }
         return arguments;
+    }
+
+    private String normalizedDescription(String value) {
+        if (value == null || value.isBlank()) {
+            return NO_DESCRIPTION;
+        }
+        return value;
     }
 }
