@@ -19,11 +19,14 @@ import java.util.StringJoiner;
 public final class PaperHelpCatalogPublisher {
 
     private static final String NO_DESCRIPTION = "-";
+    private static final String UNKNOWN_SOURCE = "paper-unknown";
 
     private final JavaPlugin plugin;
+    private final String configuredSourceId;
 
-    public PaperHelpCatalogPublisher(JavaPlugin plugin) {
+    public PaperHelpCatalogPublisher(JavaPlugin plugin, String configuredSourceId) {
         this.plugin = plugin;
+        this.configuredSourceId = configuredSourceId;
     }
 
     public @NotNull NetworkHelpCatalog snapshot(@NotNull CommandManager<PaperCommandSource> commandManager) {
@@ -32,13 +35,8 @@ public final class PaperHelpCatalogPublisher {
                 .sorted((left, right) -> left.command().compareToIgnoreCase(right.command()))
                 .toList();
 
-        String sourceId = plugin.getServer().getName();
-        return new NetworkHelpCatalog(sourceId.isBlank() ? "paper-unknown" : sourceId, SourceType.BACKEND, Instant.now(), entries);
-    }
-
-    public void publishPreview(@NotNull CommandManager<PaperCommandSource> commandManager) {
-        NetworkHelpCatalog catalog = snapshot(commandManager);
-        plugin.getLogger().info("[help-poc] backend catalog size=" + catalog.entries().size() + ", source=" + catalog.sourceId());
+        String sourceId = resolveSourceId();
+        return new NetworkHelpCatalog(sourceId, SourceType.BACKEND, Instant.now(), entries);
     }
 
     private @NotNull Entry toEntry(@NotNull Command<PaperCommandSource> command) {
@@ -90,5 +88,18 @@ public final class PaperHelpCatalogPublisher {
             return NO_DESCRIPTION;
         }
         return value;
+    }
+
+    private String resolveSourceId() {
+        if (configuredSourceId != null && !configuredSourceId.isBlank()) {
+            return configuredSourceId.trim();
+        }
+
+        String implementationName = plugin.getServer().getName();
+        if (!implementationName.isBlank()) {
+            return implementationName;
+        }
+
+        return UNKNOWN_SOURCE;
     }
 }

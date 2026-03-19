@@ -78,8 +78,9 @@ public final class PaperCommandBootstrap {
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
 
-        PaperHelpCatalogPublisher publisher = new PaperHelpCatalogPublisher(plugin);
         String redisUri = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().uri();
+        String backendId = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().backendId();
+        PaperHelpCatalogPublisher publisher = new PaperHelpCatalogPublisher(plugin, backendId);
         this.helpCatalogTransport = new PaperHelpCatalogTransport(runtime.componentLogger("help-sync"), publisher, redisUri);
         this.helpCatalogTransport.connect();
         this.helpCatalogTransport.publish(commandManager);

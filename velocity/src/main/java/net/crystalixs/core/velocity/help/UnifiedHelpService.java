@@ -40,7 +40,7 @@ public final class UnifiedHelpService {
 
         Map<String, UnifiedHelpEntry> backendUnique = new LinkedHashMap<>();
         for (NetworkHelpCatalog catalog : cache.all()) {
-            if (currentServer != null && !catalog.sourceId().equalsIgnoreCase(currentServer)) {
+            if (currentServer != null && !isSameServer(catalog.sourceId(), currentServer)) {
                 continue;
             }
             for (var entry : catalog.entries()) {
@@ -82,6 +82,12 @@ public final class UnifiedHelpService {
                                  || entry.syntax().equalsIgnoreCase(detailsQuery)
                                  || entry.syntax().equalsIgnoreCase("/" + detailsQuery))
                 .findFirst()).orElse(null);
+    }
+
+    private boolean isSameServer(String sourceId, String currentServer) {
+        String left = normalize(sourceId);
+        String right = normalize(currentServer);
+        return left.equals(right) || left.contains(right) || right.contains(left);
     }
 
     private String normalize(String value) {
