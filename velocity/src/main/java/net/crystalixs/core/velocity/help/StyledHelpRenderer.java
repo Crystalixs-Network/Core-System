@@ -54,7 +54,7 @@ public final class StyledHelpRenderer {
 
     private Component commandRow(UnifiedHelpEntry entry) {
         return text("   ├─ ", DARK_GRAY)
-                .append(text(entry.syntax(), GREEN)
+                .append(colorizedSyntax(entry.syntax())
                         .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE)))
                         .clickEvent(ClickEvent.runCommand(detailsCommandBuilder.apply(entry))))
                 .append(text(" - ", DARK_GRAY))
@@ -87,5 +87,41 @@ public final class StyledHelpRenderer {
 
     private Component strikeLine() {
         return text("-".repeat(15), GOLD, STRIKETHROUGH);
+    }
+
+    private Component colorizedSyntax(String syntax) {
+        var builder = text();
+        int index = 0;
+        while (index < syntax.length()) {
+            int open = syntax.indexOf('[', index);
+            if (open < 0) {
+                builder.append(text(syntax.substring(index), GREEN));
+                break;
+            }
+            if (open > index) {
+                builder.append(text(syntax.substring(index, open), GREEN));
+            }
+            int close = findMatchingBracket(syntax, open);
+            if (close == -1) {
+                builder.append(text(syntax.substring(open), YELLOW));
+                break;
+            }
+            builder.append(text(syntax.substring(open, close + 1), YELLOW));
+            index = close + 1;
+        }
+        return builder.build();
+    }
+
+    private int findMatchingBracket(String input, int openIndex) {
+        int depth = 0;
+        for (int i = openIndex; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c == '[') depth++;
+            if (c == ']') {
+                depth--;
+                if (depth == 0) return i;
+            }
+        }
+        return -1;
     }
 }
