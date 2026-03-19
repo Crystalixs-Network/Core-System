@@ -1,10 +1,18 @@
 package net.crystalixs.core.velocity.help;
 
+import net.crystalixs.core.common.command.help.NetworkHelpCatalog;
+import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.component.CommandComponent;
 import org.incendo.cloud.description.Description;
+import org.incendo.cloud.help.result.VerboseCommandResult;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,7 +40,8 @@ public final class StyledHelpRenderer {
                 .append(strikeLine())
                 .build();
 
-        Component info = text("Zeige Suchergebnisse für Query: ", GRAY).append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
+        Component info = text("Zeige Suchergebnisse für Query: ", GRAY)
+                .append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
         Component head = text("`- ", DARK_GRAY).append(text("Verfügbare Befehle:", GRAY));
 
         var rows = pageEntries.stream().map(this::commandRow).toList();
@@ -44,6 +53,89 @@ public final class StyledHelpRenderer {
                     list.add(navigation);
                     return list;
                 }));
+    }
+
+    public List<Component> renderProxyVerboseDetails(
+            VelocityCommandSource sender,
+            CommandManager<VelocityCommandSource> commandManager,
+            String query,
+            VerboseCommandResult<VelocityCommandSource> verbose
+    ) {
+        String commandSyntax = commandManager.commandSyntaxFormatter()
+                .apply(sender, verbose.entry().command().components(), null);
+
+        List<Component> output = new ArrayList<>();
+        output.add(detailHeader());
+        output.add(detailQueryLine("/" + query));
+        output.add(detailLine("Command:", "/" + commandSyntax, true));
+        output.add(detailLine(
+                "Description:",
+                descriptionText(verbose.entry().command().commandDescription().verboseDescription()),
+                false
+        ));
+
+        if (verbose.entry().command().components().size() > 1) {
+            output.add(detailLine("Arguments:", "", false));
+
+            Iterator<CommandComponent<VelocityCommandSource>> iterator = verbose.entry().command().components().iterator();
+            iterator.next();
+            int depth = 0;
+
+            while (iterator.hasNext()) {
+                CommandComponent<VelocityCommandSource> component = iterator.next();
+                String syntax = commandManager.commandSyntaxFormatter()
+                        .apply(sender, Collections.singletonList(component), null);
+
+                Component line = text(" ", GRAY).append(syntaxComponent(syntax));
+                if (component.optional()) {
+                    line = line.append(text(" (Optional)", YELLOW));
+                }
+
+                String description = descriptionText(component.description());
+                if (!description.isBlank() && !description.equals("-")) {
+                    line = line.append(text(" - ", GRAY)).append(text(description, GRAY));
+                }
+
+                output.add(nestedArgumentLine(depth, line));
+                depth++;
+            }
+        }
+
+        return output;
+    }
+
+    public List<Component> renderCommandSuggestions(
+            String query,
+            List<String> suggestions,
+            Function<String, ClickEvent> clickBuilder
+    ) {
+        List<Component> output = new ArrayList<>();
+        output.add(detailHeader());
+        output.add(detailQueryLine("/" + query));
+        output.add(detailLine("Available Commands:", "", false));
+        suggestions.forEach(syntax -> output.add(commandSuggestionRow(syntax, clickBuilder.apply(syntax))));
+        return output;
+    }
+
+    public List<Component> renderBackendDetails(String detailsQuery, String sourceId, NetworkHelpCatalog.Entry entry) {
+        List<Component> output = new ArrayList<>();
+        output.add(detailHeader());
+        output.add(detailQueryLine("/" + detailsQuery));
+        output.add(detailLine("Command:", entry.syntax(), true));
+        output.add(detailLine("Description:", entry.description(), false));
+        if (entry.permission() != null && !entry.permission().isBlank()) {
+            output.add(detailLine("Permission:", entry.permission(), false));
+        }
+        output.add(detailLine("Source:", sourceId, false));
+        return output;
+    }
+
+    public List<Component> renderNoResults(String query, String message) {
+        return List.of(
+                detailHeader(),
+                detailQueryLine("/" + query),
+                detailLine("No Results:", message, false)
+        );
     }
 
     public Component detailHeader() {
