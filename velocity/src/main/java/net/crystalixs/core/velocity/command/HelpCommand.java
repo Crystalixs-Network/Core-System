@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.format.TextDecoration.STRIKETHROUGH;
 import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
 import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
@@ -110,7 +111,7 @@ public class HelpCommand extends VelocityCommand {
             String commandSyntax = commandManager.commandSyntaxFormatter()
                     .apply(sender, verbose.entry().command().components(), null);
 
-            sender.plattformSender().sendMessage(detailHeader("Hilfe"));
+            sender.plattformSender().sendMessage(detailHeader());
             sender.plattformSender().sendMessage(detailQueryLine("/" + query));
             sender.plattformSender().sendMessage(detailLine("Command:", "/" + commandSyntax, true));
             sender.plattformSender().sendMessage(detailLine("Description:", descriptionText(verbose.entry().command().commandDescription().verboseDescription()), false));
@@ -144,7 +145,7 @@ public class HelpCommand extends VelocityCommand {
         }
 
         if (result instanceof MultipleCommandResult<VelocityCommandSource> multiple) {
-            sender.plattformSender().sendMessage(detailHeader("Hilfe"));
+            sender.plattformSender().sendMessage(detailHeader());
             sender.plattformSender().sendMessage(detailQueryLine("/" + query));
             sender.plattformSender().sendMessage(detailLine("Available Commands:", "", false));
             multiple.childSuggestions().forEach(suggestion -> sender.plattformSender().sendMessage(commandSuggestionRow(suggestion)));
@@ -152,14 +153,14 @@ public class HelpCommand extends VelocityCommand {
         }
 
         if (result instanceof IndexCommandResult<VelocityCommandSource> index && !index.entries().isEmpty()) {
-            sender.plattformSender().sendMessage(detailHeader("Hilfe"));
+            sender.plattformSender().sendMessage(detailHeader());
             sender.plattformSender().sendMessage(detailQueryLine("/" + query));
             sender.plattformSender().sendMessage(detailLine("Available Commands:", "", false));
             index.entries().forEach(entry -> sender.plattformSender().sendMessage(commandSuggestionRow(entry.syntax())));
             return;
         }
 
-        sender.plattformSender().sendMessage(detailHeader("Hilfe"));
+        sender.plattformSender().sendMessage(detailHeader());
         sender.plattformSender().sendMessage(detailQueryLine("/" + query));
         sender.plattformSender().sendMessage(detailLine("No Results:", "Kein passender Proxy-Befehl gefunden.", false));
     }
@@ -167,13 +168,13 @@ public class HelpCommand extends VelocityCommand {
     private void renderBackendDetails(VelocityCommandSource sender, String sourceId, String detailsQuery) {
         NetworkHelpCatalog.Entry entry = service.findBackendEntry(sourceId, detailsQuery);
         if (entry == null) {
-            sender.plattformSender().sendMessage(detailHeader("Hilfe"));
+            sender.plattformSender().sendMessage(detailHeader());
             sender.plattformSender().sendMessage(detailQueryLine("/" + detailsQuery));
             sender.plattformSender().sendMessage(detailLine("No Results:", "Kein Backend-Help-Eintrag gefunden.", false));
             return;
         }
 
-        sender.plattformSender().sendMessage(detailHeader("Hilfe"));
+        sender.plattformSender().sendMessage(detailHeader());
         sender.plattformSender().sendMessage(detailQueryLine("/" + detailsQuery));
         sender.plattformSender().sendMessage(detailLine("Command:", entry.syntax(), true));
         sender.plattformSender().sendMessage(detailLine("Description:", entry.description(), false));
@@ -183,19 +184,27 @@ public class HelpCommand extends VelocityCommand {
         sender.plattformSender().sendMessage(detailLine("Source:", sourceId, false));
     }
 
-    private Component detailHeader(String title) {
-        return text("--------- ", DARK_GRAY)
-                .append(text(title, GREEN))
-                .append(text(" ---------", DARK_GRAY));
+    private Component detailHeader() {
+        return text()
+                .append(strikeLine(10))
+                .append(text(" ", WHITE))
+                .append(text("Hilfe", GREEN))
+                .append(text(" ", WHITE))
+                .append(strikeLine(10))
+                .build();
     }
 
     private Component detailQueryLine(String query) {
-        return text("Zeige Suchergebnisse fuer Query: ", GRAY)
-                .append(text("\"" + query + "\"", GREEN));
+        return text()
+                .append(text("Zeige Suchergebnisse für Query: ", GRAY))
+                .append(text("\"", WHITE))
+                .append(text(query, GREEN))
+                .append(text("\"", WHITE))
+                .build();
     }
 
     private Component detailLine(String key, String value, boolean commandLike) {
-        Component base = text("`- ", DARK_GRAY).append(text(key + " ", GOLD));
+        Component base = text("└─ ", DARK_GRAY).append(text(key + " ", GOLD));
         if (value == null || value.isBlank()) {
             return base;
         }
@@ -212,7 +221,7 @@ public class HelpCommand extends VelocityCommand {
 
     private Component nestedArgumentLine(int depth, String content) {
         String indent = "   " + "  ".repeat(Math.max(0, depth));
-        return text(indent + "|- ", DARK_GRAY).append(text(content, GRAY));
+        return text(indent + "├─ ", DARK_GRAY).append(text(content, GRAY));
     }
 
     private String descriptionText(Description description) {
@@ -222,6 +231,10 @@ public class HelpCommand extends VelocityCommand {
 
         String text = description.textDescription();
         return text == null || text.isBlank() ? "-" : text;
+    }
+
+    private Component strikeLine(int length) {
+        return text("-".repeat(length), GOLD, STRIKETHROUGH);
     }
 
     private String encodeQuery(String query) {
