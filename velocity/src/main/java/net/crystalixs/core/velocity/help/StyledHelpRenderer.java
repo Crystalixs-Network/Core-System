@@ -3,6 +3,7 @@ package net.crystalixs.core.velocity.help;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
+import org.incendo.cloud.description.Description;
 
 import java.util.List;
 import java.util.function.Function;
@@ -36,10 +37,8 @@ public final class StyledHelpRenderer {
                 .append(strikeLine())
                 .build();
 
-        Component info = text("Zeige Suchergebnisse für Query: ", GRAY)
-                .append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
-
-        Component head = text("└─ ", DARK_GRAY).append(text("Verfügbare Befehle:", GRAY));
+        Component info = text("Zeige Suchergebnisse für Query: ", GRAY).append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
+        Component head = text("`- ", DARK_GRAY).append(text("Verfügbare Befehle:", GRAY));
 
         var rows = pageEntries.stream().map(this::commandRow).toList();
         Component navigation = navigation(query, page, pages);
@@ -52,13 +51,71 @@ public final class StyledHelpRenderer {
                 }));
     }
 
+    public Component detailHeader() {
+        return text()
+                .append(strikeLine())
+                .append(text(" ", WHITE))
+                .append(text("Hilfe", GREEN))
+                .append(text(" ", WHITE))
+                .append(strikeLine())
+                .build();
+    }
+
+    public Component detailQueryLine(String query) {
+        return text()
+                .append(text("Zeige Suchergebnisse für Query: ", GRAY))
+                .append(text("\"", WHITE))
+                .append(text(query, GREEN))
+                .append(text("\"", WHITE))
+                .build();
+    }
+
+    public Component detailLine(String key, String value, boolean commandLike) {
+        Component base = text("`- ", DARK_GRAY).append(text(key + " ", GOLD));
+        if (value == null || value.isBlank()) {
+            return base;
+        }
+        return commandLike
+                ? base.append(colorizedSyntax(value))
+                : base.append(text(value, GRAY));
+    }
+
+    public Component commandSuggestionRow(String syntax, String command) {
+        return text()
+                .append(text("   |- ", DARK_GRAY))
+                .append(text("/" + syntax, GREEN)
+                        .clickEvent(ClickEvent.runCommand(command))
+                        .append(text(" - Details anzeigen", GRAY)))
+                .build();
+    }
+
+    public Component nestedArgumentLine(int depth, Component content) {
+        String indent = "   " + "  ".repeat(Math.max(0, depth));
+        return text(indent + "|- ", DARK_GRAY).append(content);
+    }
+
+    public String descriptionText(Description description) {
+        if (description == null || description.isEmpty()) {
+            return "-";
+        }
+
+        String value = description.textDescription();
+        return value.isBlank() ? "-" : value;
+    }
+
+    public Component syntaxComponent(String syntax) {
+        return colorizedSyntax(syntax);
+    }
+
     private Component commandRow(UnifiedHelpEntry entry) {
-        return text("   ├─ ", DARK_GRAY)
+        return text()
+                .append(text("   |- ", DARK_GRAY))
                 .append(colorizedSyntax(entry.syntax())
                         .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE)))
                         .clickEvent(ClickEvent.runCommand(detailsCommandBuilder.apply(entry))))
                 .append(text(" - ", DARK_GRAY))
-                .append(text(entry.description(), GRAY));
+                .append(text(entry.description(), GRAY))
+                .build();
     }
 
     private Component navigation(String query, int page, int pages) {
@@ -116,10 +173,14 @@ public final class StyledHelpRenderer {
         int depth = 0;
         for (int i = openIndex; i < input.length(); i++) {
             char c = input.charAt(i);
-            if (c == '[') depth++;
+            if (c == '[') {
+                depth++;
+            }
             if (c == ']') {
                 depth--;
-                if (depth == 0) return i;
+                if (depth == 0) {
+                    return i;
+                }
             }
         }
         return -1;
