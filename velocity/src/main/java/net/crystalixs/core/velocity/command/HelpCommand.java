@@ -31,7 +31,6 @@ import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 public class HelpCommand extends VelocityCommand {
 
     private final UnifiedHelpService service;
-    private CommandManager<VelocityCommandSource> commandManager;
 
     public HelpCommand(CorePlugin plugin, UnifiedHelpService service) {
         super(plugin);
@@ -40,23 +39,21 @@ public class HelpCommand extends VelocityCommand {
 
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
-        this.commandManager = commandManager;
-
         commandManager.command(commandManager.commandBuilder("help", "?")
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
                 .optional("query", greedyStringParser(), translatable("command.help.description.query"))
-                .handler(context -> renderPage(context.sender(), context.getOrDefault("query", ""), 1)));
+                .handler(context -> renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), 1)));
 
         commandManager.command(commandManager.commandBuilder("help-page")
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
                 .required("page", integerParser(1), translatable("command.help.description.page"))
                 .optional("query", greedyStringParser())
-                .handler(context -> renderPage(context.sender(), context.getOrDefault("query", ""), context.get("page"))));
+                .handler(context -> renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), context.get("page"))));
     }
 
-    private void renderPage(VelocityCommandSource sender, String query, int requestedPage) {
+    private void renderPage(CommandManager<VelocityCommandSource> commandManager, VelocityCommandSource sender, String query, int requestedPage) {
         var all = service.query(sender, query);
 
         int pageSize = 8;
@@ -67,23 +64,23 @@ public class HelpCommand extends VelocityCommand {
         int to = Math.min(from + pageSize, all.size());
         var pageEntries = all.subList(from, to);
 
-        createRenderer(sender).render(query, page, pages, pageEntries).forEach(sender.plattformSender()::sendMessage);
+        createRenderer(sender, commandManager).render(query, page, pages, pageEntries).forEach(sender.plattformSender()::sendMessage);
     }
 
-    private StyledHelpRenderer createRenderer(VelocityCommandSource sender) {
+    private StyledHelpRenderer createRenderer(VelocityCommandSource sender, CommandManager<VelocityCommandSource> commandManager) {
         return new StyledHelpRenderer(entry -> ClickEvent.callback(audience -> {
             if (entry.isProxyCommand()) {
-                renderProxyDetails(sender, entry.detailsQuery());
+                renderProxyDetails(sender, entry.detailsQuery(), commandManager);
                 return;
             }
-            renderBackendDetails(sender, entry.sourceLabel(), entry.detailsQuery());
+            renderBackendDetails(commandManager, sender, entry.sourceLabel(), entry.detailsQuery());
         }));
     }
 
-    private void renderProxyDetails(VelocityCommandSource sender, String detailsQuery) {
+    private void renderProxyDetails(VelocityCommandSource sender, String detailsQuery, CommandManager<VelocityCommandSource> commandManager) {
         String query = detailsQuery.startsWith("/") ? detailsQuery.substring(1) : detailsQuery;
         HelpQueryResult<VelocityCommandSource> result = commandManager.createHelpHandler().query(HelpQuery.of(sender, query));
-        StyledHelpRenderer renderer = createRenderer(sender);
+        StyledHelpRenderer renderer = createRenderer(sender, commandManager);
 
         switch (result) {
             case VerboseCommandResult<VelocityCommandSource> verbose -> {
@@ -131,7 +128,7 @@ public class HelpCommand extends VelocityCommand {
                 sender.plattformSender().sendMessage(renderer.detailQueryLine("/" + query));
                 sender.plattformSender().sendMessage(renderer.detailLine("Available Commands:", "", false));
                 multiple.childSuggestions().forEach(suggestion -> sender.plattformSender().sendMessage(
-                        renderer.commandSuggestionRow(suggestion, ClickEvent.callback(audience -> renderProxyDetails(sender, suggestion)))
+                        renderer.commandSuggestionRow(suggestion, ClickEvent.callback(audience -> renderProxyDetails(sender, suggestion, commandManager)))
                 ));
                 return;
             }
@@ -140,7 +137,7 @@ public class HelpCommand extends VelocityCommand {
                 sender.plattformSender().sendMessage(renderer.detailQueryLine("/" + query));
                 sender.plattformSender().sendMessage(renderer.detailLine("Available Commands:", "", false));
                 index.entries().forEach(entry -> sender.plattformSender().sendMessage(
-                        renderer.commandSuggestionRow(entry.syntax(), ClickEvent.callback(audience -> renderProxyDetails(sender, entry.syntax())))
+                        renderer.commandSuggestionRow(entry.syntax(), ClickEvent.callback(audience -> renderProxyDetails(sender, entry.syntax(), commandManager)))
                 ));
                 return;
             }
@@ -153,8 +150,8 @@ public class HelpCommand extends VelocityCommand {
         sender.plattformSender().sendMessage(renderer.detailLine("No Results:", "Kein passender Proxy-Befehl gefunden.", false));
     }
 
-    private void renderBackendDetails(VelocityCommandSource sender, String sourceId, String detailsQuery) {
-        StyledHelpRenderer renderer = createRenderer(sender);
+    private void renderBackendDetails(CommandManager<VelocityCommandSource> commandManager, VelocityCommandSource sender, String sourceId, String detailsQuery) {
+        StyledHelpRenderer renderer = createRenderer(sender, commandManager);
         NetworkHelpCatalog.Entry entry = service.findBackendEntry(sourceId, detailsQuery);
         if (entry == null) {
             sender.plattformSender().sendMessage(renderer.detailHeader());
