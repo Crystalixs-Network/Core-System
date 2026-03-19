@@ -107,57 +107,59 @@ public class HelpCommand extends VelocityCommand {
         String query = detailsQuery.startsWith("/") ? detailsQuery.substring(1) : detailsQuery;
         HelpQueryResult<VelocityCommandSource> result = commandManager.createHelpHandler().query(HelpQuery.of(sender, query));
 
-        if (result instanceof VerboseCommandResult<VelocityCommandSource> verbose) {
-            String commandSyntax = commandManager.commandSyntaxFormatter()
-                    .apply(sender, verbose.entry().command().components(), null);
+        switch (result) {
+            case VerboseCommandResult<VelocityCommandSource> verbose -> {
+                String commandSyntax = commandManager.commandSyntaxFormatter()
+                        .apply(sender, verbose.entry().command().components(), null);
 
-            sender.plattformSender().sendMessage(detailHeader());
-            sender.plattformSender().sendMessage(detailQueryLine("/" + query));
-            sender.plattformSender().sendMessage(detailLine("Command:", "/" + commandSyntax, true));
-            sender.plattformSender().sendMessage(detailLine("Description:", descriptionText(verbose.entry().command().commandDescription().verboseDescription()), false));
+                sender.plattformSender().sendMessage(detailHeader());
+                sender.plattformSender().sendMessage(detailQueryLine("/" + query));
+                sender.plattformSender().sendMessage(detailLine("Command:", "/" + commandSyntax, true));
+                sender.plattformSender().sendMessage(detailLine("Description:", descriptionText(verbose.entry().command().commandDescription().verboseDescription()), false));
 
-            if (verbose.entry().command().components().size() > 1) {
-                sender.plattformSender().sendMessage(detailLine("Arguments:", "", false));
-                Iterator<CommandComponent<VelocityCommandSource>> iterator = verbose.entry().command().components().iterator();
-                iterator.next();
-                int depth = 0;
+                if (verbose.entry().command().components().size() > 1) {
+                    sender.plattformSender().sendMessage(detailLine("Arguments:", "", false));
+                    Iterator<CommandComponent<VelocityCommandSource>> iterator = verbose.entry().command().components().iterator();
+                    iterator.next();
+                    int depth = 0;
 
-                while (iterator.hasNext()) {
-                    CommandComponent<VelocityCommandSource> component = iterator.next();
-                    String syntax = commandManager.commandSyntaxFormatter()
-                            .apply(sender, Collections.singletonList(component), null);
+                    while (iterator.hasNext()) {
+                        CommandComponent<VelocityCommandSource> component = iterator.next();
+                        String syntax = commandManager.commandSyntaxFormatter()
+                                .apply(sender, Collections.singletonList(component), null);
 
-                    StringBuilder line = new StringBuilder(" - ").append(syntax);
-                    if (component.optional()) {
-                        line.append(" (optional)");
+                        StringBuilder line = new StringBuilder(" - ").append(syntax);
+                        if (component.optional()) {
+                            line.append(" (optional)");
+                        }
+
+                        String description = descriptionText(component.description());
+                        if (!description.isBlank() && !"-".equals(description)) {
+                            line.append(" - ").append(description);
+                        }
+
+                        sender.plattformSender().sendMessage(nestedArgumentLine(depth, line.toString()));
+                        depth++;
                     }
-
-                    String description = descriptionText(component.description());
-                    if (!description.isBlank() && !"-".equals(description)) {
-                        line.append(" - ").append(description);
-                    }
-
-                    sender.plattformSender().sendMessage(nestedArgumentLine(depth, line.toString()));
-                    depth++;
                 }
+                return;
             }
-            return;
-        }
-
-        if (result instanceof MultipleCommandResult<VelocityCommandSource> multiple) {
-            sender.plattformSender().sendMessage(detailHeader());
-            sender.plattformSender().sendMessage(detailQueryLine("/" + query));
-            sender.plattformSender().sendMessage(detailLine("Available Commands:", "", false));
-            multiple.childSuggestions().forEach(suggestion -> sender.plattformSender().sendMessage(commandSuggestionRow(suggestion)));
-            return;
-        }
-
-        if (result instanceof IndexCommandResult<VelocityCommandSource> index && !index.entries().isEmpty()) {
-            sender.plattformSender().sendMessage(detailHeader());
-            sender.plattformSender().sendMessage(detailQueryLine("/" + query));
-            sender.plattformSender().sendMessage(detailLine("Available Commands:", "", false));
-            index.entries().forEach(entry -> sender.plattformSender().sendMessage(commandSuggestionRow(entry.syntax())));
-            return;
+            case MultipleCommandResult<VelocityCommandSource> multiple -> {
+                sender.plattformSender().sendMessage(detailHeader());
+                sender.plattformSender().sendMessage(detailQueryLine("/" + query));
+                sender.plattformSender().sendMessage(detailLine("Available Commands:", "", false));
+                multiple.childSuggestions().forEach(suggestion -> sender.plattformSender().sendMessage(commandSuggestionRow(suggestion)));
+                return;
+            }
+            case IndexCommandResult<VelocityCommandSource> index when !index.entries().isEmpty() -> {
+                sender.plattformSender().sendMessage(detailHeader());
+                sender.plattformSender().sendMessage(detailQueryLine("/" + query));
+                sender.plattformSender().sendMessage(detailLine("Available Commands:", "", false));
+                index.entries().forEach(entry -> sender.plattformSender().sendMessage(commandSuggestionRow(entry.syntax())));
+                return;
+            }
+            default -> {
+            }
         }
 
         sender.plattformSender().sendMessage(detailHeader());
@@ -186,11 +188,11 @@ public class HelpCommand extends VelocityCommand {
 
     private Component detailHeader() {
         return text()
-                .append(strikeLine(10))
+                .append(strikeLine())
                 .append(text(" ", WHITE))
                 .append(text("Hilfe", GREEN))
                 .append(text(" ", WHITE))
-                .append(strikeLine(10))
+                .append(strikeLine())
                 .build();
     }
 
@@ -230,11 +232,11 @@ public class HelpCommand extends VelocityCommand {
         }
 
         String text = description.textDescription();
-        return text == null || text.isBlank() ? "-" : text;
+        return text.isBlank() ? "-" : text;
     }
 
-    private Component strikeLine(int length) {
-        return text("-".repeat(length), GOLD, STRIKETHROUGH);
+    private Component strikeLine() {
+        return text("-".repeat(10), GOLD, STRIKETHROUGH);
     }
 
     private String encodeQuery(String query) {
