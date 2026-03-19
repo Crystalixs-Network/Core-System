@@ -38,6 +38,9 @@ adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minim
 # UI
 invui = { group = "xyz.xenondevs.invui", name = "invui", version = "1.49" }
 
+# Sync
+lettuce = { group = "io.lettuce", name = "lettuce-core", version = "7.5.0.RELEASE" }
+
 [plugins]
 bukkitConvention = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourceFactory" }
 velocityConvention = { id = "xyz.jpenilla.resource-factory-velocity-convention", version.ref = "resourceFactory" }
