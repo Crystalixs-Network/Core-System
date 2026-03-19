@@ -128,17 +128,18 @@ public class HelpCommand extends VelocityCommand {
                         String syntax = commandManager.commandSyntaxFormatter()
                                 .apply(sender, Collections.singletonList(component), null);
 
-                        StringBuilder line = new StringBuilder(" - ").append(syntax);
+                        Component line = text(" ", GRAY).append(colorizedSyntax(syntax));
                         if (component.optional()) {
-                            line.append(" (optional)");
+                            line = line.append(text(" (Optional)", YELLOW));
                         }
 
                         String description = descriptionText(component.description());
-                        if (!description.isBlank() && !"-".equals(description)) {
-                            line.append(" - ").append(description);
+                        if (!description.isBlank() && !description.equals("-")) {
+                            line = line.append(text(" - ", GRAY)).append(text(description, GRAY));
                         }
 
-                        sender.plattformSender().sendMessage(nestedArgumentLine(depth, line.toString()));
+                        sender.plattformSender().sendMessage(nestedArgumentLine(depth, line));
+
                         depth++;
                     }
                 }
@@ -223,9 +224,9 @@ public class HelpCommand extends VelocityCommand {
                         .append(text(" - Details anzeigen", GRAY)));
     }
 
-    private Component nestedArgumentLine(int depth, String content) {
+    private Component nestedArgumentLine(int depth, Component content) {
         String indent = "   " + "  ".repeat(Math.max(0, depth));
-        return text(indent + "├─ ", DARK_GRAY).append(text(content, GRAY));
+        return text(indent + "├─ ", DARK_GRAY).append(content);
     }
 
     private String descriptionText(Description description) {
