@@ -10,7 +10,6 @@ import java.util.Objects;
 
 public final class NetworkHelpSyncProtocol {
 
-    public static final @NotNull String CHANNEL = "core:help_sync";
     public static final @NotNull String REDIS_TOPIC = "core:help_sync:catalog";
     public static final int VERSION = 1;
 
