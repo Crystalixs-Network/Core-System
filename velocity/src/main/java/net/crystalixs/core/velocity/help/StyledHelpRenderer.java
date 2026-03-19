@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
+import static net.kyori.adventure.text.format.TextDecoration.STRIKETHROUGH;
 
 public final class StyledHelpRenderer {
 
@@ -26,15 +27,17 @@ public final class StyledHelpRenderer {
     }
 
     public List<Component> render(String query, int page, int pages, List<UnifiedHelpEntry> pageEntries) {
-        Component top = text("--------- ", DARK_GRAY)
+        Component top = text("-".repeat(8), GOLD, STRIKETHROUGH)
+                .append(text(" ", WHITE))
                 .append(text("Hilfe", GREEN))
                 .append(text(" (" + page + "/" + pages + ")", GOLD))
-                .append(text(" --------- ", DARK_GRAY));
+                .append(text(" ", WHITE))
+                .append(text("-".repeat(8), GOLD, STRIKETHROUGH));
 
-        Component info = text("Zeige Suchergebnisse fuer Query: ", GRAY)
+        Component info = text("Zeige Suchergebnisse für Query: ", GRAY)
                 .append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
 
-        Component head = text("`- ", DARK_GRAY).append(text("Verfuegbare Befehle:", GOLD));
+        Component head = text("└─ ", DARK_GRAY).append(text("Verfügbare Befehle:", GRAY));
 
         var rows = pageEntries.stream().map(this::commandRow).toList();
         Component navigation = navigation(query, page, pages);
@@ -48,7 +51,7 @@ public final class StyledHelpRenderer {
     }
 
     private Component commandRow(UnifiedHelpEntry entry) {
-        return text("  |- ", DARK_GRAY)
+        return text("   ├─ ", DARK_GRAY)
                 .append(text(entry.syntax(), GREEN)
                         .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE)))
                         .clickEvent(ClickEvent.runCommand(detailsCommandBuilder.apply(entry))))
@@ -62,13 +65,19 @@ public final class StyledHelpRenderer {
         String next = q.isBlank() ? "/help-page " + (page + 1) : "/help-page " + (page + 1) + " " + q;
 
         Component left = page > 1
-                ? text("[<-]", GOLD).clickEvent(ClickEvent.runCommand(previous))
-                : text("[<-]", DARK_GRAY);
+                ? text("[←]", GOLD).clickEvent(ClickEvent.runCommand(previous))
+                : text("[←]", DARK_GRAY);
 
         Component right = page < pages
-                ? text("[->]", GOLD).clickEvent(ClickEvent.runCommand(next))
-                : text("[->]", DARK_GRAY);
+                ? text("[→]", GOLD).clickEvent(ClickEvent.runCommand(next))
+                : text("[→]", DARK_GRAY);
 
-        return text("`- ", DARK_GRAY).append(left).append(text(" ", GRAY)).append(right);
+        return text("-".repeat(10), GOLD, STRIKETHROUGH)
+                .append(text(" ", WHITE))
+                .append(left)
+                .append(text("   ", WHITE))
+                .append(right)
+                .append(text(" ", WHITE))
+                .append(text("-".repeat(10), GOLD, STRIKETHROUGH));
     }
 }
