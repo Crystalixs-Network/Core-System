@@ -48,7 +48,7 @@ public final class VelocityPluginBootstrap extends AbstractPluginBootstrap<Veloc
         VelocityPluginRuntime runtime = runtime();
         configUpdater = configBootstrap.load(runtime);
         translationBootstrap = VelocityTranslationBootstrap.create(runtime, configUpdater);
-        commandBootstrap.register(plugin, runtime, configUpdater, translationBootstrap.provider());
+        commandBootstrap.register(plugin, runtime, configUpdater, translationBootstrap.provider(), backendHelpCache);
         listenerBootstrap.register(plugin, runtime, configUpdater, backendHelpCache);
     }
 
@@ -60,7 +60,11 @@ public final class VelocityPluginBootstrap extends AbstractPluginBootstrap<Veloc
                 translationBootstrap.close();
             }
         } finally {
-            configBootstrap.save(runtime, configUpdater);
+            try {
+                listenerBootstrap.close();
+            } finally {
+                configBootstrap.save(runtime, configUpdater);
+            }
         }
     }
 }

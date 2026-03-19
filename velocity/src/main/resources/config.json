@@ -17,5 +17,8 @@
       "footer": "<gray>Weitere Informationen findest du auf unserem Discord",
       "url": "<red>https://discord.gg/crystalixs"
     }
+  },
+  "redis-sync": {
+    "uri": "redis://localhost:6379"
   }
 }

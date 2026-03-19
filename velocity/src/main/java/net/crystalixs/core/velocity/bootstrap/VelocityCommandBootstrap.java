@@ -21,9 +21,13 @@ import static net.kyori.adventure.text.Component.translatable;
 
 public final class VelocityCommandBootstrap {
 
-    private final BackendHelpCatalogCache backendHelpCache = new BackendHelpCatalogCache();
-
-    public void register(CorePlugin plugin, VelocityPluginRuntime runtime, VelocityConfigUpdater configUpdater, TranslationProvider provider) {
+    public void register(
+            CorePlugin plugin,
+            VelocityPluginRuntime runtime,
+            VelocityConfigUpdater configUpdater,
+            TranslationProvider provider,
+            BackendHelpCatalogCache backendHelpCache
+    ) {
         final VelocityCommandManager<VelocityCommandSource> commandManager = new VelocityCommandManager<>(
                 runtime.pluginContainer(),
                 runtime.server(),

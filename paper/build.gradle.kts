@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.bundles.cloudPaper)
     implementation(libs.configurate.hocon)
     implementation(libs.invui)
+    implementation(libs.lettuce)
 }
 
 tasks {
@@ -25,6 +26,7 @@ tasks {
             libs.cloud.paper to "cloud",
             libs.configurate.hocon to "configurate.hocon",
             libs.invui to "invui",
+            libs.lettuce to "lettuce",
         )
 
         val base = "$group.$artifact.paper.libs"

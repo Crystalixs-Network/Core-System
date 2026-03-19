@@ -15,8 +15,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
@@ -39,18 +37,13 @@ public final class StyledHelpRenderer {
     }
 
     public List<Component> render(String query, int page, int pages, List<UnifiedHelpEntry> pageEntries) {
-        List<Component> rows = buildOverviewRows(pageEntries);
-        Component top = buildTop(page, pages);
-        Component info = buildQueryInfo(query);
-        Component head = prefixedLine(0, true, text(AVAILABLE_COMMANDS_LABEL, GRAY));
-        Component navigation = navigation(query, page, pages);
-
-        return Stream.of(top, info, head)
-                .collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
-                    list.addAll(rows);
-                    list.add(navigation);
-                    return list;
-                }));
+        List<Component> output = new ArrayList<>();
+        output.add(buildTop(page, pages));
+        output.add(buildQueryInfo(query));
+        output.add(prefixedLine(0, true, text(AVAILABLE_COMMANDS_LABEL, GRAY)));
+        output.addAll(buildOverviewRows(pageEntries));
+        output.add(navigation(query, page, pages));
+        return output;
     }
 
     public List<Component> renderProxyVerboseDetails(VelocityCommandSource sender, CommandManager<VelocityCommandSource> commandManager, String query, VerboseCommandResult<VelocityCommandSource> verbose) {
@@ -63,8 +56,7 @@ public final class StyledHelpRenderer {
 
             while (iterator.hasNext()) {
                 CommandComponent<VelocityCommandSource> component = iterator.next();
-                String syntax = commandManager.commandSyntaxFormatter()
-                        .apply(sender, Collections.singletonList(component), null);
+                String syntax = commandManager.commandSyntaxFormatter().apply(sender, Collections.singletonList(component), null);
                 argumentContents.add(buildArgumentContent(syntax, component.optional(), descriptionText(component.description())));
             }
         }
@@ -87,7 +79,7 @@ public final class StyledHelpRenderer {
     }
 
     public List<Component> renderBackendDetails(String detailsQuery, NetworkHelpCatalog.Entry entry) {
-        List<Component> argumentContents = parseBackendArguments(entry.syntax());
+        List<Component> argumentContents = parseBackendArguments(entry);
         return renderVerboseDetails("/" + detailsQuery, entry.syntax(), entry.description(), argumentContents);
     }
 
@@ -95,7 +87,8 @@ public final class StyledHelpRenderer {
         return List.of(
                 detailHeader(),
                 detailQueryLine("/" + query),
-                prefixedKeyValue(0, true, "Keine Ergebnisse:", message, false));
+                prefixedKeyValue(0, true, "Keine Ergebnisse:", message, false)
+        );
     }
 
     public Component detailHeader() {
@@ -118,9 +111,11 @@ public final class StyledHelpRenderer {
     }
 
     public Component commandSuggestionRow(String syntax, ClickEvent clickEvent, boolean isLast) {
-        Component content = text("/" + syntax, GREEN)
+        Component content = text()
+                .append(text("/" + syntax, GREEN))
                 .clickEvent(clickEvent)
-                .append(text(" - Details anzeigen", GRAY));
+                .append(text(" - Details anzeigen", GRAY))
+                .build();
 
         return prefixedLine(1, isLast, content);
     }
@@ -162,7 +157,12 @@ public final class StyledHelpRenderer {
         return text(SEARCH_LABEL, GRAY).append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
     }
 
-    private List<Component> renderVerboseDetails(String shownQuery, String commandSyntax, String description, List<Component> argumentContents) {
+    private List<Component> renderVerboseDetails(
+            String shownQuery,
+            String commandSyntax,
+            String description,
+            List<Component> argumentContents
+    ) {
         List<Component> output = new ArrayList<>();
         output.add(detailHeader());
         output.add(detailQueryLine(shownQuery));
@@ -180,7 +180,18 @@ public final class StyledHelpRenderer {
         return output;
     }
 
-    private List<Component> parseBackendArguments(String syntax) {
+    private List<Component> parseBackendArguments(NetworkHelpCatalog.Entry entry) {
+        if (!entry.arguments().isEmpty()) {
+            List<Component> lines = new ArrayList<>();
+            for (NetworkHelpCatalog.Argument argument : entry.arguments()) {
+                lines.add(buildArgumentContent(argument.syntax(), argument.optional(), argument.description()));
+            }
+            return lines;
+        }
+        return parseBackendArgumentsFromSyntax(entry.syntax());
+    }
+
+    private List<Component> parseBackendArgumentsFromSyntax(String syntax) {
         String normalized = syntax.startsWith("/") ? syntax.substring(1) : syntax;
         List<String> tokens = splitSyntaxTokens(normalized);
         if (tokens.size() <= 1) {
@@ -238,11 +249,13 @@ public final class StyledHelpRenderer {
     }
 
     private Component commandRow(UnifiedHelpEntry entry, boolean isLast) {
-        Component content = colorizedSyntax(entry.syntax())
+        Component content = text()
+                .append(colorizedSyntax(entry.syntax()))
                 .hoverEvent(HoverEvent.showText(text(entry.description(), WHITE)))
                 .clickEvent(detailsClickBuilder.apply(entry))
                 .append(text(" - ", DARK_GRAY))
-                .append(text(entry.description(), GRAY));
+                .append(text(entry.description(), GRAY))
+                .build();
 
         return prefixedLine(1, isLast, content);
     }
