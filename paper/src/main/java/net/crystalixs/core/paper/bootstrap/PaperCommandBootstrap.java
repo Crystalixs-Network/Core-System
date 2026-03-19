@@ -10,6 +10,7 @@ import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
@@ -29,6 +30,7 @@ public final class PaperCommandBootstrap {
     private final InventorySeeService inventorySeeService;
     private final VanishService vanishService;
     private PaperHelpCatalogTransport helpCatalogTransport;
+    private BukkitTask helpCatalogRepublishTask;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
@@ -84,9 +86,19 @@ public final class PaperCommandBootstrap {
         this.helpCatalogTransport = new PaperHelpCatalogTransport(runtime.componentLogger("help-sync"), publisher, redisUri);
         this.helpCatalogTransport.connect();
         this.helpCatalogTransport.publish(commandManager);
+        this.helpCatalogRepublishTask = runtime.plugin().getServer().getScheduler().runTaskTimerAsynchronously(
+                runtime.plugin(),
+                () -> this.helpCatalogTransport.publish(commandManager),
+                20L * 30L,
+                20L * 30L
+        );
     }
 
     public void shutdown() {
+        if (helpCatalogRepublishTask != null) {
+            helpCatalogRepublishTask.cancel();
+            helpCatalogRepublishTask = null;
+        }
         if (helpCatalogTransport != null) {
             helpCatalogTransport.close();
             helpCatalogTransport = null;
