@@ -28,12 +28,12 @@ public final class StyledHelpRenderer {
 
     public List<Component> render(String query, int page, int pages, List<UnifiedHelpEntry> pageEntries) {
         Component top = text()
-                .append(text("-".repeat(15), GOLD, STRIKETHROUGH))
+                .append(strikeLine())
                 .append(text(" ", WHITE))
                 .append(text("Hilfe", GREEN))
                 .append(text(" (" + page + "/" + pages + ")", GOLD))
                 .append(text(" ", WHITE))
-                .append(text("-".repeat(15), GOLD, STRIKETHROUGH))
+                .append(strikeLine())
                 .build();
 
         Component info = text("Zeige Suchergebnisse für Query: ", GRAY)
@@ -75,13 +75,17 @@ public final class StyledHelpRenderer {
                 : text("[→]", DARK_GRAY);
 
         return text()
-                .append(text("-".repeat(15), GOLD, STRIKETHROUGH))
+                .append(strikeLine())
                 .append(text(" ", WHITE))
                 .append(left)
                 .append(text("   ", WHITE))
                 .append(right)
                 .append(text(" ", WHITE))
-                .append(text("-".repeat(15), GOLD, STRIKETHROUGH))
+                .append(strikeLine())
                 .build();
+    }
+
+    private Component strikeLine() {
+        return text("-".repeat(15), GOLD, STRIKETHROUGH);
     }
 }
