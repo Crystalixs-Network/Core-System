@@ -16,14 +16,9 @@ import static net.kyori.adventure.text.format.TextDecoration.STRIKETHROUGH;
 
 public final class StyledHelpRenderer {
 
-    private final Function<String, String> queryEncoder;
     private final Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder;
 
-    public StyledHelpRenderer(
-            Function<String, String> queryEncoder,
-            Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder
-    ) {
-        this.queryEncoder = queryEncoder;
+    public StyledHelpRenderer(Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder) {
         this.detailsClickBuilder = detailsClickBuilder;
     }
 
@@ -119,7 +114,7 @@ public final class StyledHelpRenderer {
     }
 
     private Component navigation(String query, int page, int pages) {
-        String q = queryEncoder.apply(query);
+        String q = query == null ? "" : query.trim();
         String previous = q.isBlank() ? "/help-page " + (page - 1) : "/help-page " + (page - 1) + " " + q;
         String next = q.isBlank() ? "/help-page " + (page + 1) : "/help-page " + (page + 1) + " " + q;
 

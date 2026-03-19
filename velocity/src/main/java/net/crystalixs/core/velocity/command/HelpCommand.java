@@ -18,8 +18,6 @@ import org.incendo.cloud.help.result.MultipleCommandResult;
 import org.incendo.cloud.help.result.VerboseCommandResult;
 import org.jspecify.annotations.NonNull;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.Iterator;
 
@@ -29,7 +27,6 @@ import static net.kyori.adventure.text.format.NamedTextColor.YELLOW;
 import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
 import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
-import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
 public class HelpCommand extends VelocityCommand {
 
@@ -55,13 +52,8 @@ public class HelpCommand extends VelocityCommand {
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
                 .required("page", integerParser(1), translatable("command.help.description.page"))
-                .optional("query", stringParser())
-                .handler(context -> {
-                    int page = context.get("page");
-                    String encoded = context.getOrDefault("query", "");
-                    String query = decodeQuery(encoded);
-                    renderPage(context.sender(), query, page);
-                }));
+                .optional("query", greedyStringParser())
+                .handler(context -> renderPage(context.sender(), context.getOrDefault("query", ""), context.get("page"))));
     }
 
     private void renderPage(VelocityCommandSource sender, String query, int requestedPage) {
@@ -79,7 +71,7 @@ public class HelpCommand extends VelocityCommand {
     }
 
     private StyledHelpRenderer createRenderer(VelocityCommandSource sender) {
-        return new StyledHelpRenderer(this::encodeQuery, entry -> ClickEvent.callback(audience -> {
+        return new StyledHelpRenderer(entry -> ClickEvent.callback(audience -> {
             if (entry.isProxyCommand()) {
                 renderProxyDetails(sender, entry.detailsQuery());
                 return;
@@ -179,19 +171,5 @@ public class HelpCommand extends VelocityCommand {
             sender.plattformSender().sendMessage(renderer.detailLine("Permission:", entry.permission(), false));
         }
         sender.plattformSender().sendMessage(renderer.detailLine("Source:", sourceId, false));
-    }
-
-    private String encodeQuery(String query) {
-        if (query == null || query.isBlank()) return "";
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(query.getBytes(StandardCharsets.UTF_8));
-    }
-
-    private String decodeQuery(String encoded) {
-        if (encoded == null || encoded.isBlank()) return "";
-        try {
-            return new String(Base64.getUrlDecoder().decode(encoded), StandardCharsets.UTF_8);
-        } catch (IllegalArgumentException exception) {
-            return "";
-        }
     }
 }
