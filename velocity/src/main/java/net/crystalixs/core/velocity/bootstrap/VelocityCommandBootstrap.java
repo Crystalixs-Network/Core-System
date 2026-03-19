@@ -24,8 +24,6 @@ public final class VelocityCommandBootstrap {
     private final BackendHelpCatalogCache backendHelpCache = new BackendHelpCatalogCache();
 
     public void register(CorePlugin plugin, VelocityPluginRuntime runtime, VelocityConfigUpdater configUpdater, TranslationProvider provider) {
-        backendHelpCache.loadPreviewSample(); // POC seed, bis Transport steht
-
         final VelocityCommandManager<VelocityCommandSource> commandManager = new VelocityCommandManager<>(
                 runtime.pluginContainer(),
                 runtime.server(),
