@@ -5,5 +5,8 @@
     "username": "root",
     "password": "",
     "database": "crystalixs"
+  },
+  "redis-sync": {
+    "uri": "redis://localhost:6379"
   }
 }
