@@ -40,8 +40,7 @@ public final class StyledHelpRenderer {
                 .append(strikeLine())
                 .build();
 
-        Component info = text("Zeige Suchergebnisse für Query: ", GRAY)
-                .append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
+        Component info = text("Zeige Suchergebnisse für Query: ", GRAY).append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
         Component head = text("`- ", DARK_GRAY).append(text("Verfügbare Befehle:", GRAY));
 
         var rows = pageEntries.stream().map(this::commandRow).toList();
@@ -55,28 +54,10 @@ public final class StyledHelpRenderer {
                 }));
     }
 
-    public List<Component> renderProxyVerboseDetails(
-            VelocityCommandSource sender,
-            CommandManager<VelocityCommandSource> commandManager,
-            String query,
-            VerboseCommandResult<VelocityCommandSource> verbose
-    ) {
-        String commandSyntax = commandManager.commandSyntaxFormatter()
-                .apply(sender, verbose.entry().command().components(), null);
-
-        List<Component> output = new ArrayList<>();
-        output.add(detailHeader());
-        output.add(detailQueryLine("/" + query));
-        output.add(detailLine("Command:", "/" + commandSyntax, true));
-        output.add(detailLine(
-                "Description:",
-                descriptionText(verbose.entry().command().commandDescription().verboseDescription()),
-                false
-        ));
-
+    public List<Component> renderProxyVerboseDetails(VelocityCommandSource sender, CommandManager<VelocityCommandSource> commandManager, String query, VerboseCommandResult<VelocityCommandSource> verbose) {
+        String commandSyntax = commandManager.commandSyntaxFormatter().apply(sender, verbose.entry().command().components(), null);
+        List<Component> argumentLines = new ArrayList<>();
         if (verbose.entry().command().components().size() > 1) {
-            output.add(detailLine("Arguments:", "", false));
-
             Iterator<CommandComponent<VelocityCommandSource>> iterator = verbose.entry().command().components().iterator();
             iterator.next();
             int depth = 0;
@@ -96,19 +77,15 @@ public final class StyledHelpRenderer {
                     line = line.append(text(" - ", GRAY)).append(text(description, GRAY));
                 }
 
-                output.add(nestedArgumentLine(depth, line));
+                argumentLines.add(nestedArgumentLine(depth, line));
                 depth++;
             }
         }
 
-        return output;
+        return renderVerboseDetails("/" + query, "/" + commandSyntax, descriptionText(verbose.entry().command().commandDescription().verboseDescription()), argumentLines, List.of());
     }
 
-    public List<Component> renderCommandSuggestions(
-            String query,
-            List<String> suggestions,
-            Function<String, ClickEvent> clickBuilder
-    ) {
+    public List<Component> renderCommandSuggestions(String query, List<String> suggestions, Function<String, ClickEvent> clickBuilder) {
         List<Component> output = new ArrayList<>();
         output.add(detailHeader());
         output.add(detailQueryLine("/" + query));
@@ -118,24 +95,85 @@ public final class StyledHelpRenderer {
     }
 
     public List<Component> renderBackendDetails(String detailsQuery, String sourceId, NetworkHelpCatalog.Entry entry) {
-        List<Component> output = new ArrayList<>();
-        output.add(detailHeader());
-        output.add(detailQueryLine("/" + detailsQuery));
-        output.add(detailLine("Command:", entry.syntax(), true));
-        output.add(detailLine("Description:", entry.description(), false));
+        List<Component> argumentLines = parseBackendArguments(entry.syntax());
+        List<Component> extra = new ArrayList<>();
         if (entry.permission() != null && !entry.permission().isBlank()) {
-            output.add(detailLine("Permission:", entry.permission(), false));
+            extra.add(detailLine("Permission:", entry.permission(), false));
         }
-        output.add(detailLine("Source:", sourceId, false));
-        return output;
+        extra.add(detailLine("Source:", sourceId, false));
+
+        return renderVerboseDetails("/" + detailsQuery, entry.syntax(), entry.description(), argumentLines, extra);
     }
 
     public List<Component> renderNoResults(String query, String message) {
         return List.of(
                 detailHeader(),
                 detailQueryLine("/" + query),
-                detailLine("No Results:", message, false)
-        );
+                detailLine("No Results:", message, false));
+    }
+
+    private List<Component> renderVerboseDetails(String shownQuery, String commandSyntax, String description, List<Component> argumentLines, List<Component> extraLines) {
+        List<Component> output = new ArrayList<>();
+        output.add(detailHeader());
+        output.add(detailQueryLine(shownQuery));
+        output.add(detailLine("Command:", commandSyntax, true));
+        output.add(detailLine("Description:", description, false));
+        if (!argumentLines.isEmpty()) {
+            output.add(detailLine("Arguments:", "", false));
+            output.addAll(argumentLines);
+        }
+        output.addAll(extraLines);
+        return output;
+    }
+
+    private List<Component> parseBackendArguments(String syntax) {
+        String normalized = syntax.startsWith("/") ? syntax.substring(1) : syntax;
+        List<String> tokens = splitSyntaxTokens(normalized);
+        if (tokens.size() <= 1) {
+            return List.of();
+        }
+
+        List<Component> lines = new ArrayList<>();
+        int depth = 0;
+        for (int i = 1; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+            Component line = text(" ", GRAY).append(syntaxComponent(token));
+            if (token.startsWith("[") && token.endsWith("]")) {
+                line = line.append(text(" (Optional)", YELLOW));
+            }
+            lines.add(nestedArgumentLine(depth, line));
+            depth++;
+        }
+        return lines;
+    }
+
+    private List<String> splitSyntaxTokens(String syntax) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        int bracketDepth = 0;
+
+        for (int i = 0; i < syntax.length(); i++) {
+            char ch = syntax.charAt(i);
+            if (Character.isWhitespace(ch) && bracketDepth == 0) {
+                if (!current.isEmpty()) {
+                    tokens.add(current.toString());
+                    current.setLength(0);
+                }
+                continue;
+            }
+
+            if (ch == '[') {
+                bracketDepth++;
+            } else if (ch == ']' && bracketDepth > 0) {
+                bracketDepth--;
+            }
+            current.append(ch);
+        }
+
+        if (!current.isEmpty()) {
+            tokens.add(current.toString());
+        }
+        return tokens;
     }
 
     public Component detailHeader() {
