@@ -108,6 +108,6 @@ public class HelpCommand extends VelocityCommand {
             renderer.renderNoResults(detailsQuery, "Kein Backend-Help-Eintrag gefunden.").forEach(sender.plattformSender()::sendMessage);
             return;
         }
-        renderer.renderBackendDetails(detailsQuery, sourceId, entry).forEach(sender.plattformSender()::sendMessage);
+        renderer.renderBackendDetails(detailsQuery, entry).forEach(sender.plattformSender()::sendMessage);
     }
 }

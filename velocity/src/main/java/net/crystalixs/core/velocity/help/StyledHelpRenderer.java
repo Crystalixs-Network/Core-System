@@ -94,15 +94,9 @@ public final class StyledHelpRenderer {
         return output;
     }
 
-    public List<Component> renderBackendDetails(String detailsQuery, String sourceId, NetworkHelpCatalog.Entry entry) {
+    public List<Component> renderBackendDetails(String detailsQuery, NetworkHelpCatalog.Entry entry) {
         List<Component> argumentLines = parseBackendArguments(entry.syntax());
-        List<Component> extra = new ArrayList<>();
-        if (entry.permission() != null && !entry.permission().isBlank()) {
-            extra.add(detailLine("Permission:", entry.permission(), false));
-        }
-        extra.add(detailLine("Source:", sourceId, false));
-
-        return renderVerboseDetails("/" + detailsQuery, entry.syntax(), entry.description(), argumentLines, extra);
+        return renderVerboseDetails("/" + detailsQuery, entry.syntax(), entry.description(), argumentLines, List.of());
     }
 
     public List<Component> renderNoResults(String query, String message) {
