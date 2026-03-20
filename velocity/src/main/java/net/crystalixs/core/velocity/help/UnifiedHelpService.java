@@ -4,6 +4,7 @@ import net.crystalixs.core.common.command.help.NetworkHelpCatalog;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,7 +61,7 @@ public final class UnifiedHelpService {
 
     private boolean hasBackendPermission(VelocityCommandSource sender, String permission) {
         if (permission == null || permission.isBlank()) return true;
-        return sender.plattformSender().hasPermission(permission);
+        return commandManager.testPermission(sender, Permission.of(permission.trim())).allowed();
     }
 
     private boolean matches(String needle, String syntax, String description) {
