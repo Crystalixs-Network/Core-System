@@ -10,7 +10,10 @@ import net.crystalixs.core.velocity.help.UnifiedHelpService;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.help.HelpQuery;
-import org.incendo.cloud.help.result.*;
+import org.incendo.cloud.help.result.CommandEntry;
+import org.incendo.cloud.help.result.IndexCommandResult;
+import org.incendo.cloud.help.result.MultipleCommandResult;
+import org.incendo.cloud.help.result.VerboseCommandResult;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
@@ -33,23 +36,21 @@ public class HelpCommand extends VelocityCommand {
         commandManager.command(commandManager.commandBuilder("help", "?")
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
+                .flag(commandManager.flagBuilder("page")
+                        .withAliases("p")
+                        .withDescription(translatable("command.help.description.page"))
+                        .withComponent(integerParser(1))
+                        .build())
                 .optional("query", greedyStringParser(), translatable("command.help.description.query"))
-                .handler(context -> renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), 1)));
+                .handler(context -> {
+                    Integer rawPage = context.flags().getValue("page", 1);
+                    int page = rawPage != null ? rawPage : 1;
 
-        commandManager.command(commandManager.commandBuilder("help-page")
-                .commandDescription(translatable("command.help.description.main"))
-                .senderType(VelocityPlayerCommandSource.class)
-                .required("page", integerParser(1), translatable("command.help.description.page"))
-                .optional("query", greedyStringParser())
-                .handler(context -> renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), context.get("page"))));
+                    renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), page);
+                }));
     }
 
-    private void renderPage(
-            CommandManager<VelocityCommandSource> commandManager,
-            VelocityCommandSource sender,
-            String query,
-            int requestedPage
-    ) {
+    private void renderPage(CommandManager<VelocityCommandSource> commandManager, VelocityCommandSource sender, String query, int requestedPage) {
         var all = service.query(sender, query);
 
         int pageSize = 8;
@@ -75,8 +76,8 @@ public class HelpCommand extends VelocityCommand {
 
     private void renderProxyDetails(VelocityCommandSource sender, String detailsQuery, CommandManager<VelocityCommandSource> commandManager) {
         String query = detailsQuery.startsWith("/") ? detailsQuery.substring(1) : detailsQuery;
-        HelpQueryResult<VelocityCommandSource> result = commandManager.createHelpHandler().query(HelpQuery.of(sender, query));
-        StyledHelpRenderer renderer = createRenderer(sender, commandManager);
+        var result = commandManager.createHelpHandler().query(HelpQuery.of(sender, query));
+        var renderer = createRenderer(sender, commandManager);
 
         switch (result) {
             case VerboseCommandResult<VelocityCommandSource> verbose -> {
