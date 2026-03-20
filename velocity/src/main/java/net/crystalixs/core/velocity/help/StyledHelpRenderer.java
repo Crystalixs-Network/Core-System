@@ -27,7 +27,7 @@ public final class StyledHelpRenderer {
     private static final String TREE_LAST = "└─";
     private static final String ARROW_LEFT = "←";
     private static final String ARROW_RIGHT = "→";
-    private static final String NO_DESCRIPTION_FALLBACK_KEY = "command.help.ui.no-description";
+    private static final String NO_DESCRIPTION = "-";
 
     private final Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder;
 
@@ -121,10 +121,10 @@ public final class StyledHelpRenderer {
 
     public String descriptionText(Description description) {
         if (description == null || description.isEmpty()) {
-            return NO_DESCRIPTION_FALLBACK_KEY;
+            return NO_DESCRIPTION;
         }
         String value = description.textDescription();
-        return value.isBlank() ? NO_DESCRIPTION_FALLBACK_KEY : value;
+        return value.isBlank() ? NO_DESCRIPTION : value;
     }
 
     public Component syntaxComponent(String syntax) {
@@ -241,7 +241,7 @@ public final class StyledHelpRenderer {
                     .append(translatable("command.help.ui.optional").color(YELLOW))
                     .append(text(")", YELLOW));
         }
-        if (description != null && !description.isBlank() && !description.equals(NO_DESCRIPTION_FALLBACK_KEY)) {
+        if (description != null && !description.isBlank() && !description.equals(NO_DESCRIPTION)) {
             line = line.append(text(" - ", GRAY)).append(text(description, GRAY));
         }
         return line;
