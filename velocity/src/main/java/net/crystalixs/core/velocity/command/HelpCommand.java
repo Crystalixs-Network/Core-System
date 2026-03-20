@@ -21,7 +21,6 @@ import java.util.List;
 
 import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
 import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
-import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
 public class HelpCommand extends VelocityCommand {
@@ -35,26 +34,17 @@ public class HelpCommand extends VelocityCommand {
 
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
-        var pageFlag = commandManager
-                .flagBuilder("page")
-                .withAliases("p")
-                .withDescription(translatable("command.help.description.page"))
-                .withComponent(integerParser(1))
-                .build();
-
         commandManager.command(commandManager.commandBuilder("help", "?")
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
+                .flag(commandManager.flagBuilder("page")
+                        .withAliases("p")
+                        .withDescription(translatable("command.help.description.page"))
+                        .withComponent(integerParser(1))
+                        .build()
+                )
                 .optional("query", stringParser(), translatable("command.help.description.query"))
-                .flag(pageFlag)
-                .handler(context -> renderPage(commandManager, context.sender(), "", page(context))));
-
-        commandManager.command(commandManager.commandBuilder("help", "?")
-                .commandDescription(translatable("command.help.description.proxy"))
-                .senderType(VelocityPlayerCommandSource.class)
-                .flag(pageFlag)
-                .required("query", greedyStringParser(), translatable("command.help.description.query"))
-                .handler(context -> renderPage(commandManager, context.sender(), context.get("query"), page(context))));
+                .handler(context -> renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), page(context))));
     }
 
     private void renderPage(CommandManager<VelocityCommandSource> commandManager, VelocityCommandSource sender, String query, int requestedPage) {
