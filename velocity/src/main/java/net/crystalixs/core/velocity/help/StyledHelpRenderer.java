@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.format.NamedTextColor.*;
 import static net.kyori.adventure.text.format.TextDecoration.STRIKETHROUGH;
 
@@ -26,10 +27,6 @@ public final class StyledHelpRenderer {
     private static final String TREE_LAST = "└─";
     private static final String ARROW_LEFT = "←";
     private static final String ARROW_RIGHT = "→";
-    private static final String HEADER_TITLE = "Hilfe";
-    private static final String SEARCH_LABEL = "Zeige Suchergebnisse für Query: ";
-    private static final String AVAILABLE_COMMANDS_LABEL = "Verfügbare Befehle:";
-
     private final Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder;
 
     public StyledHelpRenderer(Function<UnifiedHelpEntry, ClickEvent> detailsClickBuilder) {
@@ -40,7 +37,7 @@ public final class StyledHelpRenderer {
         var output = new ArrayList<Component>();
         output.add(buildTop(page, pages));
         output.add(buildQueryInfo(query));
-        output.add(prefixedLine(0, true, text(AVAILABLE_COMMANDS_LABEL, GRAY)));
+        output.add(prefixedLine(0, true, translatable("command.help.ui.available-commands").color(GRAY)));
         output.addAll(buildOverviewRows(pageEntries));
         output.add(navigation(query, page, pages));
         return output;
@@ -68,7 +65,7 @@ public final class StyledHelpRenderer {
         var output = new ArrayList<Component>();
         output.add(detailHeader());
         output.add(detailQueryLine("/" + query));
-        output.add(prefixedLine(0, true, text(AVAILABLE_COMMANDS_LABEL, GRAY)));
+        output.add(prefixedLine(0, true, translatable("command.help.ui.available-commands").color(GRAY)));
 
         for (int i = 0; i < suggestions.size(); i++) {
             String syntax = suggestions.get(i);
@@ -87,14 +84,14 @@ public final class StyledHelpRenderer {
         return List.of(
                 detailHeader(),
                 detailQueryLine("/" + query),
-                prefixedKeyValue(0, true, "Keine Ergebnisse:", message, false));
+                prefixedKeyValue(translatable("command.help.ui.no-results-label").color(GOLD), message));
     }
 
     public Component detailHeader() {
         return text()
                 .append(strikeLine())
                 .append(text(" ", WHITE))
-                .append(text(HEADER_TITLE, GREEN))
+                .append(translatable("command.help.ui.title").color(GREEN))
                 .append(text(" ", WHITE))
                 .append(strikeLine())
                 .build();
@@ -102,7 +99,7 @@ public final class StyledHelpRenderer {
 
     public Component detailQueryLine(String query) {
         return text()
-                .append(text(SEARCH_LABEL, GRAY))
+                .append(translatable("command.help.ui.search-label").color(GRAY))
                 .append(text("\"", WHITE))
                 .append(text(query, GREEN))
                 .append(text("\"", WHITE))
@@ -113,7 +110,8 @@ public final class StyledHelpRenderer {
         Component content = text()
                 .append(text("/" + syntax, GREEN))
                 .clickEvent(clickEvent)
-                .append(text(" - Details anzeigen", GRAY))
+                .append(text(" - ", GRAY))
+                .append(translatable("command.help.ui.show-details").color(GRAY))
                 .build();
 
         return prefixedLine(1, isLast, content);
@@ -145,7 +143,7 @@ public final class StyledHelpRenderer {
         return text()
                 .append(strikeLine())
                 .append(text(" ", WHITE))
-                .append(text(HEADER_TITLE, GREEN))
+                .append(translatable("command.help.ui.title").color(GREEN))
                 .append(text(" (" + page + "/" + pages + ")", GOLD))
                 .append(text(" ", WHITE))
                 .append(strikeLine())
@@ -153,20 +151,23 @@ public final class StyledHelpRenderer {
     }
 
     private Component buildQueryInfo(String query) {
-        return text(SEARCH_LABEL, GRAY).append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
+        return text()
+                .append(translatable("command.help.ui.search-label").color(GRAY))
+                .append(text("\"/" + (query == null ? "" : query) + "\"", GREEN))
+                .build();
     }
 
     private List<Component> renderVerboseDetails(String shownQuery, String commandSyntax, String description, List<Component> argumentContents) {
         var output = new ArrayList<Component>();
         output.add(detailHeader());
         output.add(detailQueryLine(shownQuery));
-        output.add(prefixedKeyValue(0, true, "Befehl:", commandSyntax, true));
+        output.add(prefixedKeyValue(0, true, translatable("command.help.ui.label-command").color(GOLD), commandSyntax, true));
 
         boolean hasArguments = !argumentContents.isEmpty();
-        output.add(prefixedKeyValue(1, !hasArguments, "Beschreibung:", description, false));
+        output.add(prefixedKeyValue(1, !hasArguments, translatable("command.help.ui.label-description").color(GOLD), description, false));
 
         if (hasArguments) {
-            output.add(prefixedKeyValue(1, true, "Argumente:", "", false));
+            output.add(prefixedKeyValue(1, true, translatable("command.help.ui.label-arguments").color(GOLD), "", false));
             for (int i = 0; i < argumentContents.size(); i++) {
                 boolean isLast = i == argumentContents.size() - 1;
                 output.add(prefixedLine(2, isLast, argumentContents.get(i)));
@@ -234,7 +235,9 @@ public final class StyledHelpRenderer {
     private Component buildArgumentContent(String syntax, boolean optional, String description) {
         Component line = text(" ", GRAY).append(syntaxComponent(syntax));
         if (optional) {
-            line = line.append(text(" (Optional)", YELLOW));
+            line = line.append(text(" (", YELLOW))
+                    .append(translatable("command.help.ui.optional").color(YELLOW))
+                    .append(text(")", YELLOW));
         }
         if (description != null && !description.isBlank() && !description.equals("-")) {
             line = line.append(text(" - ", GRAY)).append(text(description, GRAY));
@@ -282,18 +285,18 @@ public final class StyledHelpRenderer {
         return text("-".repeat(15), GOLD, STRIKETHROUGH);
     }
 
-    private Component prefixedKeyValue(int level, boolean isLast, String key, String value, boolean commandLike) {
-        Component line = text(key + " ", GOLD);
-        if (value != null && !value.isBlank()) {
-            line = line.append(commandLike ? colorizedSyntax(value) : text(value, GRAY));
-        }
-        return prefixedLine(level, isLast, line);
-    }
-
-    private Component prefixedKeyValue(int level, boolean isLast, String key, Component value, boolean commandLike) {
-        Component line = text(key + " ", GOLD);
+    private Component prefixedKeyValue(Component key, Component value) {
+        Component line = key.append(text(" ", GOLD));
         if (value != null) {
             line = line.append(value);
+        }
+        return prefixedLine(0, true, line);
+    }
+
+    private Component prefixedKeyValue(int level, boolean isLast, Component key, String value, boolean commandLike) {
+        Component line = key.append(text(" ", GOLD));
+        if (value != null && !value.isBlank()) {
+            line = line.append(commandLike ? colorizedSyntax(value) : text(value, GRAY));
         }
         return prefixedLine(level, isLast, line);
     }
