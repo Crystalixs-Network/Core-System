@@ -14,13 +14,14 @@ import org.incendo.cloud.help.result.CommandEntry;
 import org.incendo.cloud.help.result.IndexCommandResult;
 import org.incendo.cloud.help.result.MultipleCommandResult;
 import org.incendo.cloud.help.result.VerboseCommandResult;
+import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
+import static net.kyori.adventure.text.Component.translatable;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public class HelpCommand extends VelocityCommand {
@@ -36,9 +37,9 @@ public class HelpCommand extends VelocityCommand {
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
         commandManager.command(commandManager.commandBuilder("help", "?")
-                .commandDescription(translatable("command.help.description.main"))
+                .commandDescription(RichDescription.translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
-                .optional("query", greedyStringParser(), translatable("command.help.description.query"))
+                .optional("query", greedyStringParser(), RichDescription.translatable("command.help.description.query"))
                 .handler(context -> {
                     String raw = context.getOrDefault("query", "");
                     ParsedHelpRequest parsed = parseHelpRequest(raw);
@@ -95,14 +96,16 @@ public class HelpCommand extends VelocityCommand {
             }
         }
 
-        renderer.renderNoResults(query, "Kein passender Proxy-Befehl gefunden.").forEach(sender.plattformSender()::sendMessage);
+        renderer.renderNoResults(query, translatable("command.help.error.proxy-not-found"))
+                .forEach(sender.plattformSender()::sendMessage);
     }
 
     private void renderBackendDetails(CommandManager<VelocityCommandSource> commandManager, VelocityCommandSource sender, String sourceId, String detailsQuery) {
         StyledHelpRenderer renderer = createRenderer(sender, commandManager);
         NetworkHelpCatalog.Entry entry = service.findBackendEntry(sender, sourceId, detailsQuery);
         if (entry == null) {
-            renderer.renderNoResults(detailsQuery, "Kein Backend-Help-Eintrag gefunden.").forEach(sender.plattformSender()::sendMessage);
+            renderer.renderNoResults(detailsQuery, translatable("command.help.error.backend-not-found"))
+                    .forEach(sender.plattformSender()::sendMessage);
             return;
         }
         renderer.renderBackendDetails(detailsQuery, entry).forEach(sender.plattformSender()::sendMessage);
