@@ -91,7 +91,7 @@ public final class PaperCommandBootstrap {
             return;
         }
 
-        PaperHelpCatalogPublisher publisher = new PaperHelpCatalogPublisher(plugin, backendId);
+        PaperHelpCatalogPublisher publisher = new PaperHelpCatalogPublisher(backendId);
         this.helpCatalogTransport = new PaperHelpCatalogTransport(helpSyncLogger, publisher, redisUri);
         this.helpCatalogTransport.connect();
         this.helpCatalogTransport.publish(commandManager);

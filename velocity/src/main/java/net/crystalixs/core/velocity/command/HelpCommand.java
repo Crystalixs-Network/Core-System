@@ -10,16 +10,21 @@ import net.crystalixs.core.velocity.help.UnifiedHelpService;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.help.HelpQuery;
-import org.incendo.cloud.help.result.*;
+import org.incendo.cloud.help.result.CommandEntry;
+import org.incendo.cloud.help.result.IndexCommandResult;
+import org.incendo.cloud.help.result.MultipleCommandResult;
+import org.incendo.cloud.help.result.VerboseCommandResult;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
-import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public class HelpCommand extends VelocityCommand {
+    private static final Pattern PAGE_FLAG_PATTERN = Pattern.compile("(^|\\s)(?:--page|-p)\\s+(\\d+)(?=\\s|$)");
 
     private final UnifiedHelpService service;
 
@@ -34,22 +39,14 @@ public class HelpCommand extends VelocityCommand {
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
                 .optional("query", greedyStringParser(), translatable("command.help.description.query"))
-                .handler(context -> renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), 1)));
-
-        commandManager.command(commandManager.commandBuilder("help-page")
-                .commandDescription(translatable("command.help.description.main"))
-                .senderType(VelocityPlayerCommandSource.class)
-                .required("page", integerParser(1), translatable("command.help.description.page"))
-                .optional("query", greedyStringParser())
-                .handler(context -> renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), context.get("page"))));
+                .handler(context -> {
+                    String raw = context.getOrDefault("query", "");
+                    ParsedHelpRequest parsed = parseHelpRequest(raw);
+                    renderPage(commandManager, context.sender(), parsed.query(), parsed.page());
+                }));
     }
 
-    private void renderPage(
-            CommandManager<VelocityCommandSource> commandManager,
-            VelocityCommandSource sender,
-            String query,
-            int requestedPage
-    ) {
+    private void renderPage(CommandManager<VelocityCommandSource> commandManager, VelocityCommandSource sender, String query, int requestedPage) {
         var all = service.query(sender, query);
 
         int pageSize = 8;
@@ -75,8 +72,8 @@ public class HelpCommand extends VelocityCommand {
 
     private void renderProxyDetails(VelocityCommandSource sender, String detailsQuery, CommandManager<VelocityCommandSource> commandManager) {
         String query = detailsQuery.startsWith("/") ? detailsQuery.substring(1) : detailsQuery;
-        HelpQueryResult<VelocityCommandSource> result = commandManager.createHelpHandler().query(HelpQuery.of(sender, query));
-        StyledHelpRenderer renderer = createRenderer(sender, commandManager);
+        var result = commandManager.createHelpHandler().query(HelpQuery.of(sender, query));
+        var renderer = createRenderer(sender, commandManager);
 
         switch (result) {
             case VerboseCommandResult<VelocityCommandSource> verbose -> {
@@ -109,5 +106,25 @@ public class HelpCommand extends VelocityCommand {
             return;
         }
         renderer.renderBackendDetails(detailsQuery, entry).forEach(sender.plattformSender()::sendMessage);
+    }
+
+    private ParsedHelpRequest parseHelpRequest(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return new ParsedHelpRequest("", 1);
+        }
+
+        Matcher matcher = PAGE_FLAG_PATTERN.matcher(raw);
+        int page = 1;
+        String query = raw;
+
+        if (matcher.find()) {
+            page = Integer.parseInt(matcher.group(2));
+            query = (raw.substring(0, matcher.start()) + " " + raw.substring(matcher.end())).trim();
+        }
+
+        return new ParsedHelpRequest(query, Math.max(1, page));
+    }
+
+    private record ParsedHelpRequest(String query, int page) {
     }
 }

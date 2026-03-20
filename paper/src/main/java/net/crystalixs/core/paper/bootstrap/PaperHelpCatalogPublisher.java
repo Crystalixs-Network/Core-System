@@ -5,7 +5,6 @@ import net.crystalixs.core.common.command.help.NetworkHelpCatalog.Argument;
 import net.crystalixs.core.common.command.help.NetworkHelpCatalog.Entry;
 import net.crystalixs.core.common.command.help.NetworkHelpCatalog.SourceType;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.component.CommandComponent;
@@ -21,11 +20,9 @@ public final class PaperHelpCatalogPublisher {
 
     private static final String NO_DESCRIPTION = "-";
 
-    private final JavaPlugin plugin;
     private final String configuredSourceId;
 
-    public PaperHelpCatalogPublisher(JavaPlugin plugin, String configuredSourceId) {
-        this.plugin = plugin;
+    public PaperHelpCatalogPublisher(String configuredSourceId) {
         this.configuredSourceId = configuredSourceId;
     }
 

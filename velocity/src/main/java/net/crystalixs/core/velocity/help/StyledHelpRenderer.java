@@ -37,7 +37,7 @@ public final class StyledHelpRenderer {
     }
 
     public List<Component> render(String query, int page, int pages, List<UnifiedHelpEntry> pageEntries) {
-        List<Component> output = new ArrayList<>();
+        var output = new ArrayList<Component>();
         output.add(buildTop(page, pages));
         output.add(buildQueryInfo(query));
         output.add(prefixedLine(0, true, text(AVAILABLE_COMMANDS_LABEL, GRAY)));
@@ -49,7 +49,7 @@ public final class StyledHelpRenderer {
     public List<Component> renderProxyVerboseDetails(VelocityCommandSource sender, CommandManager<VelocityCommandSource> commandManager, String query, VerboseCommandResult<VelocityCommandSource> verbose) {
         String commandSyntax = commandManager.commandSyntaxFormatter().apply(sender, verbose.entry().command().components(), null);
 
-        List<Component> argumentContents = new ArrayList<>();
+        var argumentContents = new ArrayList<Component>();
         if (verbose.entry().command().components().size() > 1) {
             Iterator<CommandComponent<VelocityCommandSource>> iterator = verbose.entry().command().components().iterator();
             iterator.next();
@@ -65,7 +65,7 @@ public final class StyledHelpRenderer {
     }
 
     public List<Component> renderCommandSuggestions(String query, List<String> suggestions, Function<String, ClickEvent> clickBuilder) {
-        List<Component> output = new ArrayList<>();
+        var output = new ArrayList<Component>();
         output.add(detailHeader());
         output.add(detailQueryLine("/" + query));
         output.add(prefixedLine(0, true, text(AVAILABLE_COMMANDS_LABEL, GRAY)));
@@ -87,8 +87,7 @@ public final class StyledHelpRenderer {
         return List.of(
                 detailHeader(),
                 detailQueryLine("/" + query),
-                prefixedKeyValue(0, true, "Keine Ergebnisse:", message, false)
-        );
+                prefixedKeyValue(0, true, "Keine Ergebnisse:", message, false));
     }
 
     public Component detailHeader() {
@@ -157,19 +156,15 @@ public final class StyledHelpRenderer {
         return text(SEARCH_LABEL, GRAY).append(text("\"/" + (query == null ? "" : query) + "\"", GREEN));
     }
 
-    private List<Component> renderVerboseDetails(
-            String shownQuery,
-            String commandSyntax,
-            String description,
-            List<Component> argumentContents
-    ) {
-        List<Component> output = new ArrayList<>();
+    private List<Component> renderVerboseDetails(String shownQuery, String commandSyntax, String description, List<Component> argumentContents) {
+        var output = new ArrayList<Component>();
         output.add(detailHeader());
         output.add(detailQueryLine(shownQuery));
         output.add(prefixedKeyValue(0, true, "Befehl:", commandSyntax, true));
 
         boolean hasArguments = !argumentContents.isEmpty();
         output.add(prefixedKeyValue(1, !hasArguments, "Beschreibung:", description, false));
+
         if (hasArguments) {
             output.add(prefixedKeyValue(1, true, "Argumente:", "", false));
             for (int i = 0; i < argumentContents.size(); i++) {
@@ -182,7 +177,7 @@ public final class StyledHelpRenderer {
 
     private List<Component> parseBackendArguments(NetworkHelpCatalog.Entry entry) {
         if (!entry.arguments().isEmpty()) {
-            List<Component> lines = new ArrayList<>();
+            var lines = new ArrayList<Component>();
             for (NetworkHelpCatalog.Argument argument : entry.arguments()) {
                 lines.add(buildArgumentContent(argument.syntax(), argument.optional(), argument.description()));
             }
@@ -193,12 +188,11 @@ public final class StyledHelpRenderer {
 
     private List<Component> parseBackendArgumentsFromSyntax(String syntax) {
         String normalized = syntax.startsWith("/") ? syntax.substring(1) : syntax;
-        List<String> tokens = splitSyntaxTokens(normalized);
-        if (tokens.size() <= 1) {
-            return List.of();
-        }
+        var tokens = splitSyntaxTokens(normalized);
 
-        List<Component> lines = new ArrayList<>();
+        if (tokens.size() <= 1) return Collections.emptyList();
+
+        var lines = new ArrayList<Component>();
         for (int i = 1; i < tokens.size(); i++) {
             String token = tokens.get(i);
             boolean optional = token.startsWith("[") && token.endsWith("]");
@@ -208,7 +202,7 @@ public final class StyledHelpRenderer {
     }
 
     private List<String> splitSyntaxTokens(String syntax) {
-        List<String> tokens = new ArrayList<>();
+        var tokens = new ArrayList<String>();
         StringBuilder current = new StringBuilder();
         int bracketDepth = 0;
 
@@ -262,8 +256,8 @@ public final class StyledHelpRenderer {
 
     private Component navigation(String query, int page, int pages) {
         String q = query == null ? "" : query.trim();
-        String previous = q.isBlank() ? "/help-page " + (page - 1) : "/help-page " + (page - 1) + " " + q;
-        String next = q.isBlank() ? "/help-page " + (page + 1) : "/help-page " + (page + 1) + " " + q;
+        String previous = q.isBlank() ? "/help --page " + (page - 1) : "/help " + q + " --page " + (page - 1);
+        String next = q.isBlank() ? "/help --page " + (page + 1) : "/help " + q + " --page " + (page + 1);
 
         Component left = page > 1
                 ? text("[" + ARROW_LEFT + "]", GOLD).clickEvent(ClickEvent.runCommand(previous))
