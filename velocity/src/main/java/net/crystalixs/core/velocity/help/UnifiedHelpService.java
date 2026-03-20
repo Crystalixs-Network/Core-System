@@ -4,6 +4,7 @@ import net.crystalixs.core.common.command.help.NetworkHelpCatalog;
 import net.crystalixs.core.velocity.command.cloud.VelocityCommandSource;
 import net.crystalixs.core.velocity.command.cloud.VelocityPlayerCommandSource;
 import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,13 +41,14 @@ public final class UnifiedHelpService {
 
         Map<String, UnifiedHelpEntry> backendUnique = new LinkedHashMap<>();
         for (NetworkHelpCatalog catalog : cache.all()) {
-            if (currentServer != null && !isSameServer(catalog.sourceId(), currentServer)) {
-                continue;
-            }
+            if (currentServer != null && !isSameServer(catalog.sourceId(), currentServer)) continue;
+
             for (var entry : catalog.entries()) {
+                if (!hasBackendPermission(sender, entry.permission())) continue;
                 if (!matches(needle, entry.syntax(), entry.description())) continue;
-                String key = normalize(entry.syntax());
-                backendUnique.putIfAbsent(key, new UnifiedHelpEntry(catalog.sourceId(), entry.syntax(), entry.description(), entry.permission(), false, entry.command()));
+
+                UnifiedHelpEntry fresh = new UnifiedHelpEntry(catalog.sourceId(), entry.syntax(), entry.description(), entry.permission(), false, entry.command());
+                backendUnique.putIfAbsent(normalize(entry.syntax()), fresh);
             }
         }
         out.addAll(backendUnique.values());
@@ -55,6 +57,11 @@ public final class UnifiedHelpService {
                 .thenComparing(UnifiedHelpEntry::syntax, String.CASE_INSENSITIVE_ORDER));
 
         return out;
+    }
+
+    private boolean hasBackendPermission(VelocityCommandSource sender, String permission) {
+        if (permission == null || permission.isBlank()) return true;
+        return commandManager.testPermission(sender, Permission.of(permission.trim())).allowed();
     }
 
     private boolean matches(String needle, String syntax, String description) {
@@ -72,12 +79,13 @@ public final class UnifiedHelpService {
                 .orElse(null);
     }
 
-    public @Nullable NetworkHelpCatalog.Entry findBackendEntry(@NotNull String sourceId, @NotNull String detailsQuery) {
+    public @Nullable NetworkHelpCatalog.Entry findBackendEntry(@NotNull VelocityCommandSource sender, @NotNull String sourceId, @NotNull String detailsQuery) {
         Optional<NetworkHelpCatalog> catalog = cache.all().stream()
                 .filter(value -> value.sourceId().equalsIgnoreCase(sourceId))
                 .findFirst();
 
         return catalog.flatMap(networkHelpCatalog -> networkHelpCatalog.entries().stream()
+                .filter(entry -> hasBackendPermission(sender, entry.permission()))
                 .filter(entry -> entry.command().equalsIgnoreCase(detailsQuery)
                                  || entry.syntax().equalsIgnoreCase(detailsQuery)
                                  || entry.syntax().equalsIgnoreCase("/" + detailsQuery))

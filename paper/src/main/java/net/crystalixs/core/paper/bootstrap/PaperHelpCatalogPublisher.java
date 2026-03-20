@@ -1,6 +1,7 @@
 package net.crystalixs.core.paper.bootstrap;
 
 import net.crystalixs.core.common.command.help.NetworkHelpCatalog;
+import net.crystalixs.core.common.command.help.NetworkHelpCatalog.Argument;
 import net.crystalixs.core.common.command.help.NetworkHelpCatalog.Entry;
 import net.crystalixs.core.common.command.help.NetworkHelpCatalog.SourceType;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
@@ -43,9 +44,11 @@ public final class PaperHelpCatalogPublisher {
         String syntax = buildSyntax(command);
         String description = normalizedDescription(command.commandDescription().description().textDescription());
 
-        List<NetworkHelpCatalog.Argument> arguments = extractArguments(command);
-        String commandKey = syntax.startsWith("/") ? syntax.substring(1) : syntax;
-        return new Entry(syntax, description, null, commandKey.toLowerCase(Locale.ROOT), arguments);
+        var arguments = extractArguments(command);
+        String key = syntax.startsWith("/") ? syntax.substring(1) : syntax;
+        String permission = normalizedPermission(command.commandPermission().permissionString());
+
+        return new Entry(syntax, description, permission, key.toLowerCase(Locale.ROOT), arguments);
     }
 
     private String buildSyntax(@NotNull Command<PaperCommandSource> command) {
@@ -68,19 +71,23 @@ public final class PaperHelpCatalogPublisher {
         return "<" + variable + ">";
     }
 
-    private List<NetworkHelpCatalog.Argument> extractArguments(@NotNull Command<PaperCommandSource> command) {
-        List<NetworkHelpCatalog.Argument> arguments = new ArrayList<>();
-        List<CommandComponent<PaperCommandSource>> components = command.components();
+    private List<Argument> extractArguments(@NotNull Command<PaperCommandSource> command) {
+        var arguments = new ArrayList<Argument>();
+        var components = command.components();
+
         for (int i = 1; i < components.size(); i++) {
-            CommandComponent<PaperCommandSource> component = components.get(i);
-            String argumentDescription = normalizedDescription(component.description().textDescription());
-            arguments.add(new NetworkHelpCatalog.Argument(
-                    formatComponent(component),
-                    component.optional(),
-                    argumentDescription
-            ));
+            var component = components.get(i);
+            String description = normalizedDescription(component.description().textDescription());
+            arguments.add(new Argument(formatComponent(component), component.optional(), description));
         }
         return arguments;
+    }
+
+    private String normalizedPermission(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value;
     }
 
     private String normalizedDescription(String value) {
