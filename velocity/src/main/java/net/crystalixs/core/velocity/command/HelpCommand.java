@@ -9,7 +9,6 @@ import net.crystalixs.core.velocity.help.StyledHelpRenderer;
 import net.crystalixs.core.velocity.help.UnifiedHelpService;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.incendo.cloud.CommandManager;
-import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.help.HelpQuery;
 import org.incendo.cloud.help.result.CommandEntry;
 import org.incendo.cloud.help.result.IndexCommandResult;
@@ -18,12 +17,14 @@ import org.incendo.cloud.help.result.VerboseCommandResult;
 import org.jspecify.annotations.NonNull;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
-import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
-import static org.incendo.cloud.parser.standard.StringParser.stringParser;
+import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public class HelpCommand extends VelocityCommand {
+    private static final Pattern PAGE_FLAG_PATTERN = Pattern.compile("(^|\\s)(?:--page|-p)\\s+(\\d+)(?=\\s|$)");
 
     private final UnifiedHelpService service;
 
@@ -37,14 +38,12 @@ public class HelpCommand extends VelocityCommand {
         commandManager.command(commandManager.commandBuilder("help", "?")
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
-                .flag(commandManager.flagBuilder("page")
-                        .withAliases("p")
-                        .withDescription(translatable("command.help.description.page"))
-                        .withComponent(integerParser(1))
-                        .build()
-                )
-                .optional("query", stringParser(), translatable("command.help.description.query"))
-                .handler(context -> renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), page(context))));
+                .optional("query", greedyStringParser(), translatable("command.help.description.query"))
+                .handler(context -> {
+                    String raw = context.getOrDefault("query", "");
+                    ParsedHelpRequest parsed = parseHelpRequest(raw);
+                    renderPage(commandManager, context.sender(), parsed.query(), parsed.page());
+                }));
     }
 
     private void renderPage(CommandManager<VelocityCommandSource> commandManager, VelocityCommandSource sender, String query, int requestedPage) {
@@ -109,8 +108,23 @@ public class HelpCommand extends VelocityCommand {
         renderer.renderBackendDetails(detailsQuery, entry).forEach(sender.plattformSender()::sendMessage);
     }
 
-    private int page(CommandContext<VelocityPlayerCommandSource> context) {
-        Integer rawPage = context.flags().getValue("page", 1);
-        return rawPage != null ? rawPage : 1;
+    private ParsedHelpRequest parseHelpRequest(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return new ParsedHelpRequest("", 1);
+        }
+
+        Matcher matcher = PAGE_FLAG_PATTERN.matcher(raw);
+        int page = 1;
+        String query = raw;
+
+        if (matcher.find()) {
+            page = Integer.parseInt(matcher.group(2));
+            query = (raw.substring(0, matcher.start()) + " " + raw.substring(matcher.end())).trim();
+        }
+
+        return new ParsedHelpRequest(query, Math.max(1, page));
+    }
+
+    private record ParsedHelpRequest(String query, int page) {
     }
 }

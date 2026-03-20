@@ -262,8 +262,8 @@ public final class StyledHelpRenderer {
 
     private Component navigation(String query, int page, int pages) {
         String q = query == null ? "" : query.trim();
-        String previous = q.isBlank() ? "/help --page " + (page - 1) : "/help --page " + (page - 1) + " " + q;
-        String next = q.isBlank() ? "/help --page " + (page + 1) : "/help --page " + (page + 1) + " " + q;
+        String previous = q.isBlank() ? "/help --page " + (page - 1) : "/help " + q + " --page " + (page - 1);
+        String next = q.isBlank() ? "/help --page " + (page + 1) : "/help " + q + " --page " + (page + 1);
 
         Component left = page > 1
                 ? text("[" + ARROW_LEFT + "]", GOLD).clickEvent(ClickEvent.runCommand(previous))
