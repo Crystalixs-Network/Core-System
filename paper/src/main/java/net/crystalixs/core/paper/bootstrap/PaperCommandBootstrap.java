@@ -1,14 +1,18 @@
 package net.crystalixs.core.paper.bootstrap;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.*;
+import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitTask;
 import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.execution.ExecutionCoordinator;
 import org.incendo.cloud.minecraft.extras.MinecraftExceptionHandler;
@@ -27,6 +31,8 @@ public final class PaperCommandBootstrap {
     private final TeleportRequestService teleportService;
     private final InventorySeeService inventorySeeService;
     private final VanishService vanishService;
+    private PaperHelpCatalogTransport helpCatalogTransport;
+    private BukkitTask helpCatalogRepublishTask;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
@@ -38,7 +44,7 @@ public final class PaperCommandBootstrap {
         this.vanishService = new VanishService(runtime.plugin());
     }
 
-    public void registerCommands() {
+    public void registerCommands(PaperConfigUpdater configUpdater) {
         final PaperCommandManager<PaperCommandSource> commandManager = PaperCommandManager.builder(senderMapper())
                 .executionCoordinator(ExecutionCoordinator.<PaperCommandSource>builder().build())
                 .buildOnEnable(runtime.plugin());
@@ -75,9 +81,37 @@ public final class PaperCommandBootstrap {
         new TeleportOverrideHereCommand(plugin).registerTo(commandManager);
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
+
+        StructuredLogger helpSyncLogger = runtime.componentLogger("help-sync");
+        String redisUri = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().uri();
+        String backendId = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().backendId();
+
+        if (backendId == null || backendId.isBlank()) {
+            helpSyncLogger.warn("backendId is missing or blank", LogMetadata.event("backendId.missing"));
+            return;
+        }
+
+        PaperHelpCatalogPublisher publisher = new PaperHelpCatalogPublisher(backendId);
+        this.helpCatalogTransport = new PaperHelpCatalogTransport(helpSyncLogger, publisher, redisUri);
+        this.helpCatalogTransport.connect();
+        this.helpCatalogTransport.publish(commandManager);
+        this.helpCatalogRepublishTask = runtime.plugin().getServer().getScheduler().runTaskTimerAsynchronously(
+                runtime.plugin(),
+                () -> this.helpCatalogTransport.publish(commandManager),
+                20L * 30L,
+                20L * 30L
+        );
     }
 
     public void shutdown() {
+        if (helpCatalogRepublishTask != null) {
+            helpCatalogRepublishTask.cancel();
+            helpCatalogRepublishTask = null;
+        }
+        if (helpCatalogTransport != null) {
+            helpCatalogTransport.close();
+            helpCatalogTransport = null;
+        }
         trashService.shutdown();
         sitService.shutdown();
         messageService.shutdown();

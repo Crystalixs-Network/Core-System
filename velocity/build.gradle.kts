@@ -14,6 +14,7 @@ dependencies {
 
     implementation(project(":common"))
     implementation(libs.bundles.cloudVelocity)
+    implementation(libs.lettuce)
 }
 
 tasks {
@@ -22,6 +23,7 @@ tasks {
     shadowJar {
         val mapping = mapOf(
             libs.cloud.velocity to "cloud",
+            libs.lettuce to "lettuce",
         )
 
         val base = "$group.$artifact.velocity.libs"
