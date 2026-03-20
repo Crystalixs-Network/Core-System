@@ -83,7 +83,7 @@ public final class StyledHelpRenderer {
         return renderVerboseDetails("/" + detailsQuery, entry.syntax(), entry.description(), argumentContents);
     }
 
-    public List<Component> renderNoResults(String query, String message) {
+    public List<Component> renderNoResults(String query, Component message) {
         return List.of(
                 detailHeader(),
                 detailQueryLine("/" + query),
@@ -286,6 +286,14 @@ public final class StyledHelpRenderer {
         Component line = text(key + " ", GOLD);
         if (value != null && !value.isBlank()) {
             line = line.append(commandLike ? colorizedSyntax(value) : text(value, GRAY));
+        }
+        return prefixedLine(level, isLast, line);
+    }
+
+    private Component prefixedKeyValue(int level, boolean isLast, String key, Component value, boolean commandLike) {
+        Component line = text(key + " ", GOLD);
+        if (value != null) {
+            line = line.append(value);
         }
         return prefixedLine(level, isLast, line);
     }
