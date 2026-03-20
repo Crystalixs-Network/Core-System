@@ -9,6 +9,7 @@ import net.crystalixs.core.velocity.help.StyledHelpRenderer;
 import net.crystalixs.core.velocity.help.UnifiedHelpService;
 import net.kyori.adventure.text.event.ClickEvent;
 import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.help.HelpQuery;
 import org.incendo.cloud.help.result.CommandEntry;
 import org.incendo.cloud.help.result.IndexCommandResult;
@@ -21,6 +22,7 @@ import java.util.List;
 import static org.incendo.cloud.minecraft.extras.RichDescription.translatable;
 import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
 import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
+import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
 public class HelpCommand extends VelocityCommand {
 
@@ -33,21 +35,26 @@ public class HelpCommand extends VelocityCommand {
 
     @Override
     public void registerTo(@NonNull CommandManager<VelocityCommandSource> commandManager) {
+        var pageFlag = commandManager
+                .flagBuilder("page")
+                .withAliases("p")
+                .withDescription(translatable("command.help.description.page"))
+                .withComponent(integerParser(1))
+                .build();
+
         commandManager.command(commandManager.commandBuilder("help", "?")
                 .commandDescription(translatable("command.help.description.main"))
                 .senderType(VelocityPlayerCommandSource.class)
-                .flag(commandManager.flagBuilder("page")
-                        .withAliases("p")
-                        .withDescription(translatable("command.help.description.page"))
-                        .withComponent(integerParser(1))
-                        .build())
-                .optional("query", greedyStringParser(), translatable("command.help.description.query"))
-                .handler(context -> {
-                    Integer rawPage = context.flags().getValue("page", 1);
-                    int page = rawPage != null ? rawPage : 1;
+                .optional("query", stringParser(), translatable("command.help.description.query"))
+                .flag(pageFlag)
+                .handler(context -> renderPage(commandManager, context.sender(), "", page(context))));
 
-                    renderPage(commandManager, context.sender(), context.getOrDefault("query", ""), page);
-                }));
+        commandManager.command(commandManager.commandBuilder("help", "?")
+                .commandDescription(translatable("command.help.description.proxy"))
+                .senderType(VelocityPlayerCommandSource.class)
+                .flag(pageFlag)
+                .required("query", greedyStringParser(), translatable("command.help.description.query"))
+                .handler(context -> renderPage(commandManager, context.sender(), context.get("query"), page(context))));
     }
 
     private void renderPage(CommandManager<VelocityCommandSource> commandManager, VelocityCommandSource sender, String query, int requestedPage) {
@@ -110,5 +117,10 @@ public class HelpCommand extends VelocityCommand {
             return;
         }
         renderer.renderBackendDetails(detailsQuery, entry).forEach(sender.plattformSender()::sendMessage);
+    }
+
+    private int page(CommandContext<VelocityPlayerCommandSource> context) {
+        Integer rawPage = context.flags().getValue("page", 1);
+        return rawPage != null ? rawPage : 1;
     }
 }
