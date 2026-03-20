@@ -95,7 +95,7 @@ public final class UnifiedHelpService {
     private boolean isSameServer(String sourceId, String currentServer) {
         String left = normalize(sourceId);
         String right = normalize(currentServer);
-        return left.equals(right) || left.contains(right) || right.contains(left);
+        return left.equals(right);
     }
 
     private String normalize(String value) {

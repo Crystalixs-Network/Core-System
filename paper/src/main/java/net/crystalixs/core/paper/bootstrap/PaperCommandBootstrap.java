@@ -1,6 +1,8 @@
 package net.crystalixs.core.paper.bootstrap;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.*;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
@@ -80,10 +82,17 @@ public final class PaperCommandBootstrap {
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
 
+        StructuredLogger helpSyncLogger = runtime.componentLogger("help-sync");
         String redisUri = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().uri();
         String backendId = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().backendId();
+
+        if (backendId == null || backendId.isBlank()) {
+            helpSyncLogger.warn("backendId is missing or blank", LogMetadata.event("backendId.missing"));
+            return;
+        }
+
         PaperHelpCatalogPublisher publisher = new PaperHelpCatalogPublisher(plugin, backendId);
-        this.helpCatalogTransport = new PaperHelpCatalogTransport(runtime.componentLogger("help-sync"), publisher, redisUri);
+        this.helpCatalogTransport = new PaperHelpCatalogTransport(helpSyncLogger, publisher, redisUri);
         this.helpCatalogTransport.connect();
         this.helpCatalogTransport.publish(commandManager);
         this.helpCatalogRepublishTask = runtime.plugin().getServer().getScheduler().runTaskTimerAsynchronously(

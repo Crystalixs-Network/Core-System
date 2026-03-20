@@ -20,7 +20,6 @@ import java.util.StringJoiner;
 public final class PaperHelpCatalogPublisher {
 
     private static final String NO_DESCRIPTION = "-";
-    private static final String UNKNOWN_SOURCE = "paper-unknown";
 
     private final JavaPlugin plugin;
     private final String configuredSourceId;
@@ -98,15 +97,6 @@ public final class PaperHelpCatalogPublisher {
     }
 
     private String resolveSourceId() {
-        if (configuredSourceId != null && !configuredSourceId.isBlank()) {
-            return configuredSourceId.trim();
-        }
-
-        String implementationName = plugin.getServer().getName();
-        if (!implementationName.isBlank()) {
-            return implementationName;
-        }
-
-        return UNKNOWN_SOURCE;
+        return configuredSourceId.trim();
     }
 }

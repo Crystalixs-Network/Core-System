@@ -8,6 +8,6 @@
   },
   "redis-sync": {
     "uri": "redis://localhost:6379",
-    "backend-id": "backend-1"
+    "backend-id": "SET_ME_TO_VELOCITY_SERVER_NAME"
   }
 }
