@@ -103,7 +103,7 @@ public class HelpCommand extends VelocityCommand {
 
     private void renderBackendDetails(CommandManager<VelocityCommandSource> commandManager, VelocityCommandSource sender, String sourceId, String detailsQuery) {
         StyledHelpRenderer renderer = createRenderer(sender, commandManager);
-        NetworkHelpCatalog.Entry entry = service.findBackendEntry(sourceId, detailsQuery);
+        NetworkHelpCatalog.Entry entry = service.findBackendEntry(sender, sourceId, detailsQuery);
         if (entry == null) {
             renderer.renderNoResults(detailsQuery, "Kein Backend-Help-Eintrag gefunden.").forEach(sender.plattformSender()::sendMessage);
             return;
