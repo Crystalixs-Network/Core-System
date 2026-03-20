@@ -13,7 +13,7 @@ import java.util.*;
 public final class UnifiedHelpService {
 
     private static final String PROXY_SOURCE_LABEL = "Proxy";
-    private static final String NO_DESCRIPTION = "-";
+    private static final String NO_DESCRIPTION_KEY = "command.help.ui.no-description";
 
     private final CommandManager<VelocityCommandSource> commandManager;
     private final BackendHelpCatalogCache cache;
@@ -107,7 +107,7 @@ public final class UnifiedHelpService {
 
     private String orDefaultDescription(String value) {
         if (value == null || value.isBlank()) {
-            return NO_DESCRIPTION;
+            return NO_DESCRIPTION_KEY;
         }
         return value;
     }
