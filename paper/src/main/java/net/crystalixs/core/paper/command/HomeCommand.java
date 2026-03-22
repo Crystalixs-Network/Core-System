@@ -8,6 +8,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.home.HomeError;
 import net.crystalixs.core.paper.home.HomeException;
+import net.crystalixs.core.paper.home.HomeLimitResolver;
 import net.crystalixs.core.paper.home.HomeService;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
+import static net.kyori.adventure.text.minimessage.translation.Argument.numeric;
 import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
 public final class HomeCommand extends PaperCommand {
@@ -46,6 +48,13 @@ public final class HomeCommand extends PaperCommand {
                     Player sender = context.sender().player();
                     String name = context.get("name");
 
+                    int limit = HomeLimitResolver.resolve(sender);
+                    int current = service.count(sender.getUniqueId());
+                    if (current >= limit) {
+                        sender.sendMessage(translatable("command.home.create.error.limit-reached").arguments(numeric("limit", limit)));
+                        return;
+                    }
+
                     try {
                         HomeModel created = service.create(sender.getUniqueId(), name, sender.getLocation());
                         sender.sendMessage(translatable("command.home.create.success").arguments(component("name", text(created.name()))));
@@ -57,6 +66,7 @@ public final class HomeCommand extends PaperCommand {
                             case HOME_ALREADY_EXISTS -> "command.home.create.error.already-exists";
                             case PLAYER_CREATION_FAILED -> "error.player-load";
                             case HOME_CREATION_FAILED -> "command.home.create.error.persistence";
+                            case HOME_LIMIT_REACHED -> "command.home.create.error.limit-reached";
                         };
                         if (exception.error() == HomeError.PLAYER_CREATION_FAILED || exception.error() == HomeError.HOME_CREATION_FAILED) {
                             logger.warn("home creation failed", LogMetadata
