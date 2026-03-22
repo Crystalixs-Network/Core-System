@@ -84,6 +84,9 @@ public final class DefaultHomeService implements HomeService {
                 return homes.findById(existing.id()).orElse(renamed);
 
             } catch (PersistenceException exception) {
+                if (isDuplicate(exception)) {
+                    fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedNewName + " already exists for player " + playerId);
+                }
                 fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
             }
 
