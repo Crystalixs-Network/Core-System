@@ -29,22 +29,38 @@ public final class DefaultHomeService implements HomeService {
         getOrCreatePlayer(playerId);
 
         if (homes.findByPlayerAndName(playerId, normalizedName).isPresent()) {
-            throw new HomeException(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
+            fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
         }
         try {
             return homes.create(new HomeModel(0L, playerId, normalizedName, position, null));
 
         } catch (PersistenceException exception) {
             if (isDuplicate(exception)) {
-                throw new HomeException(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
+                fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
             }
-            throw new HomeException(HomeError.HOME_CREATION_FAILED, "Could not create home '" + normalizedName + "' for player " + playerId);
+            fail(HomeError.HOME_CREATION_FAILED, "Could not create home '" + name + "' for player " + playerId);
         }
+        return null;
     }
 
     @Override
     public int count(UUID playerId) {
         return homes.findByPlayerId(playerId).size();
+    }
+
+    @Override
+    public void delete(UUID playerId, String name) {
+        String normalizedName = normalizeName(name);
+
+        try {
+            boolean deleted = homes.deleteByPlayerAndName(playerId, normalizedName);
+            if (!deleted) {
+                fail(HomeError.HOME_NOT_FOUND, "Home with name " + normalizedName + " does not exist for player " + playerId);
+            }
+
+        } catch (PersistenceException exception) {
+            fail(HomeError.HOME_DELETION_FAILED, "Could not delete home '" + normalizedName + "' for player " + playerId);
+        }
     }
 
     private boolean isDuplicate(Throwable throwable) {
@@ -88,5 +104,9 @@ public final class DefaultHomeService implements HomeService {
             players.create(playerId);
             return players.findById(playerId).orElseThrow(() -> new HomeException(HomeError.PLAYER_CREATION_FAILED, "Could not create player " + playerId));
         });
+    }
+
+    private void fail(HomeError error, String message) {
+        throw new HomeException(error, message);
     }
 }
