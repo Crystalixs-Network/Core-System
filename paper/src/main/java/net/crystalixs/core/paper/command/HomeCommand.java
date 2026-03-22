@@ -126,8 +126,8 @@ public final class HomeCommand extends PaperCommand {
                     try {
                         HomeModel renamed = service.rename(sender.getUniqueId(), oldName, newName);
                         sender.sendMessage(translatable("command.home.rename.success").arguments(
-                                component("old-name", text(oldName)),
-                                component("new-name", text(renamed.name()))));
+                                component("old_name", text(oldName)),
+                                component("new_name", text(renamed.name()))));
 
                         logger.info("home renamed", LogMetadata
                                 .event("command.home.rename.success")
