@@ -64,8 +64,8 @@ public final class DefaultHomeService implements HomeService {
 
     @Override
     public HomeModel rename(UUID playerId, String oldName, String newName) {
-        String normalizedOldName = normalizeName(oldName);
-        String normalizedNewName = normalizeName(newName);
+        String normalizedOldName = normalizeRenameOldName(oldName);
+        String normalizedNewName = normalizeRenameNewName(newName);
 
         try {
             HomeModel existing = homes
@@ -90,7 +90,7 @@ public final class DefaultHomeService implements HomeService {
             }
 
         } catch (PersistenceException exception) {
-           return fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
+            return fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
         }
     }
 
@@ -106,6 +106,28 @@ public final class DefaultHomeService implements HomeService {
             current = current.getCause();
         }
         return false;
+    }
+
+    private String normalizeRenameOldName(String oldName) {
+        try {
+            return normalizeName(oldName);
+        } catch (HomeException exception) {
+            if (exception.error() == HomeError.INVALID_NAME) {
+                return fail(HomeError.INVALID_NAME, "Old home name must be valid");
+            }
+            throw exception;
+        }
+    }
+
+    private String normalizeRenameNewName(String newName) {
+        try {
+            return normalizeName(newName);
+        } catch (HomeException exception) {
+            if (exception.error() == HomeError.INVALID_NAME) {
+                return fail(HomeError.INVALID_NAME, "New home name must be valid");
+            }
+            throw exception;
+        }
     }
 
     private String normalizeName(String name) {
