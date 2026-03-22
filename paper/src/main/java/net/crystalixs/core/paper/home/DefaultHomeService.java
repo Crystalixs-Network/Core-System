@@ -73,7 +73,7 @@ public final class DefaultHomeService implements HomeService {
                     .orElseThrow(() -> fail(HomeError.HOME_NOT_FOUND, "Home with name " + normalizedOldName + " does not exist for player " + playerId));
 
             // no-op: the name remains the same
-            if (normalizedOldName.equalsIgnoreCase(normalizedNewName)) {
+            if (existing.name().equalsIgnoreCase(normalizedNewName)) {
                 return existing;
             }
 
