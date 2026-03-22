@@ -11,6 +11,7 @@ import net.crystalixs.core.paper.command.util.*;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import net.crystalixs.core.paper.home.DefaultHomeService;
+import net.crystalixs.core.paper.home.HomeGuiFactory;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -59,6 +60,7 @@ public final class PaperCommandBootstrap {
         var persistence = plugin.persistence();
         var economyService = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
         var homeService = new DefaultHomeService(persistence.players(), persistence.homes());
+        var homeGuiFactory = new HomeGuiFactory(homeService);
 
         new CoinsCommand(plugin, economyService).registerTo(commandManager);
         new BalanceCommand(plugin, economyService).registerTo(commandManager);
@@ -83,7 +85,7 @@ public final class PaperCommandBootstrap {
         new TeleportOverrideHereCommand(plugin).registerTo(commandManager);
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
-        new HomeCommand(plugin, homeService).registerTo(commandManager);
+        new HomeCommand(plugin, homeService, homeGuiFactory).registerTo(commandManager);
 
         StructuredLogger helpSyncLogger = runtime.componentLogger("help-sync");
         String redisUri = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().uri();
