@@ -110,5 +110,56 @@ public final class HomeCommand extends PaperCommand {
                         sender.sendMessage(translatable(key));
                     }
                 }));
+
+        commandManager.command(commandManager.commandBuilder("home")
+                .commandDescription(RichDescription.translatable("command.home.description.main"))
+                .senderType(PaperPlayerCommandSource.class)
+                .permission(PERMISSION)
+                .literal("rename", RichDescription.translatable("command.home.description.rename"))
+                .required("old-name", stringParser(), RichDescription.translatable("command.home.description.old-name"))
+                .required("new-name", stringParser(), RichDescription.translatable("command.home.description.new-name"))
+                .handler(context -> {
+                    Player sender = context.sender().player();
+                    String oldName = context.get("old-name");
+                    String newName = context.get("new-name");
+
+                    try {
+                        HomeModel renamed = service.rename(sender.getUniqueId(), oldName, newName);
+                        sender.sendMessage(translatable("command.home.rename.success").arguments(
+                                component("old_name", text(oldName)),
+                                component("new_name", text(renamed.name()))));
+
+                        logger.info("home renamed", LogMetadata
+                                .event("command.home.rename.success")
+                                .and(LogMetadata.Key.ACTOR, sender.getName())
+                                .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
+                                .and(LogMetadata.Key.DESCRIPTION, oldName + " → " + renamed.name()));
+
+                    } catch (HomeException exception) {
+                        String key = switch (exception.error()) {
+                            case INVALID_NAME -> "command.home.create.error.invalid-name";
+                            case HOME_NOT_FOUND -> "command.home.rename.error.not-found";
+                            case HOME_ALREADY_EXISTS -> "command.home.rename.error.already-exists";
+                            case PLAYER_CREATION_FAILED -> "error.player-load";
+                            default -> "command.home.rename.error.persistence";
+                        };
+
+                        if (exception.error() == HomeError.HOME_RENAME_FAILED || exception.error() == HomeError.PLAYER_CREATION_FAILED) {
+                            logger.warn("home rename failed", LogMetadata
+                                    .event("command.home.rename.failed")
+                                    .and(LogMetadata.Key.ACTOR, sender.getName())
+                                    .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
+                                    .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
+                        }
+
+                        if (exception.error() == HomeError.HOME_NOT_FOUND) {
+                            sender.sendMessage(translatable(key).arguments(component("old_name", text(oldName.trim()))));
+                        } else if (exception.error() == HomeError.HOME_ALREADY_EXISTS) {
+                            sender.sendMessage(translatable(key).arguments(component("new_name", text(newName.trim()))));
+                        } else {
+                            sender.sendMessage(translatable(key));
+                        }
+                    }
+                }));
     }
 }
