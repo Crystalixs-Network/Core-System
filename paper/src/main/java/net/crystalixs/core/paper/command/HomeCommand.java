@@ -65,7 +65,7 @@ public final class HomeCommand extends PaperCommand {
                             case INVALID_POSITION -> "command.home.create.error.invalid-position";
                             case HOME_ALREADY_EXISTS -> "command.home.create.error.already-exists";
                             case PLAYER_CREATION_FAILED -> "error.player-load";
-                            case HOME_CREATION_FAILED -> "command.home.create.error.persistence";
+                            case HOME_CREATION_FAILED, HOME_DELETION_FAILED, HOME_NOT_FOUND -> "command.home.create.error.persistence";
                             case HOME_LIMIT_REACHED -> "command.home.create.error.limit-reached";
                         };
                         if (exception.error() == HomeError.PLAYER_CREATION_FAILED || exception.error() == HomeError.HOME_CREATION_FAILED) {
@@ -77,6 +77,15 @@ public final class HomeCommand extends PaperCommand {
                         }
                         sender.sendMessage(translatable(key));
                     }
+                }));
+
+        commandManager.command(commandManager.commandBuilder("home")
+                .commandDescription(RichDescription.translatable("command.home.description.main"))
+                .senderType(PaperPlayerCommandSource.class)
+                .permission(PERMISSION)
+                .literal("delete", RichDescription.translatable("command.home.description.delete"))
+                .required("name", stringParser(), RichDescription.translatable("command.home.description.name"))
+                .handler(context -> {
                 }));
     }
 }
