@@ -110,5 +110,15 @@ public final class HomeCommand extends PaperCommand {
                         sender.sendMessage(translatable(key));
                     }
                 }));
+
+        commandManager.command(commandManager.commandBuilder("home")
+                .commandDescription(RichDescription.translatable("command.home.description.main"))
+                .senderType(PaperPlayerCommandSource.class)
+                .permission(PERMISSION)
+                .literal("rename", RichDescription.translatable("command.home.description.rename"))
+                .required("old-name", stringParser(), RichDescription.translatable("command.home.description.old-name"))
+                .required("new-name", stringParser(), RichDescription.translatable("command.home.description.new-name"))
+                .handler(context -> {
+                }));
     }
 }
