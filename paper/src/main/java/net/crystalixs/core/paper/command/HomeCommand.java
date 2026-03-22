@@ -161,5 +161,49 @@ public final class HomeCommand extends PaperCommand {
                         }
                     }
                 }));
+
+        commandManager.command(commandManager.commandBuilder("home")
+                .commandDescription(RichDescription.translatable("command.home.description.main"))
+                .senderType(PaperPlayerCommandSource.class)
+                .permission(PERMISSION)
+                .literal("update", RichDescription.translatable("command.home.description.update"))
+                .required("name", stringParser(), RichDescription.translatable("command.home.description.name"))
+                .handler(context -> {
+                    Player sender = context.sender().player();
+                    String name = context.get("name");
+
+                    try {
+                        HomeModel updated = service.updatePosition(sender.getUniqueId(), name, sender.getLocation());
+                        sender.sendMessage(translatable("command.home.update.success").arguments(component("name", text(updated.name()))));
+                        logger.info("home updated", LogMetadata
+                                .event("command.home.update.success")
+                                .and(LogMetadata.Key.ACTOR, sender.getName())
+                                .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
+                                .and(LogMetadata.Key.DESCRIPTION, updated.name()));
+
+                    } catch (HomeException exception) {
+                        String key = switch (exception.error()) {
+                            case INVALID_NAME -> "command.home.create.error.invalid-name";
+                            case INVALID_POSITION -> "command.home.create.error.invalid-position";
+                            case HOME_NOT_FOUND -> "command.home.update.error.not-found";
+                            case PLAYER_CREATION_FAILED -> "error.player-load";
+                            default -> "command.home.update.error.persistence";
+                        };
+
+                        if (exception.error() == HomeError.HOME_UPDATE_FAILED || exception.error() == HomeError.PLAYER_CREATION_FAILED) {
+                            logger.warn("home update failed", LogMetadata
+                                    .event("command.home.update.failed")
+                                    .and(LogMetadata.Key.ACTOR, sender.getName())
+                                    .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
+                                    .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
+                        }
+
+                        if (exception.error() == HomeError.HOME_NOT_FOUND) {
+                            sender.sendMessage(translatable(key).arguments(component("name", text(name.trim()))));
+                            return;
+                        }
+                        sender.sendMessage(translatable(key));
+                    }
+                }));
     }
 }
