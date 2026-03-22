@@ -70,7 +70,7 @@ public final class DefaultHomeService implements HomeService {
         try {
             HomeModel existing = homes
                     .findByPlayerAndName(playerId, normalizedOldName)
-                    .orElseThrow(failAsNotExistent(playerId, normalizedOldName));
+                    .orElseThrow(() -> failAsNotExistent(playerId, normalizedOldName));
 
             // no-op: the name remains the same
             if (existing.name().equalsIgnoreCase(normalizedNewName)) {
@@ -94,7 +94,7 @@ public final class DefaultHomeService implements HomeService {
             }
 
         } catch (PersistenceException exception) {
-            return failAsAlreadyExistent(playerId, normalizedNewName);
+            return fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
         }
     }
 
@@ -167,7 +167,7 @@ public final class DefaultHomeService implements HomeService {
         return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + newName + " already exists for player " + playerId);
     }
 
-    private static <T> T failAsNotExistent(UUID playerId, String name) {
+    private static HomeException failAsNotExistent(UUID playerId, String name) {
         return fail(HomeError.HOME_NOT_FOUND, "Home with name " + name + " does not exist for player " + playerId);
     }
 
