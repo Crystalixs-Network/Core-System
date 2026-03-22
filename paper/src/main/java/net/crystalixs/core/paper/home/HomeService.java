@@ -15,4 +15,6 @@ public interface HomeService {
 
     HomeModel rename(UUID playerId, String oldName, String newName);
 
+    HomeModel updatePosition(UUID playerId, String name, Location location);
+
 }
