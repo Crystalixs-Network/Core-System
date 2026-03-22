@@ -6,6 +6,12 @@ import xyz.xenondevs.invui.window.Window;
 
 public final class HomeGuiFactory {
 
+    private static final char[] HOME_SLOT_KEYS = {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+            'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+            's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1'
+    };
+
     public void open(Player player) {
         Gui gui = Gui.normal()
                 .setStructure(
