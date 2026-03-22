@@ -7,17 +7,20 @@ import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 
 import static net.kyori.adventure.text.Component.empty;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.GRAY;
+import static net.kyori.adventure.text.format.NamedTextColor.GREEN;
 
 public final class HomeGuiItemFactory {
 
     public ItemProvider icon(HomeModel model) {
         return new ItemBuilder(Material.GRASS_BLOCK)
-                .setDisplayName(model.name());
+                .setDisplayName(new AdventureComponentWrapper(text(model.name(), GREEN)));
     }
 
     public ItemProvider available() {
         return new ItemBuilder(Material.BARRIER)
-                .setDisplayName(new AdventureComponentWrapper(empty()));
+                .setDisplayName(new AdventureComponentWrapper(text("Freier Home-Slot", GRAY)));
     }
 
     public ItemProvider locked() {
