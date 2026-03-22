@@ -142,16 +142,17 @@ public final class DefaultHomeStore implements HomeStore {
     }
 
     private PersistenceException failure(String event, String subject, String message, RuntimeException exception) {
-        logger.warn(event, LogMetadata.event(event)
-                .and(LogMetadata.Key.SUBJECT, subject), exception);
+        logger.warn(event, LogMetadata.event(event).and(LogMetadata.Key.SUBJECT, subject), exception);
         return new PersistenceException(message, exception);
     }
 
     private PersistenceException reloadFailure(HomeModel model, long homeId) {
         String subject = subject(model.playerId(), model.name());
         IllegalStateException exception = new IllegalStateException("home:" + homeId);
-        logger.warn("persistence.home.reload_failed", LogMetadata.event("persistence.home.reload_failed")
+        logger.warn("persistence.home.reload_failed", LogMetadata
+                .event("persistence.home.reload_failed")
                 .and(LogMetadata.Key.SUBJECT, subject), exception);
+
         return new PersistenceException("Could not reload created home", exception);
     }
 
