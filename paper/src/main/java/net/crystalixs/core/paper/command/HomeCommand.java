@@ -161,5 +161,13 @@ public final class HomeCommand extends PaperCommand {
                         }
                     }
                 }));
+
+        commandManager.command(commandManager.commandBuilder("home")
+                .commandDescription(RichDescription.translatable("command.home.description.main"))
+                .senderType(PaperPlayerCommandSource.class)
+                .permission(PERMISSION)
+                .literal("update", RichDescription.translatable("command.home.description.update"))
+                .required("name", stringParser(), RichDescription.translatable("command.home.description.name"))
+                .handler(context -> {}));
     }
 }
