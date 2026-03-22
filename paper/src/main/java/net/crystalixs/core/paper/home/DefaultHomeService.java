@@ -83,7 +83,7 @@ public final class DefaultHomeService implements HomeService {
 
             HomeModel renamed = new HomeModel(existing.id(), existing.playerId(), normalizedNewName, existing.position(), existing.createdAt());
             try {
-                homes.update(renamed);
+                homes.rename(playerId, normalizedOldName, normalizedNewName);
                 return homes.findById(existing.id()).orElse(renamed);
 
             } catch (PersistenceException exception) {

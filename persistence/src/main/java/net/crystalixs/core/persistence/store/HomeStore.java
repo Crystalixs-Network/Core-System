@@ -18,6 +18,8 @@ public interface HomeStore {
 
     void update(HomeModel model);
 
+    void rename(UUID playerId, String oldName, String newName);
+
     boolean deleteById(long homeId);
 
     boolean deleteByPlayerAndName(UUID playerId, String name);

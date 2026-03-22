@@ -95,6 +95,26 @@ public final class DefaultHomeStore implements HomeStore {
     }
 
     @Override
+    public void rename(UUID playerId, String oldName, String newName) {
+        try {
+            boolean changed = config.query("UPDATE homes SET name = ? WHERE player_id = ? AND name = ?;")
+                    .single(call()
+                            .bind(newName)
+                            .bind(playerId.toString())
+                            .bind(oldName))
+                    .update()
+                    .changed();
+
+            if (!changed) {
+                IllegalStateException exception = new IllegalStateException("No home row found for player=" + playerId + ", name=" + oldName);
+                throw failure("persistence.home.rename_not_found", "player:" + playerId + ", from:" + oldName + ", to:" + newName, "Could not rename home: target does not exist", exception);
+            }
+        } catch (RuntimeException exception) {
+            throw failure("persistence.home.rename_failed", "player:" + playerId + ", from:" + oldName + ", to:" + newName, "Could not rename home", exception);
+        }
+    }
+
+    @Override
     public boolean deleteById(long homeId) {
         try {
             return config.query("DELETE FROM homes WHERE id = ?;")
