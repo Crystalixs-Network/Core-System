@@ -29,18 +29,17 @@ public final class DefaultHomeService implements HomeService {
         getOrCreatePlayer(playerId);
 
         if (homes.findByPlayerAndName(playerId, normalizedName).isPresent()) {
-            fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
+            return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
         }
         try {
             return homes.create(new HomeModel(0L, playerId, normalizedName, position, null));
 
         } catch (PersistenceException exception) {
             if (isDuplicate(exception)) {
-                fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
+                return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
             }
-            fail(HomeError.HOME_CREATION_FAILED, "Could not create home '" + name + "' for player " + playerId);
+            return fail(HomeError.HOME_CREATION_FAILED, "Could not create home '" + name + "' for player " + playerId);
         }
-        return null;
     }
 
     @Override
@@ -85,15 +84,14 @@ public final class DefaultHomeService implements HomeService {
 
             } catch (PersistenceException exception) {
                 if (isDuplicate(exception)) {
-                    fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedNewName + " already exists for player " + playerId);
+                    return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedNewName + " already exists for player " + playerId);
                 }
-                fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
+                return fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
             }
 
         } catch (PersistenceException exception) {
-            fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
+           return fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
         }
-        return null;
     }
 
     private boolean isDuplicate(Throwable throwable) {
@@ -139,7 +137,7 @@ public final class DefaultHomeService implements HomeService {
         });
     }
 
-    private HomeException fail(HomeError error, String message) {
+    private static <T> T fail(HomeError error, String message) {
         throw new HomeException(error, message);
     }
 }
