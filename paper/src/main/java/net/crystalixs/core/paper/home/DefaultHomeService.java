@@ -59,7 +59,7 @@ public final class DefaultHomeService implements HomeService {
             }
 
         } catch (PersistenceException exception) {
-            fail(playerId, normalizedName);
+            throw new HomeException(HomeError.HOME_DELETION_FAILED, "Could not delete home '" + normalizedName + "' for player " + playerId);
         }
     }
 
