@@ -38,13 +38,29 @@ public final class DefaultHomeService implements HomeService {
             if (isDuplicate(exception)) {
                 throw new HomeException(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
             }
-            throw new HomeException(HomeError.HOME_CREATION_FAILED, "Could not create home '" + normalizedName + "' for player " + playerId);
+            fail(playerId, normalizedName);
         }
+        return null;
     }
 
     @Override
     public int count(UUID playerId) {
         return homes.findByPlayerId(playerId).size();
+    }
+
+    @Override
+    public void delete(UUID playerId, String name) {
+        String normalizedName = normalizeName(name);
+
+        try {
+            boolean deleted = homes.deleteByPlayerAndName(playerId, normalizedName);
+            if (!deleted) {
+                throw new HomeException(HomeError.HOME_NOT_FOUND, "Home with name " + normalizedName + " does not exist for player " + playerId);
+            }
+
+        } catch (PersistenceException exception) {
+            fail(playerId, normalizedName);
+        }
     }
 
     private boolean isDuplicate(Throwable throwable) {
@@ -88,5 +104,9 @@ public final class DefaultHomeService implements HomeService {
             players.create(playerId);
             return players.findById(playerId).orElseThrow(() -> new HomeException(HomeError.PLAYER_CREATION_FAILED, "Could not create player " + playerId));
         });
+    }
+
+    private void fail(UUID playerId, String name) {
+        throw new HomeException(HomeError.HOME_CREATION_FAILED, "Could not create home '" + name + "' for player " + playerId);
     }
 }
