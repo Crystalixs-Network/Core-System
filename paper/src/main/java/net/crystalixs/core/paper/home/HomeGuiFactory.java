@@ -12,7 +12,16 @@ public final class HomeGuiFactory {
             's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1'
     };
 
+    private final HomeService service;
+
+    public HomeGuiFactory(HomeService service) {
+        this.service = service;
+    }
+
     public void open(Player player) {
+        int limit = HomeLimitResolver.resolve(player);
+        var homes = service.all(player.getUniqueId());
+
         Gui gui = Gui.normal()
                 .setStructure(
                         "a b c d e f g h i",

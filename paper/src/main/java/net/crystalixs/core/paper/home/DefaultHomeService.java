@@ -7,6 +7,8 @@ import net.crystalixs.core.persistence.store.HomeStore;
 import net.crystalixs.core.persistence.store.PlayerStore;
 import org.bukkit.Location;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.UUID;
 
 public final class DefaultHomeService implements HomeService {
@@ -45,6 +47,13 @@ public final class DefaultHomeService implements HomeService {
     @Override
     public int count(UUID playerId) {
         return homes.findByPlayerId(playerId).size();
+    }
+
+    @Override
+    public Collection<HomeModel> all(UUID playerId) {
+        return homes.findByPlayerId(playerId).stream()
+                .sorted(Comparator.comparing(HomeModel::name, String.CASE_INSENSITIVE_ORDER))
+                .toList();
     }
 
     @Override
