@@ -29,14 +29,14 @@ public final class DefaultHomeService implements HomeService {
         getOrCreatePlayer(playerId);
 
         if (homes.findByPlayerAndName(playerId, normalizedName).isPresent()) {
-            return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
+            return failAsAlreadyExistent(playerId, normalizedName);
         }
         try {
             return homes.create(new HomeModel(0L, playerId, normalizedName, position, null));
 
         } catch (PersistenceException exception) {
             if (isDuplicate(exception)) {
-                return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
+                return failAsAlreadyExistent(playerId, normalizedName);
             }
             return fail(HomeError.HOME_CREATION_FAILED, "Could not create home '" + name + "' for player " + playerId);
         }
@@ -54,7 +54,7 @@ public final class DefaultHomeService implements HomeService {
         try {
             boolean deleted = homes.deleteByPlayerAndName(playerId, normalizedName);
             if (!deleted) {
-                fail(HomeError.HOME_NOT_FOUND, "Home with name " + normalizedName + " does not exist for player " + playerId);
+                failAsNotExistent(playerId, normalizedName);
             }
 
         } catch (PersistenceException exception) {
@@ -70,7 +70,7 @@ public final class DefaultHomeService implements HomeService {
         try {
             HomeModel existing = homes
                     .findByPlayerAndName(playerId, normalizedOldName)
-                    .orElseThrow(() -> fail(HomeError.HOME_NOT_FOUND, "Home with name " + normalizedOldName + " does not exist for player " + playerId));
+                    .orElseThrow(() -> failAsNotExistent(playerId, normalizedOldName));
 
             // no-op: the name remains the same
             if (existing.name().equalsIgnoreCase(normalizedNewName)) {
@@ -78,7 +78,7 @@ public final class DefaultHomeService implements HomeService {
             }
 
             if (homes.findByPlayerAndName(playerId, normalizedNewName).isPresent()) {
-                return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedNewName + " already exists for player " + playerId);
+                return failAsAlreadyExistent(playerId, normalizedNewName);
             }
 
             HomeModel renamed = new HomeModel(existing.id(), existing.playerId(), normalizedNewName, existing.position(), existing.createdAt());
@@ -88,13 +88,13 @@ public final class DefaultHomeService implements HomeService {
 
             } catch (PersistenceException exception) {
                 if (isDuplicate(exception)) {
-                    return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedNewName + " already exists for player " + playerId);
+                    return failAsAlreadyExistent(playerId, normalizedNewName);
                 }
                 return fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
             }
 
         } catch (PersistenceException exception) {
-            return fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
+            return failAsAlreadyExistent(playerId, normalizedNewName);
         }
     }
 
@@ -161,6 +161,14 @@ public final class DefaultHomeService implements HomeService {
             players.create(playerId);
             return players.findById(playerId).orElseThrow(() -> new HomeException(HomeError.PLAYER_CREATION_FAILED, "Could not create player " + playerId));
         });
+    }
+
+    private static <T> T failAsAlreadyExistent(UUID playerId, String newName) {
+        return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + newName + " already exists for player " + playerId);
+    }
+
+    private static <T> T failAsNotExistent(UUID playerId, String name) {
+        return fail(HomeError.HOME_NOT_FOUND, "Home with name " + name + " does not exist for player " + playerId);
     }
 
     private static <T> T fail(HomeError error, String message) {
