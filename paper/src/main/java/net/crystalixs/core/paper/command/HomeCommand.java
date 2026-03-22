@@ -152,7 +152,13 @@ public final class HomeCommand extends PaperCommand {
                                     .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
                         }
 
-                        sender.sendMessage(translatable(key));
+                        if (exception.error() == HomeError.HOME_NOT_FOUND) {
+                            sender.sendMessage(translatable(key).arguments(component("old_name", text(oldName.trim()))));
+                        } else if (exception.error() == HomeError.HOME_ALREADY_EXISTS) {
+                            sender.sendMessage(translatable(key).arguments(component("new_name", text(newName.trim()))));
+                        } else {
+                            sender.sendMessage(translatable(key));
+                        }
                     }
                 }));
     }
