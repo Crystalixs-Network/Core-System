@@ -107,6 +107,10 @@ public final class DefaultHomeService implements HomeService {
                 .findByPlayerAndName(playerId, name)
                 .orElseThrow(() -> failAsNotExistent(playerId, normalizedName));
 
+        if (isSamePosition(existing.position(), position)) {
+            return existing;
+        }
+
         HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), position, existing.createdAt());
 
         try {
@@ -123,6 +127,15 @@ public final class DefaultHomeService implements HomeService {
             throw new HomeException(HomeError.INVALID_POSITION, "Location/world must not be null");
         }
         return new HomePositionModel(location.getWorld().getName(), location.x(), location.y(), location.z(), location.getYaw(), location.getPitch());
+    }
+
+    private boolean isSamePosition(HomePositionModel a, HomePositionModel b) {
+        return a.worldName().equals(b.worldName())
+               && Double.compare(a.x(), b.x()) == 0
+               && Double.compare(a.y(), b.y()) == 0
+               && Double.compare(a.z(), b.z()) == 0
+               && Float.compare(a.yaw(), b.yaw()) == 0
+               && Float.compare(a.pitch(), b.pitch()) == 0;
     }
 
     private boolean isDuplicate(Throwable throwable) {
