@@ -35,7 +35,7 @@ public final class HomeGuiFactory {
                 );
 
         HomeGuiItemFactory factory = new HomeGuiItemFactory();
-        for (int slot = 0; slot <= HOME_SLOT_KEYS.length; slot++) {
+        for (int slot = 0; slot < HOME_SLOT_KEYS.length; slot++) {
             char key = HOME_SLOT_KEYS[slot];
 
             if (slot < orderedHomes.size()) {
