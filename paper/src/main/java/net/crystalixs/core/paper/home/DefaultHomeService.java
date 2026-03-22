@@ -77,6 +77,10 @@ public final class DefaultHomeService implements HomeService {
                 return existing;
             }
 
+            if (homes.findByPlayerAndName(playerId, normalizedNewName).isPresent()) {
+                return fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedNewName + " already exists for player " + playerId);
+            }
+
             HomeModel renamed = new HomeModel(existing.id(), existing.playerId(), normalizedNewName, existing.position(), existing.createdAt());
             try {
                 homes.update(renamed);
