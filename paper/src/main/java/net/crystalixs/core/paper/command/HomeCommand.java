@@ -119,6 +119,14 @@ public final class HomeCommand extends PaperCommand {
                 .required("old-name", stringParser(), RichDescription.translatable("command.home.description.old-name"))
                 .required("new-name", stringParser(), RichDescription.translatable("command.home.description.new-name"))
                 .handler(context -> {
+                    Player sender = context.sender().player();
+                    String oldName = context.get("old-name");
+                    String newName = context.get("new-name");
+
+                    HomeModel renamed = service.rename(sender.getUniqueId(), oldName, newName);
+                    sender.sendMessage(translatable("command.home.rename.success").arguments(
+                            component("old-name", text(oldName)),
+                            component("new-name", text(renamed.name()))));
                 }));
     }
 }
