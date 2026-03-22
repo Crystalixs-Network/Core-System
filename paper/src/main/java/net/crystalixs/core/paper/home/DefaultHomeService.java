@@ -81,7 +81,8 @@ public final class DefaultHomeService implements HomeService {
             HomeModel renamed = new HomeModel(existing.id(), existing.playerId(), normalizedNewName, existing.position(), existing.createdAt());
             try {
                 homes.update(renamed);
-                return renamed;
+                return homes.findById(existing.id()).orElse(renamed);
+
             } catch (PersistenceException exception) {
                 fail(HomeError.HOME_RENAME_FAILED, "Could not rename home '" + normalizedOldName + "' to '" + normalizedNewName + "' for player " + playerId);
             }
