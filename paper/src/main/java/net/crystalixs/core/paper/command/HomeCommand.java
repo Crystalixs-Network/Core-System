@@ -65,8 +65,8 @@ public final class HomeCommand extends PaperCommand {
                             case INVALID_POSITION -> "command.home.create.error.invalid-position";
                             case HOME_ALREADY_EXISTS -> "command.home.create.error.already-exists";
                             case PLAYER_CREATION_FAILED -> "error.player-load";
-                            case HOME_CREATION_FAILED, HOME_DELETION_FAILED, HOME_NOT_FOUND -> "command.home.create.error.persistence";
                             case HOME_LIMIT_REACHED -> "command.home.create.error.limit-reached";
+                            default -> "command.home.create.error.persistence";
                         };
                         if (exception.error() == HomeError.PLAYER_CREATION_FAILED || exception.error() == HomeError.HOME_CREATION_FAILED) {
                             logger.warn("home creation failed", LogMetadata
@@ -89,8 +89,28 @@ public final class HomeCommand extends PaperCommand {
                     Player sender = context.sender().player();
                     String name = context.get("name");
 
-                    service.delete(sender.getUniqueId(), name);
-                    sender.sendMessage(translatable("command.home.delete.success").arguments(component("name", text(name))));
+                    try {
+                        service.delete(sender.getUniqueId(), name);
+                        sender.sendMessage(translatable("command.home.delete.success").arguments(component("name", text(name))));
+
+                    } catch (HomeException exception) {
+                        String key = switch (exception.error()) {
+                            case INVALID_NAME -> "command.home.delete.error.invalid-name";
+                            case INVALID_POSITION -> "command.home.delete.error.invalid-position";
+                            case HOME_ALREADY_EXISTS -> "command.home.delete.error.already-exists";
+                            case PLAYER_CREATION_FAILED -> "error.player-load";
+                            case HOME_LIMIT_REACHED -> "command.home.delete.error.limit-reached";
+                            default -> "command.home.create.delete.persistence";
+                        };
+                        if (exception.error() == HomeError.PLAYER_CREATION_FAILED || exception.error() == HomeError.HOME_CREATION_FAILED) {
+                            logger.warn("home delete failed", LogMetadata
+                                    .event("command.home.delete.failed")
+                                    .and(LogMetadata.Key.ACTOR, sender.getName())
+                                    .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
+                                    .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
+                        }
+                        sender.sendMessage(translatable(key));
+                    }
                 }));
     }
 }
