@@ -70,7 +70,7 @@ public final class DefaultHomeService implements HomeService {
         try {
             HomeModel existing = homes
                     .findByPlayerAndName(playerId, normalizedOldName)
-                    .orElseThrow(() -> failAsNotExistent(playerId, normalizedOldName));
+                    .orElseThrow(failAsNotExistent(playerId, normalizedOldName));
 
             // no-op: the name remains the same
             if (existing.name().equalsIgnoreCase(normalizedNewName)) {
