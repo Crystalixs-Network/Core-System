@@ -98,6 +98,33 @@ public final class DefaultHomeService implements HomeService {
         }
     }
 
+    @Override
+    public HomeModel updatePosition(UUID playerId, String name, Location location) {
+        String normalizedName = normalizeName(name);
+        HomePositionModel position = toPosition(location);
+
+        HomeModel existing = homes
+                .findByPlayerAndName(playerId, name)
+                .orElseThrow(() -> failAsNotExistent(playerId, normalizedName));
+
+        HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), position, existing.createdAt());
+
+        try {
+            homes.update(updated);
+            return homes.findById(existing.id()).orElse(updated);
+
+        } catch (PersistenceException exception) {
+            return fail(HomeError.HOME_UPDATE_FAILED, "Could not update home '" + normalizedName + "' for player " + playerId);
+        }
+    }
+
+    private HomePositionModel toPosition(Location location) {
+        if (location == null || location.getWorld() == null) {
+            throw new HomeException(HomeError.INVALID_POSITION, "Location/world must not be null");
+        }
+        return new HomePositionModel(location.getWorld().getName(), location.x(), location.y(), location.z(), location.getYaw(), location.getPitch());
+    }
+
     private boolean isDuplicate(Throwable throwable) {
         var current = throwable;
         while (current != null) {
@@ -147,13 +174,6 @@ public final class DefaultHomeService implements HomeService {
             throw new HomeException(HomeError.INVALID_NAME, "Name must not be longer than " + MAX_HOME_NAME_LENGTH + " characters");
         }
         return normalized;
-    }
-
-    private HomePositionModel toPosition(Location location) {
-        if (location == null || location.getWorld() == null) {
-            throw new HomeException(HomeError.INVALID_POSITION, "Location/world must not be null");
-        }
-        return new HomePositionModel(location.getWorld().getName(), location.x(), location.y(), location.z(), location.getYaw(), location.getPitch());
     }
 
     private void getOrCreatePlayer(UUID playerId) {
