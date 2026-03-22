@@ -1,7 +1,10 @@
 package net.crystalixs.core.paper.home;
 
 import net.crystalixs.core.persistence.model.HomeModel;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.entity.Player;
+import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.window.Window;
@@ -34,7 +37,7 @@ public final class HomeGuiFactory {
                         "s t u v w x y z 1"
                 );
 
-        HomeGuiItemFactory factory = new HomeGuiItemFactory();
+        HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
         for (int slot = 0; slot < HOME_SLOT_KEYS.length; slot++) {
             char key = HOME_SLOT_KEYS[slot];
 
@@ -50,9 +53,11 @@ public final class HomeGuiFactory {
             }
         }
 
+        var renderedTitle = GlobalTranslator.render(Component.translatable("command.home.ui.title"), player.locale());
+
         Window.single()
                 .setViewer(player)
-                .setTitle("Homes")
+                .setTitle(new AdventureComponentWrapper(renderedTitle))
                 .setGui(normal.build())
                 .open(player);
     }
