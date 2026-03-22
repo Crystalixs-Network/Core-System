@@ -83,6 +83,7 @@ public final class PaperCommandBootstrap {
         new TeleportOverrideHereCommand(plugin).registerTo(commandManager);
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
+        new HomeCommand(plugin, homeService).registerTo(commandManager);
 
         StructuredLogger helpSyncLogger = runtime.componentLogger("help-sync");
         String redisUri = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().uri();
