@@ -11,4 +11,6 @@ public interface HomeService {
 
     int count(UUID playerId);
 
+    void delete(UUID playerId, String name);
+
 }
