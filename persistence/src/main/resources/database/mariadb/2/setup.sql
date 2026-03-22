@@ -1,4 +1,4 @@
-CREATE TABLE player
+CREATE TABLE IF NOT EXISTS player
 (
     uuid     UUID            NOT NULL PRIMARY KEY,
     playtime BIGINT          NOT NULL DEFAULT 0,
@@ -6,7 +6,7 @@ CREATE TABLE player
     gems     BIGINT UNSIGNED NOT NULL DEFAULT 0
 );
 
-CREATE TABLE homes
+CREATE TABLE IF NOT EXISTS homes
 (
     id         BIGINT      NOT NULL PRIMARY KEY AUTO_INCREMENT,
     player_id  UUID        NOT NULL,
@@ -22,9 +22,9 @@ CREATE TABLE homes
     CONSTRAINT uq_homes_player_name UNIQUE (player_id, name)
 );
 
-CREATE INDEX idx_homes_player ON homes (player_id);
+CREATE INDEX IF NOT EXISTS idx_homes_player ON homes (player_id);
 
-CREATE TABLE economy_transactions
+CREATE TABLE IF NOT EXISTS economy_transactions
 (
     id              BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
     type            VARCHAR(32)     NOT NULL,
@@ -41,12 +41,12 @@ CREATE TABLE economy_transactions
     CONSTRAINT fk_economy_tx_actor_player FOREIGN KEY (actor_player_id) REFERENCES player (uuid)
 );
 
-CREATE INDEX idx_eco_tx_from ON economy_transactions (from_player_id, created_at);
-CREATE INDEX idx_eco_tx_to ON economy_transactions (to_player_id, created_at);
-CREATE INDEX idx_eco_tx_actor ON economy_transactions (actor_player_id, created_at);
-CREATE INDEX idx_eco_tx_created_at ON economy_transactions (created_at);
+CREATE INDEX IF NOT EXISTS idx_eco_tx_from ON economy_transactions (from_player_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_eco_tx_to ON economy_transactions (to_player_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_eco_tx_actor ON economy_transactions (actor_player_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_eco_tx_created_at ON economy_transactions (created_at);
 
-CREATE TABLE economy_audit
+CREATE TABLE IF NOT EXISTS economy_audit
 (
     id         BIGINT      NOT NULL PRIMARY KEY AUTO_INCREMENT,
     action     VARCHAR(64) NOT NULL,
@@ -55,5 +55,5 @@ CREATE TABLE economy_audit
     created_at TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_eco_audit_action ON economy_audit (action, created_at);
-CREATE INDEX idx_eco_audit_status ON economy_audit (status, created_at);
+CREATE INDEX IF NOT EXISTS idx_eco_audit_action ON economy_audit (action, created_at);
+CREATE INDEX IF NOT EXISTS idx_eco_audit_status ON economy_audit (status, created_at);
