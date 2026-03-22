@@ -13,4 +13,6 @@ public interface HomeService {
 
     void delete(UUID playerId, String name);
 
+    HomeModel rename(UUID playerId, String oldName, String newName);
+
 }
