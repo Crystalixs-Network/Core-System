@@ -6,10 +6,7 @@ import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
-import net.crystalixs.core.paper.home.HomeError;
-import net.crystalixs.core.paper.home.HomeException;
-import net.crystalixs.core.paper.home.HomeLimitResolver;
-import net.crystalixs.core.paper.home.HomeService;
+import net.crystalixs.core.paper.home.*;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
@@ -29,15 +26,26 @@ public final class HomeCommand extends PaperCommand {
 
     private final HomeService service;
     private final StructuredLogger logger;
+    private final HomeGuiFactory factory;
 
-    public HomeCommand(CorePlugin plugin, HomeService service) {
+    public HomeCommand(CorePlugin plugin, HomeService service, HomeGuiFactory factory) {
         super(plugin);
         this.service = service;
         this.logger = plugin.commandLogger("home");
+        this.factory = factory;
     }
 
     @Override
     public void registerTo(@NotNull CommandManager<PaperCommandSource> commandManager) {
+        commandManager.command(commandManager.commandBuilder("home")
+                .commandDescription(RichDescription.translatable("command.home.description.main"))
+                .senderType(PaperPlayerCommandSource.class)
+                .permission(PERMISSION)
+                .handler(context -> {
+                    Player sender = context.sender().player();
+                    factory.open(sender);
+                }));
+
         commandManager.command(commandManager.commandBuilder("home")
                 .commandDescription(RichDescription.translatable("command.home.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
