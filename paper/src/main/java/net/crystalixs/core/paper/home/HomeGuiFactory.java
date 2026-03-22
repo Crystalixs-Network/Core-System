@@ -40,11 +40,13 @@ public final class HomeGuiFactory {
 
             if (slot < orderedHomes.size()) {
                 HomeModel model = orderedHomes.get(slot);
-                normal.addIngredient(key, new SimpleItem(factory.homeItem(model)));
+                normal.addIngredient(key, new SimpleItem(factory.icon(model)));
                 continue;
             }
-            if (slot >= limit) {
-                normal.addIngredient(key, new SimpleItem(factory.lockedItem()));
+            if (slot < limit) {
+                normal.addIngredient(key, new SimpleItem(factory.available()));
+            } else {
+                normal.addIngredient(key, new SimpleItem(factory.locked()));
             }
         }
 
