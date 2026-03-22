@@ -123,10 +123,37 @@ public final class HomeCommand extends PaperCommand {
                     String oldName = context.get("old-name");
                     String newName = context.get("new-name");
 
-                    HomeModel renamed = service.rename(sender.getUniqueId(), oldName, newName);
-                    sender.sendMessage(translatable("command.home.rename.success").arguments(
-                            component("old-name", text(oldName)),
-                            component("new-name", text(renamed.name()))));
+                    try {
+                        HomeModel renamed = service.rename(sender.getUniqueId(), oldName, newName);
+                        sender.sendMessage(translatable("command.home.rename.success").arguments(
+                                component("old-name", text(oldName)),
+                                component("new-name", text(renamed.name()))));
+
+                        logger.info("home renamed", LogMetadata
+                                .event("command.home.rename.success")
+                                .and(LogMetadata.Key.ACTOR, sender.getName())
+                                .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
+                                .and(LogMetadata.Key.DESCRIPTION, oldName + " → " + renamed.name()));
+
+                    } catch (HomeException exception) {
+                        String key = switch (exception.error()) {
+                            case INVALID_NAME -> "command.home.create.error.invalid-name";
+                            case HOME_NOT_FOUND -> "command.home.rename.error.not-found";
+                            case HOME_ALREADY_EXISTS -> "command.home.rename.error.already-exists";
+                            case PLAYER_CREATION_FAILED -> "error.player-load";
+                            default -> "command.home.rename.error.persistence";
+                        };
+
+                        if (exception.error() == HomeError.HOME_RENAME_FAILED || exception.error() == HomeError.PLAYER_CREATION_FAILED) {
+                            logger.warn("home rename failed", LogMetadata
+                                    .event("command.home.rename.failed")
+                                    .and(LogMetadata.Key.ACTOR, sender.getName())
+                                    .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
+                                    .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
+                        }
+
+                        sender.sendMessage(translatable(key));
+                    }
                 }));
     }
 }
