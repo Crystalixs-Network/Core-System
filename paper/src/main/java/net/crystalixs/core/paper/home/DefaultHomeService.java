@@ -36,7 +36,7 @@ public final class DefaultHomeService implements HomeService {
 
         } catch (PersistenceException exception) {
             if (isDuplicate(exception)) {
-                throw new HomeException(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
+                fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
             }
             fail(HomeError.HOME_CREATION_FAILED, "Could not create home '" + name + "' for player " + playerId);
         }
