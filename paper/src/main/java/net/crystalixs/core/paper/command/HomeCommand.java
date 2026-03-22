@@ -23,6 +23,8 @@ import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
 public final class HomeCommand extends PaperCommand {
 
+    private static final Permission PERMISSION = Permission.of("core.command.home");
+
     private final HomeService service;
     private final StructuredLogger logger;
 
@@ -37,7 +39,7 @@ public final class HomeCommand extends PaperCommand {
         commandManager.command(commandManager.commandBuilder("home")
                 .commandDescription(RichDescription.translatable("command.home.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
-                .permission(Permission.of("core.command.home"))
+                .permission(PERMISSION)
                 .literal("create", RichDescription.translatable("command.home.description.create"))
                 .required("name", stringParser(), RichDescription.translatable("command.home.description.name"))
                 .handler(context -> {
