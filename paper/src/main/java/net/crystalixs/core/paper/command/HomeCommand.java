@@ -168,6 +168,12 @@ public final class HomeCommand extends PaperCommand {
                 .permission(PERMISSION)
                 .literal("update", RichDescription.translatable("command.home.description.update"))
                 .required("name", stringParser(), RichDescription.translatable("command.home.description.name"))
-                .handler(context -> {}));
+                .handler(context -> {
+                    Player sender = context.sender().player();
+                    String name = context.get("name");
+
+                    HomeModel updated = service.updatePosition(sender.getUniqueId(), name, sender.getLocation());
+                    sender.sendMessage(translatable("command.home.update.success").arguments(component("name", text(updated.name()))));
+                }));
     }
 }
