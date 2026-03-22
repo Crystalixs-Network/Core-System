@@ -86,6 +86,11 @@ public final class HomeCommand extends PaperCommand {
                 .literal("delete", RichDescription.translatable("command.home.description.delete"))
                 .required("name", stringParser(), RichDescription.translatable("command.home.description.name"))
                 .handler(context -> {
+                    Player sender = context.sender().player();
+                    String name = context.get("name");
+
+                    service.delete(sender.getUniqueId(), name);
+                    sender.sendMessage(translatable("command.home.delete.success").arguments(component("name", text(name))));
                 }));
     }
 }
