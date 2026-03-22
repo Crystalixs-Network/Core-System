@@ -20,6 +20,8 @@ public interface HomeStore {
 
     void rename(UUID playerId, String oldName, String newName);
 
+    void updatePosition(long homeId, String worldName, double x, double y, double z, float yaw, float pitch);
+
     boolean deleteById(long homeId);
 
     boolean deleteByPlayerAndName(UUID playerId, String name);

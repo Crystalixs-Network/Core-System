@@ -112,9 +112,8 @@ public final class DefaultHomeService implements HomeService {
         }
 
         HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), position, existing.createdAt());
-
         try {
-            homes.update(updated);
+            homes.updatePosition(existing.id(), position.worldName(), position.x(), position.y(), position.z(), position.yaw(), position.pitch());
             return homes.findById(existing.id()).orElse(updated);
 
         } catch (PersistenceException exception) {
