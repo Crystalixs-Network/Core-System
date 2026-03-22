@@ -115,6 +115,31 @@ public final class DefaultHomeStore implements HomeStore {
     }
 
     @Override
+    public void updatePosition(long homeId, String worldName, double x, double y, double z, float yaw, float pitch) {
+        try {
+            boolean changed = config.query("UPDATE homes SET world_name = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ? WHERE id = ?;")
+                    .single(call()
+                            .bind(worldName)
+                            .bind(x)
+                            .bind(y)
+                            .bind(z)
+                            .bind(yaw)
+                            .bind(pitch)
+                            .bind(homeId)
+                    )
+                    .update()
+                    .changed();
+
+            if (!changed) {
+                IllegalStateException exception = new IllegalStateException("No home row found for id=" + homeId);
+                throw failure("persistence.home.update_position_not_found", "home:" + homeId, "Could not update home position: target does not exist", exception);
+            }
+        } catch (RuntimeException exception) {
+            throw failure("persistence.home.update_position_failed", "home:" + homeId, "Could not update home position", exception);
+        }
+    }
+
+    @Override
     public boolean deleteById(long homeId) {
         try {
             return config.query("DELETE FROM homes WHERE id = ?;")
