@@ -9,4 +9,6 @@ public interface HomeService {
 
     HomeModel create(UUID playerId, String name, Location location);
 
+    int count(UUID playerId);
+
 }

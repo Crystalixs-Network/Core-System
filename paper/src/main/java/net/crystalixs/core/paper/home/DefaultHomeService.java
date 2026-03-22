@@ -42,6 +42,11 @@ public final class DefaultHomeService implements HomeService {
         }
     }
 
+    @Override
+    public int count(UUID playerId) {
+        return homes.findByPlayerId(playerId).size();
+    }
+
     private boolean isDuplicate(Throwable throwable) {
         var current = throwable;
         while (current != null) {
