@@ -8,7 +8,7 @@ import net.crystalixs.core.persistence.store.PlayerStore;
 import org.bukkit.Location;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.UUID;
 
 public final class DefaultHomeService implements HomeService {
@@ -51,7 +51,9 @@ public final class DefaultHomeService implements HomeService {
 
     @Override
     public Collection<HomeModel> all(UUID playerId) {
-        return Collections.unmodifiableCollection(homes.findByPlayerId(playerId));
+        return homes.findByPlayerId(playerId).stream()
+                .sorted(Comparator.comparing(HomeModel::name, String.CASE_INSENSITIVE_ORDER))
+                .toList();
     }
 
     @Override
