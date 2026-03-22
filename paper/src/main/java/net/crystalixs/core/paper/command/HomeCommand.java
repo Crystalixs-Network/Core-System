@@ -96,13 +96,11 @@ public final class HomeCommand extends PaperCommand {
                     } catch (HomeException exception) {
                         String key = switch (exception.error()) {
                             case INVALID_NAME -> "command.home.create.error.invalid-name";
-                            case INVALID_POSITION -> "command.home.delete.error.invalid-position";
-                            case HOME_ALREADY_EXISTS -> "command.home.delete.error.already-exists";
+                            case HOME_NOT_FOUND -> "command.home.delete.error.not-found";
                             case PLAYER_CREATION_FAILED -> "error.player-load";
-                            case HOME_LIMIT_REACHED -> "command.home.delete.error.limit-reached";
                             default -> "command.home.create.error.persistence";
                         };
-                        if (exception.error() == HomeError.PLAYER_CREATION_FAILED || exception.error() == HomeError.HOME_CREATION_FAILED) {
+                        if (exception.error() == HomeError.PLAYER_CREATION_FAILED || exception.error() == HomeError.HOME_DELETION_FAILED) {
                             logger.warn("home delete failed", LogMetadata
                                     .event("command.home.delete.failed")
                                     .and(LogMetadata.Key.ACTOR, sender.getName())
