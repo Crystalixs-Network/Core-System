@@ -29,7 +29,7 @@ public final class DefaultHomeService implements HomeService {
         getOrCreatePlayer(playerId);
 
         if (homes.findByPlayerAndName(playerId, normalizedName).isPresent()) {
-            throw new HomeException(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
+            fail(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
         }
         try {
             return homes.create(new HomeModel(0L, playerId, normalizedName, position, null));
@@ -38,7 +38,7 @@ public final class DefaultHomeService implements HomeService {
             if (isDuplicate(exception)) {
                 throw new HomeException(HomeError.HOME_ALREADY_EXISTS, "Home with name " + normalizedName + " already exists for player " + playerId);
             }
-            fail(playerId, normalizedName);
+            fail(HomeError.HOME_CREATION_FAILED, "Could not create home '" + name + "' for player " + playerId);
         }
         return null;
     }
@@ -55,11 +55,11 @@ public final class DefaultHomeService implements HomeService {
         try {
             boolean deleted = homes.deleteByPlayerAndName(playerId, normalizedName);
             if (!deleted) {
-                throw new HomeException(HomeError.HOME_NOT_FOUND, "Home with name " + normalizedName + " does not exist for player " + playerId);
+                fail(HomeError.HOME_NOT_FOUND, "Home with name " + normalizedName + " does not exist for player " + playerId);
             }
 
         } catch (PersistenceException exception) {
-            throw new HomeException(HomeError.HOME_DELETION_FAILED, "Could not delete home '" + normalizedName + "' for player " + playerId);
+            fail(HomeError.HOME_DELETION_FAILED, "Could not delete home '" + normalizedName + "' for player " + playerId);
         }
     }
 
@@ -106,7 +106,7 @@ public final class DefaultHomeService implements HomeService {
         });
     }
 
-    private void fail(UUID playerId, String name) {
-        throw new HomeException(HomeError.HOME_CREATION_FAILED, "Could not create home '" + name + "' for player " + playerId);
+    private void fail(HomeError error, String message) {
+        throw new HomeException(error, message);
     }
 }
