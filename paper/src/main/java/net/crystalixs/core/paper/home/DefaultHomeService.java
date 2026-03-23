@@ -135,22 +135,23 @@ public final class DefaultHomeService implements HomeService {
     @Override
     public void teleport(Player player, String homeName) {
         String normalizedName = normalizeName(homeName);
+        HomeModel home;
         try {
-            HomeModel home = homes
-                    .findByPlayerAndName(player.getUniqueId(), normalizedName)
-                    .orElseThrow(() -> failAsNotExistent(player.getUniqueId(), normalizedName));
+            home = homes.findByPlayerAndName(player.getUniqueId(), normalizedName).orElseThrow(() -> failAsNotExistent(player.getUniqueId(), normalizedName));
 
-            World world = Bukkit.getWorld(home.position().worldName());
-            if (world == null) {
-                fail(HomeError.HOME_WORLD_NOT_AVAILABLE, "Home world '" + home.position().worldName() + "' is not available for home '" + normalizedName + "'");
-            }
+        } catch (PersistenceException exception) {
+            fail(HomeError.HOME_TELEPORT_FAILED, "Could not load home '" + normalizedName + "' for player " + player.getUniqueId());
+            return;
+        }
 
+        World world = Bukkit.getWorld(home.position().worldName());
+        if (world == null) {
+            fail(HomeError.HOME_WORLD_NOT_AVAILABLE, "Home world '" + home.position().worldName() + "' is not available for home '" + normalizedName + "'");
+        }
+        try {
             if (!player.teleport(toLocation(home, world))) {
                 fail(HomeError.HOME_TELEPORT_FAILED, "Could not teleport player " + player.getUniqueId() + " to home '" + normalizedName + "'");
             }
-        } catch (PersistenceException exception) {
-            fail(HomeError.HOME_TELEPORT_FAILED, "Could not load home '" + normalizedName + "' for player " + player.getUniqueId());
-
         } catch (RuntimeException exception) {
             fail(HomeError.HOME_TELEPORT_FAILED, "Unexpected teleport failure for player " + player.getUniqueId() + " and home '" + normalizedName + "'");
         }
