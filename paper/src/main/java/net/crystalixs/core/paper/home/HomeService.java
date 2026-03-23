@@ -2,6 +2,7 @@ package net.crystalixs.core.paper.home;
 
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -19,5 +20,7 @@ public interface HomeService {
     HomeModel rename(UUID playerId, String oldName, String newName);
 
     HomeModel updatePosition(UUID playerId, String name, Location location);
+
+    void teleport(Player player, String homeName);
 
 }
