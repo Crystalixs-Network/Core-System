@@ -29,6 +29,7 @@ public final class TeleportHomeGuiItem extends AbstractItem {
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
+        if (!clickType.isLeftClick()) return;
         service.teleport(player, home.name());
     }
 }
