@@ -43,7 +43,7 @@ public final class HomeGuiFactory {
 
             if (slot < orderedHomes.size()) {
                 HomeModel model = orderedHomes.get(slot);
-                normal.addIngredient(key, new SimpleItem(factory.icon(model)));
+                normal.addIngredient(key, new TeleportHomeGuiItem(model, service, factory));
                 continue;
             }
             if (slot < limit) {
