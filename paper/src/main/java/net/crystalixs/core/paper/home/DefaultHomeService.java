@@ -5,7 +5,10 @@ import net.crystalixs.core.persistence.model.HomeModel;
 import net.crystalixs.core.persistence.model.HomePositionModel;
 import net.crystalixs.core.persistence.store.HomeStore;
 import net.crystalixs.core.persistence.store.PlayerStore;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -111,7 +114,6 @@ public final class DefaultHomeService implements HomeService {
     public HomeModel updatePosition(UUID playerId, String name, Location location) {
         String normalizedName = normalizeName(name);
         HomePositionModel position = toPosition(location);
-
         HomeModel existing = homes
                 .findByPlayerAndName(playerId, name)
                 .orElseThrow(() -> failAsNotExistent(playerId, normalizedName));
@@ -130,11 +132,35 @@ public final class DefaultHomeService implements HomeService {
         }
     }
 
+    @Override
+    public void teleport(Player player, String homeName) {
+        String normalizedName = normalizeName(homeName);
+        HomeModel home = homes
+                .findByPlayerAndName(player.getUniqueId(), normalizedName)
+                .orElseThrow(() -> failAsNotExistent(player.getUniqueId(), normalizedName));
+
+        World world = Bukkit.getWorld(home.position().worldName());
+        if (world == null) {
+            fail(HomeError.HOME_WORLD_NOT_AVAILABLE, "Home world '" + home.position().worldName() + "' is not available for home '" + normalizedName + "'");
+        }
+
+        if (!player.teleport(toLocation(home, world))) {
+            fail(HomeError.HOME_TELEPORT_FAILED, "Could not teleport player " + player.getUniqueId() + " to home '" + normalizedName + "'");
+        }
+    }
+
     private HomePositionModel toPosition(Location location) {
         if (location == null || location.getWorld() == null) {
             throw new HomeException(HomeError.INVALID_POSITION, "Location/world must not be null");
         }
         return new HomePositionModel(location.getWorld().getName(), location.x(), location.y(), location.z(), location.getYaw(), location.getPitch());
+    }
+
+    private Location toLocation(HomeModel model, World world) {
+        if (model == null || world == null) {
+            throw new HomeException(HomeError.INVALID_POSITION, "Home/world must not be null");
+        }
+        return new Location(world, model.position().x(), model.position().y(), model.position().z(), model.position().yaw(), model.position().pitch());
     }
 
     private boolean isSamePosition(HomePositionModel a, HomePositionModel b) {
