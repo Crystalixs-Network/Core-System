@@ -29,8 +29,8 @@ public final class HomeEditGui implements HomeGui {
     public Gui buildGui(Player player) {
         return Gui.normal()
                 .setStructure(
-                        "x x x x x x x x x",
                         "x x x x i x x x x",
+                        "x x x x x x x x x",
                         "x x x x b x x x x"
                 )
                 .addIngredient('x', new SimpleItem(itemFactory.locked()))
