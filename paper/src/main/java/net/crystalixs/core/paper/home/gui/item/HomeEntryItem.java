@@ -1,5 +1,10 @@
-package net.crystalixs.core.paper.home;
+package net.crystalixs.core.paper.home.gui.item;
 
+import net.crystalixs.core.paper.home.HomeException;
+import net.crystalixs.core.paper.home.HomeGuiFactory;
+import net.crystalixs.core.paper.home.HomeGuiItemFactory;
+import net.crystalixs.core.paper.home.HomeService;
+import net.crystalixs.core.paper.home.gui.HomeEditGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -12,27 +17,33 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
-public final class TeleportHomeGuiItem extends AbstractItem {
+public final class HomeEntryItem extends AbstractItem {
 
-    private final HomeModel home;
     private final HomeService service;
-    private final HomeGuiItemFactory factory;
+    private final HomeModel home;
+    private final HomeGuiItemFactory itemFactory;
+    private final HomeGuiFactory guiFactory;
 
-    public TeleportHomeGuiItem(HomeModel home, HomeService service, HomeGuiItemFactory factory) {
-        this.home = home;
+    public HomeEntryItem(HomeService service, HomeModel home, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory) {
         this.service = service;
-        this.factory = factory;
+        this.home = home;
+        this.itemFactory = itemFactory;
+        this.guiFactory = guiFactory;
     }
 
     @Override
     public ItemProvider getItemProvider() {
-        return factory.icon(home);
+        return itemFactory.icon(home);
     }
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        if (!clickType.isLeftClick()) return;
+        if (clickType.isRightClick()) {
+            guiFactory.open(player, HomeEditGui.class, home);
+            return;
+        }
 
+        if (!clickType.isLeftClick()) return;
         try {
             service.teleport(player, home.name());
             player.closeInventory();

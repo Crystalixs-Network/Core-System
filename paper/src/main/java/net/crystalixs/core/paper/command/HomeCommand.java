@@ -7,6 +7,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.home.*;
+import net.crystalixs.core.paper.home.gui.HomeListGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
@@ -43,7 +44,7 @@ public final class HomeCommand extends PaperCommand {
                 .permission(PERMISSION)
                 .handler(context -> {
                     Player sender = context.sender().player();
-                    factory.open(sender);
+                    factory.open(sender, HomeListGui.class, null);
                 }));
 
         commandManager.command(commandManager.commandBuilder("home")
