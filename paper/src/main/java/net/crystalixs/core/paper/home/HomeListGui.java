@@ -17,10 +17,12 @@ public final class HomeListGui implements HomeGui {
 
     private final HomeService service;
     private final HomeGuiItemFactory factory;
+    private final HomeGuiFactory guiFactory;
 
-    HomeListGui(HomeService service, HomeGuiItemFactory factory) {
+    HomeListGui(HomeService service, HomeGuiItemFactory factory, HomeGuiFactory guiFactory) {
         this.service = service;
         this.factory = factory;
+        this.guiFactory = guiFactory;
     }
 
     @Override

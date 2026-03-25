@@ -14,19 +14,21 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 
 public final class TeleportHomeGuiItem extends AbstractItem {
 
-    private final HomeModel home;
     private final HomeService service;
-    private final HomeGuiItemFactory factory;
+    private final HomeModel home;
+    private final HomeGuiItemFactory itemFactory;
+    private final HomeGuiFactory guiFactory;
 
-    public TeleportHomeGuiItem(HomeModel home, HomeService service, HomeGuiItemFactory factory) {
-        this.home = home;
+    public TeleportHomeGuiItem(HomeService service, HomeModel home, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory) {
         this.service = service;
-        this.factory = factory;
+        this.home = home;
+        this.itemFactory = itemFactory;
+        this.guiFactory = guiFactory;
     }
 
     @Override
     public ItemProvider getItemProvider() {
-        return factory.icon(home);
+        return itemFactory.icon(home);
     }
 
     @Override
