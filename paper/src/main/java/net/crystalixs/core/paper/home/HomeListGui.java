@@ -16,12 +16,12 @@ public final class HomeListGui implements HomeGui {
     };
 
     private final HomeService service;
-    private final HomeGuiItemFactory factory;
+    private final HomeGuiItemFactory itemFactory;
     private final HomeGuiFactory guiFactory;
 
     HomeListGui(HomeService service, HomeGuiItemFactory factory, HomeGuiFactory guiFactory) {
         this.service = service;
-        this.factory = factory;
+        this.itemFactory = factory;
         this.guiFactory = guiFactory;
     }
 
@@ -48,7 +48,7 @@ public final class HomeListGui implements HomeGui {
 
             if (slot < orderedHomes.size()) {
                 HomeModel model = orderedHomes.get(slot);
-                normal.addIngredient(key, new TeleportHomeGuiItem(model, service, factory));
+                normal.addIngredient(key, new TeleportHomeGuiItem(service, model, this.itemFactory, guiFactory));
                 continue;
             }
             if (slot < limit) {

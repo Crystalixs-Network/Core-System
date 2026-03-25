@@ -18,7 +18,7 @@ public final class HomeGuiFactory {
         HomeGui gui;
 
         if (guiClass == HomeListGui.class) {
-            gui = new HomeListGui(service, factory);
+            gui = new HomeListGui(service, factory, this);
 
         } else if (guiClass == HomeEditGui.class) {
             if (model == null) {
