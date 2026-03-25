@@ -19,7 +19,8 @@ public final class HomeActionGuiItem extends AbstractItem {
         this.action = action;
     }
 
-    public ItemProvider provider() {
+    @Override
+    public ItemProvider getItemProvider() {
         return provider;
     }
 
