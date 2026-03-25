@@ -27,7 +27,7 @@ public final class HomeGuiFactory {
             if (model == null) {
                 throw new IllegalArgumentException("HomeEditGui requires a home model");
             }
-            gui = new HomeEditGui(model, factory);
+            gui = new HomeEditGui(model, factory, this);
 
         } else {
             throw new IllegalArgumentException("Unsupported GUI class: " + guiClass.getName());
