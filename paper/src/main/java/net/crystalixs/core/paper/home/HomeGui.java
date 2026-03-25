@@ -8,7 +8,8 @@ import xyz.xenondevs.invui.window.Window;
 
 import static net.kyori.adventure.text.Component.translatable;
 
-public interface HomeGui {
+public sealed interface HomeGui
+        permits HomeListGui {
 
     default void open(Player player) {
         Gui gui = buildGui(player);
