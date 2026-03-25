@@ -4,7 +4,7 @@ import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
 import net.crystalixs.core.paper.home.HomeLimitResolver;
 import net.crystalixs.core.paper.home.HomeService;
-import net.crystalixs.core.paper.home.gui.item.TeleportHomeGuiItem;
+import net.crystalixs.core.paper.home.gui.item.HomeEntryItem;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.gui.Gui;
@@ -53,7 +53,7 @@ public final class HomeListGui implements HomeGui {
 
             if (slot < orderedHomes.size()) {
                 HomeModel model = orderedHomes.get(slot);
-                normal.addIngredient(key, new TeleportHomeGuiItem(service, model, this.itemFactory, guiFactory));
+                normal.addIngredient(key, new HomeEntryItem(service, model, this.itemFactory, guiFactory));
                 continue;
             }
             if (slot < limit) {
