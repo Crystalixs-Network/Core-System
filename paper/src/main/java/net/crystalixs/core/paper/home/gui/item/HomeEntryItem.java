@@ -17,14 +17,14 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
-public final class TeleportHomeGuiItem extends AbstractItem {
+public final class HomeEntryItem extends AbstractItem {
 
     private final HomeService service;
     private final HomeModel home;
     private final HomeGuiItemFactory itemFactory;
     private final HomeGuiFactory guiFactory;
 
-    public TeleportHomeGuiItem(HomeService service, HomeModel home, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory) {
+    public HomeEntryItem(HomeService service, HomeModel home, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory) {
         this.service = service;
         this.home = home;
         this.itemFactory = itemFactory;

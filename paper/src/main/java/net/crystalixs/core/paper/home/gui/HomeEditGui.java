@@ -2,7 +2,7 @@ package net.crystalixs.core.paper.home.gui;
 
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
-import net.crystalixs.core.paper.home.gui.item.HomeActionGuiItem;
+import net.crystalixs.core.paper.home.gui.item.HomeMenuButtonItem;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.gui.Gui;
@@ -35,7 +35,7 @@ public final class HomeEditGui implements HomeGui {
                 )
                 .addIngredient('x', new SimpleItem(itemFactory.locked()))
                 .addIngredient('i', new SimpleItem(itemFactory.icon(model)))
-                .addIngredient('b', new HomeActionGuiItem(itemFactory.back(), p -> guiFactory.open(p, HomeListGui.class, null)))
+                .addIngredient('b', new HomeMenuButtonItem(guiFactory, itemFactory.icon(model), HomeMenuButtonItem.Action.BACK_TO_LIST))
                 .build();
     }
 }
