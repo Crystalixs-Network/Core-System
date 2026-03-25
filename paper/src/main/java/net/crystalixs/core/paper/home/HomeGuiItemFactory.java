@@ -38,7 +38,7 @@ public final class HomeGuiItemFactory {
     }
 
     public ItemProvider back() {
-        var name = translatable("command.home.ui.item.back");
+        var name = translatable("command.home.ui.edit.item.back");
         var renderedName = GlobalTranslator.render(name, player.locale());
 
         return new ItemBuilder(Material.ARROW).setDisplayName(new AdventureComponentWrapper(renderedName));
