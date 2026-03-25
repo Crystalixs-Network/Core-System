@@ -7,7 +7,7 @@ import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 import java.util.ArrayList;
 
-final class HomeListGui implements HomeGui {
+public final class HomeListGui implements HomeGui {
 
     private static final char[] HOME_SLOT_KEYS = {
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
