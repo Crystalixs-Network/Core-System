@@ -1,5 +1,8 @@
 package net.crystalixs.core.paper.home;
 
+import net.crystalixs.core.paper.home.gui.HomeEditGui;
+import net.crystalixs.core.paper.home.gui.HomeGui;
+import net.crystalixs.core.paper.home.gui.HomeListGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;

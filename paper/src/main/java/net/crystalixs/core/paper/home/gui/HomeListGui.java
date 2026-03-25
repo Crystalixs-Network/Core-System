@@ -1,5 +1,10 @@
-package net.crystalixs.core.paper.home;
+package net.crystalixs.core.paper.home.gui;
 
+import net.crystalixs.core.paper.home.HomeGuiFactory;
+import net.crystalixs.core.paper.home.HomeGuiItemFactory;
+import net.crystalixs.core.paper.home.HomeLimitResolver;
+import net.crystalixs.core.paper.home.HomeService;
+import net.crystalixs.core.paper.home.gui.item.TeleportHomeGuiItem;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.gui.Gui;
@@ -19,7 +24,7 @@ public final class HomeListGui implements HomeGui {
     private final HomeGuiItemFactory itemFactory;
     private final HomeGuiFactory guiFactory;
 
-    HomeListGui(HomeService service, HomeGuiItemFactory factory, HomeGuiFactory guiFactory) {
+    public HomeListGui(HomeService service, HomeGuiItemFactory factory, HomeGuiFactory guiFactory) {
         this.service = service;
         this.itemFactory = factory;
         this.guiFactory = guiFactory;

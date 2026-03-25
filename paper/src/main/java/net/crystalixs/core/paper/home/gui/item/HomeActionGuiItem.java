@@ -1,4 +1,4 @@
-package net.crystalixs.core.paper.home;
+package net.crystalixs.core.paper.home.gui.item;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;

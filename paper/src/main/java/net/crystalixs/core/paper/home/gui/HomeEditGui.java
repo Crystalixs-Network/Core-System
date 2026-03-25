@@ -1,5 +1,6 @@
-package net.crystalixs.core.paper.home;
+package net.crystalixs.core.paper.home.gui;
 
+import net.crystalixs.core.paper.home.HomeGuiItemFactory;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.gui.Gui;
@@ -10,7 +11,7 @@ public final class HomeEditGui implements HomeGui {
     private final HomeModel model;
     private final HomeGuiItemFactory factory;
 
-    HomeEditGui(HomeModel model, HomeGuiItemFactory factory) {
+    public HomeEditGui(HomeModel model, HomeGuiItemFactory factory) {
         this.model = model;
         this.factory = factory;
     }

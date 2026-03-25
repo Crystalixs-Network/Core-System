@@ -1,4 +1,4 @@
-package net.crystalixs.core.paper.home;
+package net.crystalixs.core.paper.home.gui;
 
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.entity.Player;

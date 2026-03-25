@@ -1,5 +1,9 @@
-package net.crystalixs.core.paper.home;
+package net.crystalixs.core.paper.home.gui.item;
 
+import net.crystalixs.core.paper.home.HomeException;
+import net.crystalixs.core.paper.home.HomeGuiFactory;
+import net.crystalixs.core.paper.home.HomeGuiItemFactory;
+import net.crystalixs.core.paper.home.HomeService;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
