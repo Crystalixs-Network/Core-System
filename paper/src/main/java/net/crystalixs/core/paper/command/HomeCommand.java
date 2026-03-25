@@ -43,7 +43,7 @@ public final class HomeCommand extends PaperCommand {
                 .permission(PERMISSION)
                 .handler(context -> {
                     Player sender = context.sender().player();
-                    factory.open(sender);
+                    factory.open(sender, HomeListGui.class, null);
                 }));
 
         commandManager.command(commandManager.commandBuilder("home")
