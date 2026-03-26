@@ -12,6 +12,7 @@ import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
 public class HomeEditGuiDeleteItem extends AbstractItem {
 
@@ -36,6 +37,6 @@ public class HomeEditGuiDeleteItem extends AbstractItem {
 
         service.delete(player.getUniqueId(), model.name());
         player.closeInventory();
-        player.sendMessage(translatable("command.home.delete.success").arguments(text(model.name())));
+        player.sendMessage(translatable("command.home.delete.success").arguments(component("name", text(model.name()))));
     }
 }
