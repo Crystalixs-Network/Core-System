@@ -1,5 +1,6 @@
 package net.crystalixs.core.paper.command;
 
+import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.command.cloud.PaperCommand;
@@ -74,7 +75,7 @@ public final class HomeCommand extends PaperCommand {
                     try {
                         HomeModel created = service.create(sender.getUniqueId(), name, sender.getLocation());
                         sender.sendMessage(translatable("command.home.create.success").arguments(component("name", text(created.name()))));
-                        homeLog.info(HomeLogEvent.CREATE_SUCCESS, sender, created.name());
+                        homeLog.info(HomeLogEvent.CREATE_SUCCESS, sender, LogMetadata.of(LogMetadata.Key.HOME_NAME, created.name()));
 
                     } catch (HomeException exception) {
                         String key = switch (exception.error()) {
@@ -86,7 +87,7 @@ public final class HomeCommand extends PaperCommand {
                             default -> "command.home.create.error.persistence";
                         };
                         if (exception.error() == HomeError.PLAYER_CREATION_FAILED || exception.error() == HomeError.HOME_CREATION_FAILED) {
-                            homeLog.warn(HomeLogEvent.CREATE_FAILED, sender, exception.error().name(), exception);
+                            homeLog.warn(HomeLogEvent.CREATE_FAILED, sender, LogMetadata.of(LogMetadata.Key.ERROR, exception.error().name()), exception);
                         }
                         sender.sendMessage(translatable(key));
                     }
@@ -105,7 +106,7 @@ public final class HomeCommand extends PaperCommand {
                     try {
                         service.delete(sender.getUniqueId(), name);
                         sender.sendMessage(translatable("command.home.delete.success").arguments(component("name", text(name))));
-                        homeLog.info(HomeLogEvent.DELETE_SUCCESS, sender, name);
+                        homeLog.info(HomeLogEvent.DELETE_SUCCESS, sender, LogMetadata.of(LogMetadata.Key.HOME_NAME, name));
 
                     } catch (HomeException exception) {
                         String key = switch (exception.error()) {
@@ -115,7 +116,7 @@ public final class HomeCommand extends PaperCommand {
                             default -> "command.home.create.error.persistence";
                         };
                         if (exception.error() == HomeError.PLAYER_CREATION_FAILED || exception.error() == HomeError.HOME_DELETION_FAILED) {
-                            homeLog.warn(HomeLogEvent.DELETE_FAILED, sender, exception.error().name(), exception);
+                            homeLog.warn(HomeLogEvent.DELETE_FAILED, sender, LogMetadata.of(LogMetadata.Key.ERROR, exception.error().name()), exception);
                         }
                         sender.sendMessage(translatable(key));
                     }
@@ -139,7 +140,8 @@ public final class HomeCommand extends PaperCommand {
                                 component("old_name", text(oldName)),
                                 component("new_name", text(renamed.name()))));
 
-                        homeLog.info(HomeLogEvent.RENAME_SUCCESS, sender, oldName + " -> " + renamed.name());
+                        homeLog.info(HomeLogEvent.RENAME_SUCCESS, sender, LogMetadata.of(LogMetadata.Key.OLD_HOME_NAME, oldName)
+                                .and(LogMetadata.Key.NEW_HOME_NAME, renamed.name()));
                         return;
                     }
 
@@ -159,7 +161,7 @@ public final class HomeCommand extends PaperCommand {
                     try {
                         HomeModel updated = service.updatePosition(sender.getUniqueId(), name, sender.getLocation());
                         sender.sendMessage(translatable("command.home.update.success").arguments(component("name", text(updated.name()))));
-                        homeLog.info(HomeLogEvent.UPDATE_POSITION_SUCCESS, sender, updated.name());
+                        homeLog.info(HomeLogEvent.UPDATE_POSITION_SUCCESS, sender, LogMetadata.of(LogMetadata.Key.HOME_NAME, updated.name()));
 
                     } catch (HomeException exception) {
                         String key = switch (exception.error()) {
@@ -171,7 +173,7 @@ public final class HomeCommand extends PaperCommand {
                         };
 
                         if (exception.error() == HomeError.HOME_UPDATE_FAILED || exception.error() == HomeError.PLAYER_CREATION_FAILED) {
-                            homeLog.warn(HomeLogEvent.UPDATE_POSITION_FAILED, sender, exception.error().name(), exception);
+                            homeLog.warn(HomeLogEvent.UPDATE_POSITION_FAILED, sender, LogMetadata.of(LogMetadata.Key.ERROR, exception.error().name()), exception);
                         }
 
                         if (exception.error() == HomeError.HOME_NOT_FOUND) {
