@@ -1,10 +1,10 @@
 package net.crystalixs.core.paper.home.gui;
 
-import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
-import net.crystalixs.core.paper.home.HomeException;
 import net.crystalixs.core.paper.home.HomeRenameExecutor;
+import net.crystalixs.core.paper.home.HomeRenameExecutor.Outcome;
+import net.crystalixs.core.paper.home.HomeRenameFailureHandler;
 import net.crystalixs.core.paper.home.HomeService;
 import net.crystalixs.core.persistence.model.HomeModel;
 import net.kyori.adventure.translation.GlobalTranslator;
@@ -24,11 +24,13 @@ public final class RenameHomeGui {
     private final HomeModel model;
     private final StructuredLogger logger;
     private final HomeRenameExecutor renameExecutor;
+    private final HomeRenameFailureHandler renameFailureHandler;
 
     public RenameHomeGui(CorePlugin plugin, HomeService service, HomeModel model) {
         this.model = model;
         this.logger = plugin.componentLogger("home", "gui", "rename");
         this.renameExecutor = new HomeRenameExecutor(service);
+        this.renameFailureHandler = new HomeRenameFailureHandler();
     }
 
     public void open(Player player) {
@@ -47,7 +49,7 @@ public final class RenameHomeGui {
                 .addRenameHandler(renameText -> {
                     String oldNameInput = model.name();
 
-                    HomeRenameExecutor.Outcome outcome = renameExecutor.execute(player.getUniqueId(), oldNameInput, renameText);
+                    Outcome outcome = renameExecutor.execute(player.getUniqueId(), oldNameInput, renameText);
                     if (outcome instanceof HomeRenameExecutor.Success(String oldName, HomeModel renamed)) {
                         player.sendMessage(translatable("command.home.rename.success").arguments(
                                 component("old_name", text(oldName)),
@@ -56,16 +58,7 @@ public final class RenameHomeGui {
                         return;
                     }
 
-                    HomeRenameExecutor.Failure failure = (HomeRenameExecutor.Failure) outcome;
-                    if (failure.shouldLogWarn()) {
-                        HomeException exception = failure.exception();
-                        logger.warn("home rename failed", LogMetadata
-                                .event("command.home.rename.failed")
-                                .and(LogMetadata.Key.ACTOR, player.getName())
-                                .and(LogMetadata.Key.SUBJECT, player.getUniqueId().toString())
-                                .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
-                    }
-                    player.sendMessage(failure.message());
+                    renameFailureHandler.handle(player, (HomeRenameExecutor.Failure) outcome, logger);
                 })
                 .open(player);
     }

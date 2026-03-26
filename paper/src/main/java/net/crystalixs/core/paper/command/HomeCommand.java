@@ -7,6 +7,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.home.*;
+import net.crystalixs.core.paper.home.HomeRenameExecutor.Outcome;
 import net.crystalixs.core.paper.home.gui.HomeListGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
@@ -29,6 +30,7 @@ public final class HomeCommand extends PaperCommand {
     private final StructuredLogger logger;
     private final HomeGuiFactory factory;
     private final HomeRenameExecutor renameExecutor;
+    private final HomeRenameFailureHandler renameFailureHandler;
 
     public HomeCommand(CorePlugin plugin, HomeService service, HomeGuiFactory factory) {
         super(plugin);
@@ -36,6 +38,7 @@ public final class HomeCommand extends PaperCommand {
         this.logger = plugin.commandLogger("home");
         this.factory = factory;
         this.renameExecutor = new HomeRenameExecutor(service);
+        this.renameFailureHandler = new HomeRenameFailureHandler();
     }
 
     @Override
@@ -134,7 +137,7 @@ public final class HomeCommand extends PaperCommand {
                     String oldNameInput = context.get("old-name");
                     String newNameInput = context.get("new-name");
 
-                    HomeRenameExecutor.Outcome outcome = renameExecutor.execute(sender.getUniqueId(), oldNameInput, newNameInput);
+                    Outcome outcome = renameExecutor.execute(sender.getUniqueId(), oldNameInput, newNameInput);
                     if (outcome instanceof HomeRenameExecutor.Success(String oldName, HomeModel renamed)) {
                         sender.sendMessage(translatable("command.home.rename.success").arguments(
                                 component("old_name", text(oldName)),
@@ -148,16 +151,7 @@ public final class HomeCommand extends PaperCommand {
                         return;
                     }
 
-                    HomeRenameExecutor.Failure failure = (HomeRenameExecutor.Failure) outcome;
-                    if (failure.shouldLogWarn()) {
-                        HomeException exception = failure.exception();
-                        logger.warn("home rename failed", LogMetadata
-                                .event("command.home.rename.failed")
-                                .and(LogMetadata.Key.ACTOR, sender.getName())
-                                .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
-                                .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
-                    }
-                    sender.sendMessage(failure.message());
+                    renameFailureHandler.handle(sender, (HomeRenameExecutor.Failure) outcome, logger);
                 }));
 
         commandManager.command(commandManager.commandBuilder("home")
