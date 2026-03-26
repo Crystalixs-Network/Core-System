@@ -2,7 +2,7 @@ package net.crystalixs.core.paper.home.gui;
 
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
-import net.crystalixs.core.paper.home.gui.item.HomeEditGuiReturnToListItem;
+import net.crystalixs.core.paper.home.gui.item.HomeEditGuiReturnToEditItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.gui.Gui;
@@ -42,7 +42,7 @@ public final class SelectIconGui implements HomeGui {
             Material material = IconCatalog.ICONS.get(slot);
             normal.addIngredient(ITEM_SLOTS[slot], new ItemBuilder(material));
         }
-        normal.addIngredient('2', new HomeEditGuiReturnToListItem(itemFactory, guiFactory));
+        normal.addIngredient('2', new HomeEditGuiReturnToEditItem(itemFactory, guiFactory));
         normal.addIngredient('#', new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE));
 
         return normal.build();
