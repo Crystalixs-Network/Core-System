@@ -13,9 +13,7 @@ import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.window.AnvilWindow;
 
-import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
-import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
 public final class RenameHomeGui {
 
@@ -51,13 +49,7 @@ public final class RenameHomeGui {
                     String oldNameInput = model.name();
 
                     try {
-                        String oldName = renameInputValidator.normalizeOldName(oldNameInput);
-                        String newName = renameInputValidator.normalizeNewName(renameText);
-                        HomeModel renamed = service.rename(player.getUniqueId(), oldName, newName);
-                        player.sendMessage(translatable("command.home.rename.success").arguments(
-                                component("old_name", text(oldName)),
-                                component("new_name", text(renamed.name()))));
-                        player.closeInventory();
+                        player.sendRawMessage(oldNameInput + " -> " + renameText);
 
                     } catch (HomeException exception) {
                         if (exception.error() == HomeError.HOME_RENAME_FAILED || exception.error() == HomeError.PLAYER_CREATION_FAILED) {
