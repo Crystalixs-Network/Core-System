@@ -17,6 +17,7 @@ import java.util.UUID;
 public final class DefaultHomeService implements HomeService {
 
     private static final int MAX_HOME_NAME_LENGTH = 64;
+    private static final int MAX_ICON_KEY_LENGTH = 64;
 
     private final PlayerStore players;
     private final HomeStore homes;
@@ -133,6 +134,24 @@ public final class DefaultHomeService implements HomeService {
     }
 
     @Override
+    public HomeModel updateIcon(UUID playerId, String name, String icon) {
+        String normalizedName = normalizeName(name);
+        String normalizedIcon = normalizeIcon(icon);
+        HomeModel existing = homes
+                .findByPlayerAndName(playerId, normalizedName)
+                .orElseThrow(() -> failAsNotExistent(playerId, normalizedName));
+
+        HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), normalizedIcon, existing.position(), existing.createdAt());
+        try {
+            homes.updateIcon(existing.id(), normalizedIcon);
+            return homes.findById(existing.id()).orElse(updated);
+
+        } catch (PersistenceException exception) {
+            return fail(HomeError.HOME_UPDATE_FAILED, "Could not update icon for home '" + normalizedName + "' and player " + playerId);
+        }
+    }
+
+    @Override
     public void teleport(Player player, String homeName) {
         String normalizedName = normalizeName(homeName);
         HomeModel home;
@@ -227,6 +246,17 @@ public final class DefaultHomeService implements HomeService {
         }
         if (normalized.length() > MAX_HOME_NAME_LENGTH) {
             throw new HomeException(HomeError.INVALID_NAME, "Name must not be longer than " + MAX_HOME_NAME_LENGTH + " characters");
+        }
+        return normalized;
+    }
+
+    private String normalizeIcon(String icon) {
+        if (icon == null) {
+            throw new HomeException(HomeError.INVALID_NAME, "Icon must nor not be null");
+        }
+        String normalized = icon.trim();
+        if (normalized.isBlank() || normalized.length() > MAX_ICON_KEY_LENGTH) {
+            throw new HomeException(HomeError.INVALID_NAME, "Icon must not be blank and not longer than " + MAX_ICON_KEY_LENGTH + " characters");
         }
         return normalized;
     }
