@@ -2,6 +2,7 @@ package net.crystalixs.core.paper.home.gui;
 
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
+import net.crystalixs.core.paper.home.HomeGuiItemFactory;
 import net.crystalixs.core.paper.home.HomeRenameExecutor;
 import net.crystalixs.core.paper.home.HomeRenameExecutor.Outcome;
 import net.crystalixs.core.paper.home.HomeRenameFailureHandler;
@@ -21,14 +22,19 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 
 public final class RenameHomeGui {
 
+    private final HomeGuiItemFactory factory;
     private final HomeModel model;
+
     private final StructuredLogger logger;
     private final HomeRenameExecutor renameExecutor;
     private final HomeRenameFailureHandler renameFailureHandler;
 
-    public RenameHomeGui(CorePlugin plugin, HomeService service, HomeModel model) {
+    public RenameHomeGui(CorePlugin plugin, HomeService service, HomeGuiItemFactory factory, HomeModel model) {
+        this.factory = factory;
         this.model = model;
+
         this.logger = plugin.componentLogger("home", "gui", "rename");
+
         this.renameExecutor = new HomeRenameExecutor(service);
         this.renameFailureHandler = new HomeRenameFailureHandler();
     }
@@ -38,8 +44,9 @@ public final class RenameHomeGui {
         var renderedTitle = GlobalTranslator.render(title, player.locale());
 
         Gui gui = Gui.normal()
-                .setStructure("x x x")
+                .setStructure("i x x")
                 .addIngredient('x', new ItemBuilder(Material.AIR))
+                .addIngredient('i', factory.icon(model))
                 .build();
 
         AnvilWindow.single()
