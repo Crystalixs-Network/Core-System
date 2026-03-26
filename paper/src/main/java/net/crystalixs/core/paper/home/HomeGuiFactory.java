@@ -18,7 +18,7 @@ public final class HomeGuiFactory {
         this.service = service;
     }
 
-    public void open(@NotNull Player player, @NotNull Class<? extends HomeGui> guiClass, @Nullable HomeModel model) {
+    private void open(@NotNull Player player, @NotNull Class<? extends HomeGui> guiClass, @Nullable HomeModel model) {
         HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
         HomeGui gui;
 

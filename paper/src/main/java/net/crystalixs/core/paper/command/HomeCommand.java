@@ -7,7 +7,6 @@ import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.home.*;
 import net.crystalixs.core.paper.home.HomeRenameExecutor.Outcome;
-import net.crystalixs.core.paper.home.gui.HomeListGui;
 import net.crystalixs.core.paper.home.logging.HomeLogEvent;
 import net.crystalixs.core.paper.home.logging.StructuredHomeLog;
 import net.crystalixs.core.persistence.model.HomeModel;
@@ -52,7 +51,7 @@ public final class HomeCommand extends PaperCommand {
                 .permission(PERMISSION)
                 .handler(context -> {
                     Player sender = context.sender().player();
-                    factory.open(sender, HomeListGui.class, null);
+                    factory.openList(sender);
                 }));
 
         commandManager.command(commandManager.commandBuilder("home")
