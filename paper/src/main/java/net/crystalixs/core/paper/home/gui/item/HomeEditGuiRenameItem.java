@@ -1,6 +1,7 @@
 package net.crystalixs.core.paper.home.gui.item;
 
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
+import net.crystalixs.core.paper.home.gui.RenameHomeGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -24,5 +25,6 @@ public class HomeEditGuiRenameItem extends AbstractItem {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (!clickType.isLeftClick()) return;
+        new RenameHomeGui().open(player);
     }
 }
