@@ -2,7 +2,6 @@ package net.crystalixs.core.paper.home.gui.item;
 
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
-import net.crystalixs.core.paper.home.gui.HomeListGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +24,6 @@ public class HomeEditGuiReturnToListItem extends AbstractLeftClickItem {
 
     @Override
     protected void handleLeftClick(@NotNull Player player, @NotNull InventoryClickEvent event) {
-        guiFactory.open(player, HomeListGui.class, null);
+        guiFactory.openList(player);
     }
 }

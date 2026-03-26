@@ -53,6 +53,14 @@ public final class HomeGuiFactory {
         new RenameHomeGui(plugin, service, factory, model).open(player);
     }
 
+    public void openList(@NotNull Player player) {
+        open(player, HomeListGui.class, null);
+    }
+
+    public void openEdit(@NotNull Player player, @NotNull HomeModel model) {
+        open(player, HomeEditGui.class, model);
+    }
+
     public HomeService service() {
         return service;
     }
