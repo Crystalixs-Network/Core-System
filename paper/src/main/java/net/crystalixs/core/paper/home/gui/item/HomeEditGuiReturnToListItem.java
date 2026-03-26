@@ -1,8 +1,8 @@
 package net.crystalixs.core.paper.home.gui.item;
 
+import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
-import net.crystalixs.core.paper.home.HomeService;
-import net.crystalixs.core.persistence.model.HomeModel;
+import net.crystalixs.core.paper.home.gui.HomeListGui;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -10,27 +10,24 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
-public class HomeMenuDeleteItem extends AbstractItem {
+public class HomeEditGuiReturnToListItem extends AbstractItem {
 
-    private final HomeService service;
-    private final HomeGuiItemFactory factory;
-    private final HomeModel model;
+    private final HomeGuiItemFactory itemFactory;
+    private final HomeGuiFactory guiFactory;
 
-    public HomeMenuDeleteItem(HomeService service, HomeGuiItemFactory factory, HomeModel model) {
-        this.service = service;
-        this.factory = factory;
-        this.model = model;
+    public HomeEditGuiReturnToListItem(HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory) {
+        this.itemFactory = itemFactory;
+        this.guiFactory = guiFactory;
     }
 
     @Override
     public ItemProvider getItemProvider() {
-        return factory.delete();
+        return itemFactory.back();
     }
 
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (!clickType.isLeftClick()) return;
-
-        service.delete(player.getUniqueId(), model.name());
+        guiFactory.open(player, HomeListGui.class, null);
     }
 }
