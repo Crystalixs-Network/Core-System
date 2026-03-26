@@ -4,9 +4,9 @@ import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
 import net.crystalixs.core.paper.home.HomeRenameExecutor;
-import net.crystalixs.core.paper.home.HomeRenameExecutor.Outcome;
 import net.crystalixs.core.paper.home.HomeRenameFailureHandler;
 import net.crystalixs.core.paper.home.HomeService;
+import net.crystalixs.core.paper.home.gui.item.HomeRenameConfirmItem;
 import net.crystalixs.core.persistence.model.HomeModel;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
@@ -16,11 +16,9 @@ import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.window.AnvilWindow;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
-import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
 public final class RenameHomeGui {
 
@@ -44,40 +42,21 @@ public final class RenameHomeGui {
     public void open(Player player) {
         var title = translatable("command.home.ui.edit.rename.title");
         var renderedTitle = GlobalTranslator.render(title, player.locale());
-        String originalName = model.name();
-        String normalizedOriginalName = originalName == null ? "" : originalName.trim();
-        AtomicBoolean userChangedInput = new AtomicBoolean(false);
+        var originalName = model.name();
+        var pendingNewName = new AtomicReference<>(originalName);
 
         Gui gui = Gui.normal()
-                .setStructure("i x x")
+                .setStructure("i x r")
                 .addIngredient('x', new ItemBuilder(Material.AIR))
                 .addIngredient('i', factory.icon(model))
+                .addIngredient('r', new HomeRenameConfirmItem(originalName, pendingNewName::get, renameExecutor, renameFailureHandler, logger))
                 .build();
 
         AnvilWindow.single()
                 .setViewer(player)
                 .setTitle(new AdventureComponentWrapper(renderedTitle))
                 .setGui(gui)
-                .addRenameHandler(renameText -> {
-                    String normalizedNewName = renameText == null ? "" : renameText.trim();
-                    if (!normalizedNewName.equalsIgnoreCase(normalizedOriginalName)) {
-                        userChangedInput.set(true);
-                    }
-                    if (!userChangedInput.get()) {
-                        return;
-                    }
-
-                    Outcome outcome = renameExecutor.execute(player.getUniqueId(), originalName, renameText);
-                    if (outcome instanceof HomeRenameExecutor.Success(String oldName, HomeModel renamed)) {
-                        player.sendMessage(translatable("command.home.rename.success").arguments(
-                                component("old_name", text(oldName)),
-                                component("new_name", text(renamed.name()))));
-
-                        player.closeInventory();
-                        return;
-                    }
-                    renameFailureHandler.handle(player, (HomeRenameExecutor.Failure) outcome, logger);
-                })
+                .addRenameHandler(pendingNewName::set)
                 .open(player);
     }
 }
