@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 import java.util.List;
 
-public final class IconCatalog {
+public final class HomeIconCatalog {
 
     public static final List<Material> ICONS = List.of(
             Material.GRASS_BLOCK,
@@ -36,6 +36,6 @@ public final class IconCatalog {
             Material.POINTED_DRIPSTONE
     );
 
-    private IconCatalog() {
+    private HomeIconCatalog() {
     }
 }

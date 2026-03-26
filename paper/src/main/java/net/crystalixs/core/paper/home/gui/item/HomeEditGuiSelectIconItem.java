@@ -2,7 +2,6 @@ package net.crystalixs.core.paper.home.gui.item;
 
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
-import net.crystalixs.core.paper.home.gui.SelectIconGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -31,6 +30,6 @@ public final class HomeEditGuiSelectIconItem extends AbstractItem {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (!clickType.isLeftClick()) return;
-        new SelectIconGui(itemFactory, guiFactory, model).open(player);
+        guiFactory.openIconSelection(player, model);
     }
 }

@@ -4,7 +4,6 @@ import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.home.HomeException;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
-import net.crystalixs.core.paper.home.gui.SelectIconGui;
 import net.crystalixs.core.paper.home.logging.HomeLogEvent;
 import net.crystalixs.core.paper.home.logging.StructuredHomeLog;
 import net.crystalixs.core.persistence.model.HomeModel;
@@ -45,8 +44,8 @@ public class HomeIconChoiceItem extends AbstractItem {
         if (!clickType.isLeftClick()) return;
         try {
             HomeModel updated = guiFactory.service().updateIcon(player.getUniqueId(), model.name(), icon.name());
+            guiFactory.openIconSelection(player, updated);
             homeLog.info(HomeLogEvent.UPDATE_ICON_SUCCESS, player, model.name() + " -> " + updated.icon());
-            new SelectIconGui(itemFactory, guiFactory, updated).open(player);
 
         } catch (HomeException exception) {
             homeLog.warn(HomeLogEvent.UPDATE_ICON_FAILED, player, model.name() + " -> " + icon.name() + ", error=" + exception.error().name(), exception);

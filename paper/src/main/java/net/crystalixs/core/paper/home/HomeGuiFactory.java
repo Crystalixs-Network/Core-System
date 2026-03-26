@@ -4,6 +4,7 @@ import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.home.gui.HomeEditGui;
 import net.crystalixs.core.paper.home.gui.HomeGui;
+import net.crystalixs.core.paper.home.gui.HomeIconSelectionGui;
 import net.crystalixs.core.paper.home.gui.HomeListGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
@@ -33,6 +34,12 @@ public final class HomeGuiFactory {
             }
             gui = new HomeEditGui(plugin, service, factory, this, model);
 
+        } else if (guiClass == HomeIconSelectionGui.class) {
+            if (model == null) {
+                throw new IllegalArgumentException("HomeIconSelectionGui requires a home model");
+            }
+            gui = new HomeIconSelectionGui(factory, this, model);
+
         } else {
             throw new IllegalArgumentException("Unsupported GUI class: " + guiClass.getName());
         }
@@ -46,5 +53,9 @@ public final class HomeGuiFactory {
 
     public StructuredLogger logger(String... path) {
         return plugin.componentLogger(String.join(".", path));
+    }
+
+    public void openIconSelection(@NotNull Player player, @NotNull HomeModel model) {
+        open(player, HomeIconSelectionGui.class, model);
     }
 }
