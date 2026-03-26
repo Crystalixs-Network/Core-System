@@ -34,6 +34,6 @@ public class HomeEditGuiRenameItem extends AbstractItem {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (!clickType.isLeftClick()) return;
-        new RenameHomeGui(plugin, service, model).open(player);
+        new RenameHomeGui(plugin, service, itemFactory, model).open(player);
     }
 }

@@ -21,6 +21,13 @@ public final class HomeRenameExecutor {
         try {
             String oldName = inputValidator.normalizeOldName(oldNameInput);
             String newName = inputValidator.normalizeNewName(newNameInput);
+
+            if (oldName.equalsIgnoreCase(newName)) {
+                HomeException exception = new HomeException(HomeError.HOME_ALREADY_EXISTS, "Home with name " + newName + " already exists for player " + playerId);
+                Component message = errorMapper.toMessage(exception, oldNameInput, newNameInput);
+                return new Failure(exception, message);
+            }
+
             HomeModel renamed = service.rename(playerId, oldName, newName);
             return new Success(oldName, renamed);
 
