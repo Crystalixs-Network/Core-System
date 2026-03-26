@@ -3,8 +3,7 @@ package net.crystalixs.core.paper.home.gui;
 import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
-import net.crystalixs.core.paper.home.HomeError;
-import net.crystalixs.core.paper.home.HomeException;
+import net.crystalixs.core.paper.home.*;
 import net.crystalixs.core.persistence.model.HomeModel;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
@@ -20,12 +19,19 @@ import static net.kyori.adventure.text.minimessage.translation.Argument.componen
 
 public final class RenameHomeGui {
 
+    private final HomeService service;
     private final HomeModel model;
-    private final StructuredLogger logger;
 
-    public RenameHomeGui(CorePlugin plugin, HomeModel model) {
+    private final StructuredLogger logger;
+    private final HomeRenameInputValidator renameInputValidator;
+    private final HomeRenameErrorMapper renameErrorMapper;
+
+    public RenameHomeGui(CorePlugin plugin, HomeService service, HomeModel model) {
+        this.service = service;
         this.model = model;
         this.logger = plugin.componentLogger("home", "gui", "rename");
+        this.renameInputValidator = new HomeRenameInputValidator();
+        this.renameErrorMapper = new HomeRenameErrorMapper();
     }
 
     public void open(Player player) {
@@ -42,20 +48,18 @@ public final class RenameHomeGui {
                 .setTitle(new AdventureComponentWrapper(renderedTitle))
                 .setGui(gui)
                 .addRenameHandler(renameText -> {
-                    String oldName = model.name();
+                    String oldNameInput = model.name();
 
                     try {
-                        player.sendRawMessage(oldName + " --> " + renameText);
+                        String oldName = renameInputValidator.normalizeOldName(oldNameInput);
+                        String newName = renameInputValidator.normalizeNewName(renameText);
+                        HomeModel renamed = service.rename(player.getUniqueId(), oldName, newName);
+                        player.sendMessage(translatable("command.home.rename.success").arguments(
+                                component("old_name", text(oldName)),
+                                component("new_name", text(renamed.name()))));
+                        player.closeInventory();
 
                     } catch (HomeException exception) {
-                        String key = switch (exception.error()) {
-                            case INVALID_NAME -> "command.home.create.error.invalid-name";
-                            case HOME_NOT_FOUND -> "command.home.rename.error.not-found";
-                            case HOME_ALREADY_EXISTS -> "command.home.rename.error.already-exists";
-                            case PLAYER_CREATION_FAILED -> "error.player-load";
-                            default -> "command.home.rename.error.persistence";
-                        };
-
                         if (exception.error() == HomeError.HOME_RENAME_FAILED || exception.error() == HomeError.PLAYER_CREATION_FAILED) {
                             logger.warn("home rename failed", LogMetadata
                                     .event("command.home.rename.failed")
@@ -63,14 +67,7 @@ public final class RenameHomeGui {
                                     .and(LogMetadata.Key.SUBJECT, player.getUniqueId().toString())
                                     .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
                         }
-
-                        if (exception.error() == HomeError.HOME_NOT_FOUND) {
-                            player.sendMessage(translatable(key).arguments(component("old_name", text(oldName.trim()))));
-                        } else if (exception.error() == HomeError.HOME_ALREADY_EXISTS) {
-                            player.sendMessage(translatable(key).arguments(component("new_name", text(renameText.trim()))));
-                        } else {
-                            player.sendMessage(translatable(key));
-                        }
+                        player.sendMessage(renameErrorMapper.toMessage(exception, oldNameInput, renameText));
                     }
                 })
                 .open(player);

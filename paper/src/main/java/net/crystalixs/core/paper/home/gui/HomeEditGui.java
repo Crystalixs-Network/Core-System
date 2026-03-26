@@ -47,7 +47,7 @@ public final class HomeEditGui implements HomeGui {
                 .addIngredient('i', new SimpleItem(itemFactory.icon(model)))
                 .addIngredient('b', new HomeEditGuiReturnToListItem(itemFactory, guiFactory))
                 .addIngredient('d', new HomeEditGuiDeleteItem(service, itemFactory, model))
-                .addIngredient('r', new HomeEditGuiRenameItem(plugin, itemFactory, model))
+                .addIngredient('r', new HomeEditGuiRenameItem(plugin, service, itemFactory, model))
                 .build();
     }
 }

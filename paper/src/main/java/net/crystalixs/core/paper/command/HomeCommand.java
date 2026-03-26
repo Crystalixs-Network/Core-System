@@ -28,12 +28,16 @@ public final class HomeCommand extends PaperCommand {
     private final HomeService service;
     private final StructuredLogger logger;
     private final HomeGuiFactory factory;
+    private final HomeRenameInputValidator renameInputValidator;
+    private final HomeRenameErrorMapper renameErrorMapper;
 
     public HomeCommand(CorePlugin plugin, HomeService service, HomeGuiFactory factory) {
         super(plugin);
         this.service = service;
         this.logger = plugin.commandLogger("home");
         this.factory = factory;
+        this.renameInputValidator = new HomeRenameInputValidator();
+        this.renameErrorMapper = new HomeRenameErrorMapper();
     }
 
     @Override
@@ -129,10 +133,12 @@ public final class HomeCommand extends PaperCommand {
                 .required("new-name", stringParser(), RichDescription.translatable("command.home.description.new-name"))
                 .handler(context -> {
                     Player sender = context.sender().player();
-                    String oldName = context.get("old-name");
-                    String newName = context.get("new-name");
+                    String oldNameInput = context.get("old-name");
+                    String newNameInput = context.get("new-name");
 
                     try {
+                        String oldName = renameInputValidator.normalizeOldName(oldNameInput);
+                        String newName = renameInputValidator.normalizeNewName(newNameInput);
                         HomeModel renamed = service.rename(sender.getUniqueId(), oldName, newName);
                         sender.sendMessage(translatable("command.home.rename.success").arguments(
                                 component("old_name", text(oldName)),
@@ -145,14 +151,6 @@ public final class HomeCommand extends PaperCommand {
                                 .and(LogMetadata.Key.DESCRIPTION, oldName + " → " + renamed.name()));
 
                     } catch (HomeException exception) {
-                        String key = switch (exception.error()) {
-                            case INVALID_NAME -> "command.home.create.error.invalid-name";
-                            case HOME_NOT_FOUND -> "command.home.rename.error.not-found";
-                            case HOME_ALREADY_EXISTS -> "command.home.rename.error.already-exists";
-                            case PLAYER_CREATION_FAILED -> "error.player-load";
-                            default -> "command.home.rename.error.persistence";
-                        };
-
                         if (exception.error() == HomeError.HOME_RENAME_FAILED || exception.error() == HomeError.PLAYER_CREATION_FAILED) {
                             logger.warn("home rename failed", LogMetadata
                                     .event("command.home.rename.failed")
@@ -160,14 +158,7 @@ public final class HomeCommand extends PaperCommand {
                                     .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
                                     .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
                         }
-
-                        if (exception.error() == HomeError.HOME_NOT_FOUND) {
-                            sender.sendMessage(translatable(key).arguments(component("old_name", text(oldName.trim()))));
-                        } else if (exception.error() == HomeError.HOME_ALREADY_EXISTS) {
-                            sender.sendMessage(translatable(key).arguments(component("new_name", text(newName.trim()))));
-                        } else {
-                            sender.sendMessage(translatable(key));
-                        }
+                        sender.sendMessage(renameErrorMapper.toMessage(exception, oldNameInput, newNameInput));
                     }
                 }));
 
