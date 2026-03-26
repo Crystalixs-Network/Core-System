@@ -49,7 +49,7 @@ public final class RenameHomeGui {
                 .setStructure("i x r")
                 .addIngredient('x', new ItemBuilder(Material.AIR))
                 .addIngredient('i', factory.icon(model))
-                .addIngredient('r', new RenameHomeGuiConfirmationItem(originalName, pendingNewName::get, renameExecutor, renameFailureHandler, logger))
+                .addIngredient('r', new RenameHomeGuiConfirmationItem(player, originalName, pendingNewName::get, renameExecutor, renameFailureHandler, logger))
                 .build();
 
         AnvilWindow.single()

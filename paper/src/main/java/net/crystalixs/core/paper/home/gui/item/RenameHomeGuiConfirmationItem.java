@@ -5,6 +5,7 @@ import net.crystalixs.core.paper.home.HomeRenameExecutor;
 import net.crystalixs.core.paper.home.HomeRenameExecutor.Outcome;
 import net.crystalixs.core.paper.home.HomeRenameFailureHandler;
 import net.crystalixs.core.persistence.model.HomeModel;
+import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -17,18 +18,21 @@ import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 import java.util.function.Supplier;
 
-import static net.kyori.adventure.text.Component.*;
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
 public final class RenameHomeGuiConfirmationItem extends AbstractItem {
 
+    private final Player player;
     private final String oldName;
     private final Supplier<String> newNameSupplier;
     private final HomeRenameExecutor executor;
     private final HomeRenameFailureHandler failureHandler;
     private final StructuredLogger logger;
 
-    public RenameHomeGuiConfirmationItem(String oldName, Supplier<String> newNameSupplier, HomeRenameExecutor executor, HomeRenameFailureHandler failureHandler, StructuredLogger logger) {
+    public RenameHomeGuiConfirmationItem(Player player, String oldName, Supplier<String> newNameSupplier, HomeRenameExecutor executor, HomeRenameFailureHandler failureHandler, StructuredLogger logger) {
+        this.player = player;
         this.oldName = oldName;
         this.newNameSupplier = newNameSupplier;
         this.executor = executor;
@@ -38,8 +42,11 @@ public final class RenameHomeGuiConfirmationItem extends AbstractItem {
 
     @Override
     public ItemProvider getItemProvider() {
+        var name = translatable("command.home.ui.edit.rename.confirmation");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
         return new ItemBuilder(Material.LIME_STAINED_GLASS_PANE)
-                .setDisplayName(new AdventureComponentWrapper(empty()));
+                .setDisplayName(new AdventureComponentWrapper(renderedName));
     }
 
     @Override
