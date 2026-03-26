@@ -44,7 +44,8 @@ public final class DefaultHomeStore implements HomeStore {
             return config.query("SELECT * FROM homes WHERE player_id = ? AND name = ?;")
                     .single(call()
                             .bind(playerId.toString())
-                            .bind(name))
+                            .bind(name)
+                    )
                     .map(HomeModel.map())
                     .first();
         } catch (RuntimeException exception) {
@@ -75,33 +76,14 @@ public final class DefaultHomeStore implements HomeStore {
     }
 
     @Override
-    public void update(HomeModel model) {
-        try {
-            config.query("UPDATE homes SET player_id = ?, name = ?, world_name = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ? WHERE id = ?;")
-                    .single(call()
-                            .bind(model.playerId().toString())
-                            .bind(model.name())
-                            .bind(model.position().worldName())
-                            .bind(model.position().x())
-                            .bind(model.position().y())
-                            .bind(model.position().z())
-                            .bind(model.position().yaw())
-                            .bind(model.position().pitch())
-                            .bind(model.id()))
-                    .update();
-        } catch (RuntimeException exception) {
-            throw failure("persistence.home.update_failed", "home:" + model.id(), "Could not update home", exception);
-        }
-    }
-
-    @Override
     public void rename(UUID playerId, String oldName, String newName) {
         try {
             boolean changed = config.query("UPDATE homes SET name = ? WHERE player_id = ? AND name = ?;")
                     .single(call()
                             .bind(newName)
                             .bind(playerId.toString())
-                            .bind(oldName))
+                            .bind(oldName)
+                    )
                     .update()
                     .changed();
 
@@ -160,24 +142,13 @@ public final class DefaultHomeStore implements HomeStore {
     }
 
     @Override
-    public boolean deleteById(long homeId) {
-        try {
-            return config.query("DELETE FROM homes WHERE id = ?;")
-                    .single(call().bind(homeId))
-                    .delete()
-                    .changed();
-        } catch (RuntimeException exception) {
-            throw failure("persistence.home.delete_failed", "home:" + homeId, "Could not delete home", exception);
-        }
-    }
-
-    @Override
     public boolean deleteByPlayerAndName(UUID playerId, String name) {
         try {
             return config.query("DELETE FROM homes WHERE player_id = ? AND name = ?;")
                     .single(call()
                             .bind(playerId.toString())
-                            .bind(name))
+                            .bind(name)
+                    )
                     .delete()
                     .changed();
         } catch (RuntimeException exception) {
@@ -195,15 +166,13 @@ public final class DefaultHomeStore implements HomeStore {
                         .bind(model.position().y())
                         .bind(model.position().z())
                         .bind(model.position().yaw())
-                        .bind(model.position().pitch()))
+                        .bind(model.position().pitch())
+                )
                 .insertAndGetKeys()
                 .keys()
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new PersistenceException(
-                        "Could not read generated home key",
-                        new IllegalStateException(subject(model.playerId(), model.name()))
-                ));
+                .orElseThrow(() -> new PersistenceException("Could not read generated home key", new IllegalStateException(subject(model.playerId(), model.name()))));
     }
 
     private PersistenceException failure(String event, String subject, String message, RuntimeException exception) {
