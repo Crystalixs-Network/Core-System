@@ -1,5 +1,6 @@
 package net.crystalixs.core.paper.home;
 
+import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.home.gui.HomeEditGui;
 import net.crystalixs.core.paper.home.gui.HomeGui;
 import net.crystalixs.core.paper.home.gui.HomeListGui;
@@ -10,9 +11,11 @@ import org.jetbrains.annotations.Nullable;
 
 public final class HomeGuiFactory {
 
+    private final CorePlugin plugin;
     private final HomeService service;
 
-    public HomeGuiFactory(HomeService service) {
+    public HomeGuiFactory(CorePlugin plugin, HomeService service) {
+        this.plugin = plugin;
         this.service = service;
     }
 
@@ -27,7 +30,7 @@ public final class HomeGuiFactory {
             if (model == null) {
                 throw new IllegalArgumentException("HomeEditGui requires a home model");
             }
-            gui = new HomeEditGui(service, factory, this, model);
+            gui = new HomeEditGui(plugin, service, factory, this, model);
 
         } else {
             throw new IllegalArgumentException("Unsupported GUI class: " + guiClass.getName());
