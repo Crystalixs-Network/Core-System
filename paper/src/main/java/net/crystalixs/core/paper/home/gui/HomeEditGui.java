@@ -13,15 +13,15 @@ import xyz.xenondevs.invui.item.impl.SimpleItem;
 public final class HomeEditGui implements HomeGui {
 
     private final HomeService service;
-    private final HomeModel model;
     private final HomeGuiItemFactory itemFactory;
     private final HomeGuiFactory guiFactory;
+    private final HomeModel model;
 
-    public HomeEditGui(HomeService service, HomeModel model, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory) {
+    public HomeEditGui(HomeService service, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory, HomeModel model) {
         this.service = service;
-        this.model = model;
         this.itemFactory = itemFactory;
         this.guiFactory = guiFactory;
+        this.model = model;
     }
 
     @Override
