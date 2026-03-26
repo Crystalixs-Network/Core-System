@@ -37,7 +37,7 @@ public final class DefaultHomeService implements HomeService {
             return failAsAlreadyExistent(playerId, normalizedName);
         }
         try {
-            return homes.create(new HomeModel(0L, playerId, normalizedName, position, null));
+            return homes.create(new HomeModel(0L, playerId, normalizedName, null, position, null));
 
         } catch (PersistenceException exception) {
             if (isDuplicate(exception)) {
@@ -93,7 +93,7 @@ public final class DefaultHomeService implements HomeService {
                 return failAsAlreadyExistent(playerId, normalizedNewName);
             }
 
-            HomeModel renamed = new HomeModel(existing.id(), existing.playerId(), normalizedNewName, existing.position(), existing.createdAt());
+            HomeModel renamed = new HomeModel(existing.id(), existing.playerId(), normalizedNewName, existing.icon(), existing.position(), existing.createdAt());
             try {
                 homes.rename(playerId, normalizedOldName, normalizedNewName);
                 return homes.findById(existing.id()).orElse(renamed);
@@ -122,7 +122,7 @@ public final class DefaultHomeService implements HomeService {
             return existing;
         }
 
-        HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), position, existing.createdAt());
+        HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), existing.icon(), position, existing.createdAt());
         try {
             homes.updatePosition(existing.id(), position.worldName(), position.x(), position.y(), position.z(), position.yaw(), position.pitch());
             return homes.findById(existing.id()).orElse(updated);
