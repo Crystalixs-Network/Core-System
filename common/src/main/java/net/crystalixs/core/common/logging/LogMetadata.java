@@ -28,6 +28,12 @@ public final class LogMetadata {
         return new LogMetadata(copy);
     }
 
+    public LogMetadata and(LogMetadata other) {
+        LinkedHashMap<String, Object> copy = new LinkedHashMap<>(values);
+        copy.putAll(other.values);
+        return new LogMetadata(copy);
+    }
+
     public String renderInline() {
         if (values.isEmpty()) {
             return "";
@@ -55,7 +61,13 @@ public final class LogMetadata {
         COMMAND("command"),
         STATE("state"),
         CREDENTIALS("credentials"),
-        VERSION_TABLE("versionTable");
+        VERSION_TABLE("versionTable"),
+        HOME_NAME("homeName"),
+        OLD_HOME_NAME("oldHomeName"),
+        NEW_HOME_NAME("newHomeName"),
+        ERROR("error"),
+        PREVIOUS_ICON("previousIcon"),
+        NEW_ICON("newIcon");
 
         private final String value;
 

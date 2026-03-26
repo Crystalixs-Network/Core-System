@@ -44,7 +44,8 @@ public final class DefaultHomeStore implements HomeStore {
             return config.query("SELECT * FROM homes WHERE player_id = ? AND name = ?;")
                     .single(call()
                             .bind(playerId.toString())
-                            .bind(name))
+                            .bind(name)
+                    )
                     .map(HomeModel.map())
                     .first();
         } catch (RuntimeException exception) {
@@ -75,34 +76,68 @@ public final class DefaultHomeStore implements HomeStore {
     }
 
     @Override
-    public void update(HomeModel model) {
+    public void rename(UUID playerId, String oldName, String newName) {
         try {
-            config.query("UPDATE homes SET player_id = ?, name = ?, world_name = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ? WHERE id = ?;")
+            boolean changed = config.query("UPDATE homes SET name = ? WHERE player_id = ? AND name = ?;")
                     .single(call()
-                            .bind(model.playerId().toString())
-                            .bind(model.name())
-                            .bind(model.position().worldName())
-                            .bind(model.position().x())
-                            .bind(model.position().y())
-                            .bind(model.position().z())
-                            .bind(model.position().yaw())
-                            .bind(model.position().pitch())
-                            .bind(model.id()))
-                    .update();
+                            .bind(newName)
+                            .bind(playerId.toString())
+                            .bind(oldName)
+                    )
+                    .update()
+                    .changed();
+
+            if (!changed) {
+                IllegalStateException exception = new IllegalStateException("No home row found for player=" + playerId + ", name=" + oldName);
+                throw failure("persistence.home.rename_not_found", "player:" + playerId + ", from:" + oldName + ", to:" + newName, "Could not rename home: target does not exist", exception);
+            }
         } catch (RuntimeException exception) {
-            throw failure("persistence.home.update_failed", "home:" + model.id(), "Could not update home", exception);
+            throw failure("persistence.home.rename_failed", "player:" + playerId + ", from:" + oldName + ", to:" + newName, "Could not rename home", exception);
         }
     }
 
     @Override
-    public boolean deleteById(long homeId) {
+    public void updatePosition(long homeId, String worldName, double x, double y, double z, float yaw, float pitch) {
         try {
-            return config.query("DELETE FROM homes WHERE id = ?;")
-                    .single(call().bind(homeId))
-                    .delete()
+            boolean changed = config.query("UPDATE homes SET world_name = ?, x = ?, y = ?, z = ?, yaw = ?, pitch = ? WHERE id = ?;")
+                    .single(call()
+                            .bind(worldName)
+                            .bind(x)
+                            .bind(y)
+                            .bind(z)
+                            .bind(yaw)
+                            .bind(pitch)
+                            .bind(homeId)
+                    )
+                    .update()
                     .changed();
+
+            if (!changed) {
+                IllegalStateException exception = new IllegalStateException("No home row found for id=" + homeId);
+                throw failure("persistence.home.update_position_not_found", "home:" + homeId, "Could not update home position: target does not exist", exception);
+            }
         } catch (RuntimeException exception) {
-            throw failure("persistence.home.delete_failed", "home:" + homeId, "Could not delete home", exception);
+            throw failure("persistence.home.update_position_failed", "home:" + homeId, "Could not update home position", exception);
+        }
+    }
+
+    @Override
+    public void updateIcon(long homeId, String icon) {
+        try {
+            boolean changed = config.query("UPDATE homes SET icon = ? WHERE id = ?;")
+                    .single(call()
+                            .bind(icon)
+                            .bind(homeId)
+                    )
+                    .update()
+                    .changed();
+
+            if (!changed) {
+                IllegalStateException exception = new IllegalStateException("No home row found for id=" + homeId);
+                throw failure("persistence.home.update_icon_not_found", "home:" + homeId, "Could not update home icon: target does not exist", exception);
+            }
+        } catch (RuntimeException exception) {
+            throw failure("persistence.home.update_icon_failed", "home:" + homeId, "Could not update home icon", exception);
         }
     }
 
@@ -112,7 +147,8 @@ public final class DefaultHomeStore implements HomeStore {
             return config.query("DELETE FROM homes WHERE player_id = ? AND name = ?;")
                     .single(call()
                             .bind(playerId.toString())
-                            .bind(name))
+                            .bind(name)
+                    )
                     .delete()
                     .changed();
         } catch (RuntimeException exception) {
@@ -130,28 +166,27 @@ public final class DefaultHomeStore implements HomeStore {
                         .bind(model.position().y())
                         .bind(model.position().z())
                         .bind(model.position().yaw())
-                        .bind(model.position().pitch()))
+                        .bind(model.position().pitch())
+                )
                 .insertAndGetKeys()
                 .keys()
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new PersistenceException(
-                        "Could not read generated home key",
-                        new IllegalStateException(subject(model.playerId(), model.name()))
-                ));
+                .orElseThrow(() -> new PersistenceException("Could not read generated home key", new IllegalStateException(subject(model.playerId(), model.name()))));
     }
 
     private PersistenceException failure(String event, String subject, String message, RuntimeException exception) {
-        logger.warn(event, LogMetadata.event(event)
-                .and(LogMetadata.Key.SUBJECT, subject), exception);
+        logger.warn(event, LogMetadata.event(event).and(LogMetadata.Key.SUBJECT, subject), exception);
         return new PersistenceException(message, exception);
     }
 
     private PersistenceException reloadFailure(HomeModel model, long homeId) {
         String subject = subject(model.playerId(), model.name());
         IllegalStateException exception = new IllegalStateException("home:" + homeId);
-        logger.warn("persistence.home.reload_failed", LogMetadata.event("persistence.home.reload_failed")
+        logger.warn("persistence.home.reload_failed", LogMetadata
+                .event("persistence.home.reload_failed")
                 .and(LogMetadata.Key.SUBJECT, subject), exception);
+
         return new PersistenceException("Could not reload created home", exception);
     }
 
