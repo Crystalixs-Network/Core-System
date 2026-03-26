@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS homes
     id         BIGINT      NOT NULL PRIMARY KEY AUTO_INCREMENT,
     player_id  UUID        NOT NULL,
     name       VARCHAR(64) NOT NULL,
+    icon       VARCHAR(64) NOT NULL DEFAULT 'GRASS_BLOCK',
     world_name VARCHAR(64) NOT NULL,
     x          DOUBLE      NOT NULL,
     y          DOUBLE      NOT NULL,
