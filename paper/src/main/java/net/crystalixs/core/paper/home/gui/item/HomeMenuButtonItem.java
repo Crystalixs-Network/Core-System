@@ -11,7 +11,7 @@ import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 public final class HomeMenuButtonItem extends AbstractItem {
 
-    public enum Action { BACK_TO_LIST }
+    public enum Action { BACK_TO_LIST, DELETE }
 
     private final HomeGuiFactory guiFactory;
 
