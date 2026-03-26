@@ -54,10 +54,10 @@ public final class RenameHomeGui {
                         player.sendMessage(translatable("command.home.rename.success").arguments(
                                 component("old_name", text(oldName)),
                                 component("new_name", text(renamed.name()))));
+
                         player.closeInventory();
                         return;
                     }
-
                     renameFailureHandler.handle(player, (HomeRenameExecutor.Failure) outcome, logger);
                 })
                 .open(player);
