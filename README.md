@@ -15,6 +15,7 @@
 | Unified Help             | Zeigt Proxy- und Backend-Befehle in einem gemeinsamen Help-Menü mit Paging, Server- und Permission-Filter. |
 | Konfigurations-Reload    | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.                                   |
 | Economy (Paper)          | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.                                         |
+| Home-System (Paper)      | Verwaltet Homes inklusive GUI, Umbenennen per Amboss und Icon-Auswahl mit Persistenz.                      |
 | Utility Commands (Paper) | Stellt QoL-Commands wie Hat, Enderchest, Trash, Sit, Sign, Skull, Invsee, Vanish und Teleport bereit.      |
 
 ---
@@ -98,6 +99,18 @@ Enthalten sind:
 - Zahlendarstellung basierend auf der aufgelösten Translation-Locale
 - Silent logging
 
+### Home-System (Paper)
+
+Das Paper-Modul enthält ein Home-System mit Command- und GUI-Flow.
+
+Enthalten sind:
+
+- Home-Liste und Home-Editor als GUI (`/home`)
+- Home anlegen, löschen, umbenennen und Position aktualisieren
+- Umbenennen über Amboss-GUI
+- Icon-Auswahl pro Home mit persistenter Speicherung
+- Strukturierte Logs für Home-Operationen
+
 ### Logging im Hintergrund
 
 Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und Fehler nachvollziehbar bleiben. Die Details dazu stehen in `LOGGING.md`.
@@ -136,6 +149,11 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 | `/economy give <player> <currency> <amount>`                      | Fügt Coins oder Gems hinzu.                                                             | Admin-Korrekturen, Rewards                   |
 | `/economy set <player> <currency> <amount>`                       | Setzt Coins oder Gems auf einen festen Wert.                                            | Moderation, Datenkorrekturen                 |
 | `/economy take <player> <currency> <amount>`                      | Zieht Coins oder Gems ab.                                                               | Moderation, Rückabwicklung                   |
+| `/home`                                                           | Öffnet die Home-GUI mit Home-Liste und Schnellzugriff.                                  | Navigation und Teleport über GUI             |
+| `/home create <name>`                                             | Erstellt ein neues Home an der aktuellen Position.                                      | Neues Teleport-Ziel speichern                |
+| `/home delete <name>`                                             | Löscht ein bestehendes Home.                                                            | Aufräumen/Entfernen alter Homes              |
+| `/home rename <old-name> <new-name>`                              | Benennt ein Home um.                                                                    | Umstrukturierung von Home-Namen              |
+| `/home update <name>`                                             | Aktualisiert die gespeicherte Position eines Homes auf die aktuelle Position.           | Bestehendes Home verschieben                 |
 | `/hat`                                                            | Setzt das Item in der Hand als Helm.                                                    | Cosmetic/QoL                                 |
 | `/enderchest` oder `/ec`                                          | Öffnet die eigene Enderchest.                                                           | Schneller Zugriff                            |
 | `/enderchest <player>` oder `/ec <player>`                        | Öffnet die Enderchest eines anderen Spielers.                                           | Moderation/Support                           |
@@ -176,6 +194,7 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 | `core.command.balance`                   | Erlaubt die Abfrage von Coins und Gems.                              |
 | `core.command.pay`                       | Erlaubt das Senden von Coins an andere Spieler.                      |
 | `core.command.economy`                   | Erlaubt administrative Economy-Befehle (`give`, `set`, `take`).      |
+| `core.command.home`                      | Erlaubt die Nutzung des Home-Systems (`/home` + Subcommands).        |
 | `core.command.hat`                       | Erlaubt `/hat`.                                                      |
 | `core.command.enderchest`                | Erlaubt das Öffnen der eigenen Enderchest (`/ec`).                   |
 | `core.command.enderchest.other`          | Erlaubt das Öffnen fremder Enderchests.                              |
@@ -250,4 +269,4 @@ Die SQL-Struktur liegt im Modul `persistence` unter:
 
 ## Status
 
-Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und erweitert diese auf Paper um ein Economy-System und Utility-Commands.
+Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und erweitert diese auf Paper um Economy, Home-System und Utility-Commands.
