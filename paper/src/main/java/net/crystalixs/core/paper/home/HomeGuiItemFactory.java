@@ -23,7 +23,7 @@ public final class HomeGuiItemFactory {
         var name = translatable("command.home.ui.item.home").arguments(component("name", text(model.name())));
         var renderedName = GlobalTranslator.render(name, player.locale());
 
-        return new ItemBuilder(Material.GRASS_BLOCK).setDisplayName(new AdventureComponentWrapper(renderedName));
+        return new ItemBuilder(resolveIcon(model)).setDisplayName(new AdventureComponentWrapper(renderedName));
     }
 
     public ItemProvider available() {
@@ -63,6 +63,25 @@ public final class HomeGuiItemFactory {
         var renderedName = GlobalTranslator.render(name, player.locale());
 
         return new ItemBuilder(Material.SPYGLASS).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
+    public ItemProvider choice(Material material) {
+        return new ItemBuilder(material);
+    }
+
+    public ItemProvider selectedChoice(Material material) {
+        var name = translatable("command.home.ui.edit.item.selected");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
+        return new ItemBuilder(material).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
+    public Material resolveIcon(HomeModel model) {
+        if (model.icon() == null || model.icon().isBlank()) {
+            return Material.GRASS_BLOCK;
+        }
+        Material parsed = Material.matchMaterial(model.icon().trim());
+        return parsed == null ? Material.GRASS_BLOCK : parsed;
     }
 
 }
