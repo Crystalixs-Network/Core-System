@@ -15,7 +15,7 @@ import xyz.xenondevs.invui.item.ItemProvider;
 
 import static net.kyori.adventure.text.Component.translatable;
 
-public class HomeIconChoiceItem extends AbstractLeftClickItem {
+public final class HomeIconChoiceItem extends AbstractLeftClickItem {
 
     private final HomeGuiItemFactory itemFactory;
     private final HomeGuiFactory guiFactory;

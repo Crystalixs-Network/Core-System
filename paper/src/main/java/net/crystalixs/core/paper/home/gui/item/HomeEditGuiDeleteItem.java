@@ -12,7 +12,7 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
-public class HomeEditGuiDeleteItem extends AbstractLeftClickItem {
+public final class HomeEditGuiDeleteItem extends AbstractLeftClickItem {
 
     private final HomeService service;
     private final HomeGuiItemFactory factory;

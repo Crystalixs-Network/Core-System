@@ -8,7 +8,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
 
-public class HomeEditGuiReturnToEditItem extends AbstractLeftClickItem {
+public final class HomeEditGuiReturnToEditItem extends AbstractLeftClickItem {
 
     private final HomeGuiItemFactory itemFactory;
     private final HomeGuiFactory guiFactory;

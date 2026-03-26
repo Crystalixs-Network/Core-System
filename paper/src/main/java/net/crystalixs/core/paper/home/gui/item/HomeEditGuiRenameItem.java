@@ -8,7 +8,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
 
-public class HomeEditGuiRenameItem extends AbstractLeftClickItem {
+public final class HomeEditGuiRenameItem extends AbstractLeftClickItem {
 
     private final HomeGuiItemFactory itemFactory;
     private final HomeGuiFactory guiFactory;
