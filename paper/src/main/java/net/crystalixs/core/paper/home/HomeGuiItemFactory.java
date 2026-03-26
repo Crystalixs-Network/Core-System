@@ -51,4 +51,11 @@ public final class HomeGuiItemFactory {
         return new ItemBuilder(Material.BARRIER).setDisplayName(new AdventureComponentWrapper(renderedName));
     }
 
+    public ItemProvider rename() {
+        var name = translatable("command.home.ui.edit.item.rename");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
+        return new ItemBuilder(Material.NAME_TAG).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
 }

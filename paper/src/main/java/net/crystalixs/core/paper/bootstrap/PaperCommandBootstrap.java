@@ -60,7 +60,7 @@ public final class PaperCommandBootstrap {
         var persistence = plugin.persistence();
         var economyService = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
         var homeService = new DefaultHomeService(persistence.players(), persistence.homes());
-        var homeGuiFactory = new HomeGuiFactory(homeService);
+        var homeGuiFactory = new HomeGuiFactory(plugin, homeService);
 
         new CoinsCommand(plugin, economyService).registerTo(commandManager);
         new BalanceCommand(plugin, economyService).registerTo(commandManager);
