@@ -2,7 +2,9 @@ package net.crystalixs.core.paper.home.gui;
 
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
+import net.crystalixs.core.paper.home.HomeService;
 import net.crystalixs.core.paper.home.gui.item.HomeMenuButtonItem;
+import net.crystalixs.core.paper.home.gui.item.HomeMenuDeleteItem;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.gui.Gui;
@@ -10,11 +12,13 @@ import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 public final class HomeEditGui implements HomeGui {
 
+    private final HomeService service;
     private final HomeModel model;
     private final HomeGuiItemFactory itemFactory;
     private final HomeGuiFactory guiFactory;
 
-    public HomeEditGui(HomeModel model, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory) {
+    public HomeEditGui(HomeService service, HomeModel model, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory) {
+        this.service = service;
         this.model = model;
         this.itemFactory = itemFactory;
         this.guiFactory = guiFactory;
@@ -38,7 +42,7 @@ public final class HomeEditGui implements HomeGui {
                 .addIngredient('x', new SimpleItem(itemFactory.locked()))
                 .addIngredient('i', new SimpleItem(itemFactory.icon(model)))
                 .addIngredient('b', new HomeMenuButtonItem(guiFactory, itemFactory.back(), HomeMenuButtonItem.Action.BACK_TO_LIST))
-                .addIngredient('d', new HomeMenuButtonItem(guiFactory, itemFactory.delete(), null))
+                .addIngredient('d', new HomeMenuDeleteItem(service, itemFactory, model))
                 .build();
     }
 }
