@@ -1,5 +1,6 @@
 package net.crystalixs.core.paper.home;
 
+import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.home.gui.HomeEditGui;
 import net.crystalixs.core.paper.home.gui.HomeGui;
@@ -41,5 +42,9 @@ public final class HomeGuiFactory {
 
     public HomeService service() {
         return service;
+    }
+
+    public StructuredLogger logger(String... path) {
+        return plugin.componentLogger(String.join(".", path));
     }
 }

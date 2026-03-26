@@ -35,6 +35,7 @@ public final class SelectIconGui implements HomeGui {
 
     @Override
     public Gui buildGui(Player player) {
+        var logger = guiFactory.logger("home", "gui", "icon");
         var normal = Gui.normal().setStructure(
                 "a b c d e f g h i",
                 "j k l m n o p q r",
@@ -44,7 +45,7 @@ public final class SelectIconGui implements HomeGui {
 
         for (int slot = 0; slot < ITEM_SLOTS.length; slot++) {
             Material material = IconCatalog.ICONS.get(slot);
-            normal.addIngredient(ITEM_SLOTS[slot], new HomeIconChoiceItem(itemFactory, guiFactory, model, material));
+            normal.addIngredient(ITEM_SLOTS[slot], new HomeIconChoiceItem(itemFactory, guiFactory, model, material, logger));
         }
         normal.addIngredient('2', new HomeEditGuiReturnToEditItem(itemFactory, guiFactory, model));
         normal.addIngredient('#', new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE));
