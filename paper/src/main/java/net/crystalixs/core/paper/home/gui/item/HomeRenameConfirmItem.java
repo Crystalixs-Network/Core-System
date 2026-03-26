@@ -10,14 +10,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
+import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 import java.util.function.Supplier;
 
-import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.Component.*;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
 public final class HomeRenameConfirmItem extends AbstractItem {
@@ -38,7 +38,8 @@ public final class HomeRenameConfirmItem extends AbstractItem {
 
     @Override
     public ItemProvider getItemProvider() {
-        return new ItemBuilder(Material.LIME_DYE);
+        return new ItemBuilder(Material.LIME_STAINED_GLASS_PANE)
+                .setDisplayName(new AdventureComponentWrapper(empty()));
     }
 
     @Override
