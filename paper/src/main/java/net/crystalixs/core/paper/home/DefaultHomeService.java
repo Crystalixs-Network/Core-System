@@ -17,6 +17,7 @@ import java.util.UUID;
 public final class DefaultHomeService implements HomeService {
 
     private static final int MAX_HOME_NAME_LENGTH = 64;
+    private static final int MAX_ICON_KEY_LENGTH = 64;
 
     private final PlayerStore players;
     private final HomeStore homes;
@@ -37,7 +38,7 @@ public final class DefaultHomeService implements HomeService {
             return failAsAlreadyExistent(playerId, normalizedName);
         }
         try {
-            return homes.create(new HomeModel(0L, playerId, normalizedName, position, null));
+            return homes.create(new HomeModel(0L, playerId, normalizedName, null, position, null));
 
         } catch (PersistenceException exception) {
             if (isDuplicate(exception)) {
@@ -93,7 +94,7 @@ public final class DefaultHomeService implements HomeService {
                 return failAsAlreadyExistent(playerId, normalizedNewName);
             }
 
-            HomeModel renamed = new HomeModel(existing.id(), existing.playerId(), normalizedNewName, existing.position(), existing.createdAt());
+            HomeModel renamed = new HomeModel(existing.id(), existing.playerId(), normalizedNewName, existing.icon(), existing.position(), existing.createdAt());
             try {
                 homes.rename(playerId, normalizedOldName, normalizedNewName);
                 return homes.findById(existing.id()).orElse(renamed);
@@ -122,13 +123,31 @@ public final class DefaultHomeService implements HomeService {
             return existing;
         }
 
-        HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), position, existing.createdAt());
+        HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), existing.icon(), position, existing.createdAt());
         try {
             homes.updatePosition(existing.id(), position.worldName(), position.x(), position.y(), position.z(), position.yaw(), position.pitch());
             return homes.findById(existing.id()).orElse(updated);
 
         } catch (PersistenceException exception) {
             return fail(HomeError.HOME_UPDATE_FAILED, "Could not update home '" + normalizedName + "' for player " + playerId);
+        }
+    }
+
+    @Override
+    public HomeModel updateIcon(UUID playerId, String name, String icon) {
+        String normalizedName = normalizeName(name);
+        String normalizedIcon = normalizeIcon(icon);
+        HomeModel existing = homes
+                .findByPlayerAndName(playerId, normalizedName)
+                .orElseThrow(() -> failAsNotExistent(playerId, normalizedName));
+
+        HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), normalizedIcon, existing.position(), existing.createdAt());
+        try {
+            homes.updateIcon(existing.id(), normalizedIcon);
+            return homes.findById(existing.id()).orElse(updated);
+
+        } catch (PersistenceException exception) {
+            return fail(HomeError.HOME_UPDATE_FAILED, "Could not update icon for home '" + normalizedName + "' and player " + playerId);
         }
     }
 
@@ -227,6 +246,17 @@ public final class DefaultHomeService implements HomeService {
         }
         if (normalized.length() > MAX_HOME_NAME_LENGTH) {
             throw new HomeException(HomeError.INVALID_NAME, "Name must not be longer than " + MAX_HOME_NAME_LENGTH + " characters");
+        }
+        return normalized;
+    }
+
+    private String normalizeIcon(String icon) {
+        if (icon == null) {
+            throw new HomeException(HomeError.INVALID_NAME, "Icon must nor not be null");
+        }
+        String normalized = icon.trim();
+        if (normalized.isBlank() || normalized.length() > MAX_ICON_KEY_LENGTH) {
+            throw new HomeException(HomeError.INVALID_NAME, "Icon must not be blank and not longer than " + MAX_ICON_KEY_LENGTH + " characters");
         }
         return normalized;
     }

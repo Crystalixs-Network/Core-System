@@ -38,4 +38,8 @@ public final class HomeGuiFactory {
 
         gui.open(player);
     }
+
+    public HomeService service() {
+        return service;
+    }
 }

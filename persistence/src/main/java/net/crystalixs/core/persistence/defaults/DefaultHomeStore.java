@@ -140,6 +140,26 @@ public final class DefaultHomeStore implements HomeStore {
     }
 
     @Override
+    public void updateIcon(long homeId, String icon) {
+        try {
+            boolean changed = config.query("UPDATE homes SET icon = ? WHERE id = ?;")
+                    .single(call()
+                            .bind(icon)
+                            .bind(homeId)
+                    )
+                    .update()
+                    .changed();
+
+            if (!changed) {
+                IllegalStateException exception = new IllegalStateException("No home row found for id=" + homeId);
+                throw failure("persistence.home.update_icon_not_found", "home:" + homeId, "Could not update home icon: target does not exist", exception);
+            }
+        } catch (RuntimeException exception) {
+            throw failure("persistence.home.update_icon_failed", "home:" + homeId, "Could not update home icon", exception);
+        }
+    }
+
+    @Override
     public boolean deleteById(long homeId) {
         try {
             return config.query("DELETE FROM homes WHERE id = ?;")

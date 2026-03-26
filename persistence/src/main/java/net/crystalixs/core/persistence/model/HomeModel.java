@@ -11,6 +11,7 @@ public record HomeModel(
         long id,
         UUID playerId,
         String name,
+        String icon,
         HomePositionModel position,
         Instant createdAt
 ) {
@@ -20,6 +21,7 @@ public record HomeModel(
                 row.getLong("id"),
                 row.get("player_id", uuidReader()),
                 row.getString("name"),
+                row.getString("icon"),
                 HomePositionModel.fromRow(row),
                 row.getTimestamp("created_at").toInstant());
     }
