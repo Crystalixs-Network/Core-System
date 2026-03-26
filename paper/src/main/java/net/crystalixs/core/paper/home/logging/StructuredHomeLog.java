@@ -12,16 +12,8 @@ public final class StructuredHomeLog {
         this.logger = logger;
     }
 
-    public void info(HomeLogEvent event, Player actor) {
-        logger.info(event.key(), metadata(event, actor));
-    }
-
     public void info(HomeLogEvent event, Player actor, LogMetadata metadata) {
         logger.info(event.key(), metadata(event, actor).and(metadata));
-    }
-
-    public void warn(HomeLogEvent event, Player actor, Throwable throwable) {
-        logger.warn(event.key(), metadata(event, actor), throwable);
     }
 
     public void warn(HomeLogEvent event, Player actor, LogMetadata metadata, Throwable throwable) {
