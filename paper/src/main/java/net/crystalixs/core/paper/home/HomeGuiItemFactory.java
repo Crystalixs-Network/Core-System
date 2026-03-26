@@ -44,4 +44,11 @@ public final class HomeGuiItemFactory {
         return new ItemBuilder(Material.ARROW).setDisplayName(new AdventureComponentWrapper(renderedName));
     }
 
+    public ItemProvider delete() {
+        var name = translatable("command.home.ui.edit.item.delete");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
+        return new ItemBuilder(Material.BARRIER).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
 }

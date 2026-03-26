@@ -31,13 +31,14 @@ public final class HomeEditGui implements HomeGui {
                 .setStructure(
                         "x x x x i x x x x",
                         "x x x x x x x x x",
-                        "x x x x x x x x x",
+                        "x x x x x x x d x",
                         "x x x x x x x x x",
                         "b x x x x x x x x"
                 )
                 .addIngredient('x', new SimpleItem(itemFactory.locked()))
                 .addIngredient('i', new SimpleItem(itemFactory.icon(model)))
                 .addIngredient('b', new HomeMenuButtonItem(guiFactory, itemFactory.back(), HomeMenuButtonItem.Action.BACK_TO_LIST))
+                .addIngredient('d', new HomeMenuButtonItem(guiFactory, itemFactory.delete(), null))
                 .build();
     }
 }
