@@ -10,6 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
+import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.Component.translatable;
+
 public class HomeEditGuiDeleteItem extends AbstractItem {
 
     private final HomeService service;
@@ -32,5 +35,7 @@ public class HomeEditGuiDeleteItem extends AbstractItem {
         if (!clickType.isLeftClick()) return;
 
         service.delete(player.getUniqueId(), model.name());
+        player.closeInventory();
+        player.sendMessage(translatable("command.home.delete.success").arguments(text(model.name())));
     }
 }
