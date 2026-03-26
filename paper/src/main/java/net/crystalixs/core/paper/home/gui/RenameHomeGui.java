@@ -10,7 +10,9 @@ import net.crystalixs.core.paper.home.gui.item.RenameHomeGuiConfirmationItem;
 import net.crystalixs.core.persistence.model.HomeModel;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataType;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
@@ -22,6 +24,9 @@ import static net.kyori.adventure.text.Component.translatable;
 
 public final class RenameHomeGui {
 
+    public static final String RENAME_ANVIL_PDC_KEY = "home_rename_anvil";
+
+    private final CorePlugin plugin;
     private final HomeGuiItemFactory factory;
     private final HomeModel model;
 
@@ -30,6 +35,7 @@ public final class RenameHomeGui {
     private final HomeRenameFailureHandler renameFailureHandler;
 
     public RenameHomeGui(CorePlugin plugin, HomeService service, HomeGuiItemFactory factory, HomeModel model) {
+        this.plugin = plugin;
         this.factory = factory;
         this.model = model;
 
@@ -40,6 +46,9 @@ public final class RenameHomeGui {
     }
 
     public void open(Player player) {
+        NamespacedKey key = new NamespacedKey(plugin, RENAME_ANVIL_PDC_KEY);
+        player.getPersistentDataContainer().set(key, PersistentDataType.BOOLEAN, true);
+
         var title = translatable("command.home.ui.edit.rename.title");
         var renderedTitle = GlobalTranslator.render(title, player.locale());
         var originalName = model.name();
