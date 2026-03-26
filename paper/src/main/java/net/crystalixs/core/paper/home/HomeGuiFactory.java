@@ -10,6 +10,8 @@ import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
+
 public final class HomeGuiFactory {
 
     private final CorePlugin plugin;
@@ -45,6 +47,9 @@ public final class HomeGuiFactory {
     }
 
     public StructuredLogger logger(String... path) {
-        return plugin.componentLogger(String.join(".", path));
+        if (path.length == 0) {
+            throw new IllegalArgumentException("Logger path must not be empty");
+        }
+        return plugin.componentLogger(path[0], Arrays.copyOfRange(path, 1, path.length));
     }
 }

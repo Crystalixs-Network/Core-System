@@ -1,5 +1,6 @@
 package net.crystalixs.core.paper.home.gui.item;
 
+import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.home.HomeException;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
@@ -42,10 +43,16 @@ public final class HomeIconChoiceItem extends AbstractLeftClickItem {
         try {
             HomeModel updated = guiFactory.service().updateIcon(player.getUniqueId(), model.name(), icon.name());
             guiFactory.openIconSelection(player, updated);
-            homeLog.info(HomeLogEvent.UPDATE_ICON_SUCCESS, player, model.name() + " -> " + updated.icon());
+            homeLog.info(HomeLogEvent.UPDATE_ICON_SUCCESS, player, LogMetadata
+                    .of(LogMetadata.Key.HOME_NAME, model.name())
+                    .and(LogMetadata.Key.PREVIOUS_ICON, model.icon())
+                    .and(LogMetadata.Key.NEW_ICON, updated.icon()));
 
         } catch (HomeException exception) {
-            homeLog.warn(HomeLogEvent.UPDATE_ICON_FAILED, player, model.name() + " -> " + icon.name() + ", error=" + exception.error().name(), exception);
+            homeLog.warn(HomeLogEvent.UPDATE_ICON_FAILED, player, LogMetadata
+                    .of(LogMetadata.Key.HOME_NAME, model.name())
+                    .and(LogMetadata.Key.NEW_ICON, icon.name())
+                    .and(LogMetadata.Key.ERROR, exception.error().name()), exception);
             player.sendMessage(translatable("command.home.icon.update.error"));
         }
     }
