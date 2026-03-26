@@ -39,8 +39,8 @@ public class HomeIconChoiceItem extends AbstractItem {
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (!clickType.isLeftClick()) return;
         try {
-            guiFactory.service().updateIcon(player.getUniqueId(), model.name(), icon.name());
-            new SelectIconGui(itemFactory, guiFactory, model).open(player);
+            HomeModel updated = guiFactory.service().updateIcon(player.getUniqueId(), model.name(), icon.name());
+            new SelectIconGui(itemFactory, guiFactory, updated).open(player);
 
         } catch (HomeException exception) {
             player.sendMessage(translatable("command.home.icon.update.error"));
