@@ -8,13 +8,11 @@ import net.crystalixs.core.persistence.model.HomeModel;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
 import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
-import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 import java.util.function.Supplier;
 
@@ -22,7 +20,7 @@ import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
-public final class RenameHomeGuiConfirmationItem extends AbstractItem {
+public final class RenameHomeGuiConfirmationItem extends AbstractLeftClickItem {
 
     private final Player player;
     private final String oldName;
@@ -50,9 +48,7 @@ public final class RenameHomeGuiConfirmationItem extends AbstractItem {
     }
 
     @Override
-    public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
-        if (!clickType.isLeftClick()) return;
-
+    protected void handleLeftClick(@NotNull Player player, @NotNull InventoryClickEvent event) {
         Outcome outcome = executor.execute(player.getUniqueId(), oldName, newNameSupplier.get());
         if (outcome instanceof HomeRenameExecutor.Success(String normalizedOldName, HomeModel renamed)) {
             player.sendMessage(translatable("command.home.rename.success").arguments(
