@@ -13,7 +13,7 @@ import static net.kyori.adventure.text.Component.translatable;
 public final class RenameHomeGui {
 
     public void open(Player player) {
-        var title = translatable("command.home.ui.edit.item.rename");
+        var title = translatable("command.home.ui.edit.rename.title");
         var renderedTitle = GlobalTranslator.render(title, player.locale());
 
         Gui gui = Gui.normal()
