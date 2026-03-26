@@ -23,21 +23,65 @@ public final class HomeGuiItemFactory {
         var name = translatable("command.home.ui.item.home").arguments(component("name", text(model.name())));
         var renderedName = GlobalTranslator.render(name, player.locale());
 
-        return new ItemBuilder(Material.GRASS_BLOCK)
-                .setDisplayName(new AdventureComponentWrapper(renderedName));
+        return new ItemBuilder(resolveIcon(model)).setDisplayName(new AdventureComponentWrapper(renderedName));
     }
 
     public ItemProvider available() {
         var name = translatable("command.home.ui.item.available");
         var renderedName = GlobalTranslator.render(name, player.locale());
 
-        return new ItemBuilder(Material.BARRIER)
-                .setDisplayName(new AdventureComponentWrapper(renderedName));
+        return new ItemBuilder(Material.BARRIER).setDisplayName(new AdventureComponentWrapper(renderedName));
     }
 
     public ItemProvider locked() {
-        return new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE)
-                .setDisplayName(new AdventureComponentWrapper(empty()));
+        return new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName(new AdventureComponentWrapper(empty()));
+    }
+
+    public ItemProvider back() {
+        var name = translatable("command.home.ui.edit.item.back");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
+        return new ItemBuilder(Material.ARROW).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
+    public ItemProvider delete() {
+        var name = translatable("command.home.ui.edit.item.delete");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
+        return new ItemBuilder(Material.BARRIER).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
+    public ItemProvider rename() {
+        var name = translatable("command.home.ui.edit.item.rename");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
+        return new ItemBuilder(Material.NAME_TAG).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
+    public ItemProvider selectIcon() {
+        var name = translatable("command.home.ui.edit.item.select-icon");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
+        return new ItemBuilder(Material.SPYGLASS).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
+    public ItemProvider choice(Material material) {
+        return new ItemBuilder(material);
+    }
+
+    public ItemProvider selectedChoice(Material material) {
+        var name = translatable("command.home.ui.edit.item.selected");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
+        return new ItemBuilder(material).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
+    public Material resolveIcon(HomeModel model) {
+        if (model.icon() == null || model.icon().isBlank()) {
+            return Material.GRASS_BLOCK;
+        }
+        Material parsed = Material.matchMaterial(model.icon().trim());
+        return parsed == null ? Material.GRASS_BLOCK : parsed;
     }
 
 }

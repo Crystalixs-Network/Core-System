@@ -1,0 +1,68 @@
+package net.crystalixs.core.paper.home.gui;
+
+import net.crystalixs.core.paper.home.HomeGuiFactory;
+import net.crystalixs.core.paper.home.HomeGuiItemFactory;
+import net.crystalixs.core.paper.home.HomeLimitResolver;
+import net.crystalixs.core.paper.home.HomeService;
+import net.crystalixs.core.paper.home.gui.item.HomeEntryItem;
+import net.crystalixs.core.persistence.model.HomeModel;
+import org.bukkit.entity.Player;
+import xyz.xenondevs.invui.gui.Gui;
+import xyz.xenondevs.invui.item.impl.SimpleItem;
+
+import java.util.ArrayList;
+
+public final class HomeListGui implements HomeGui {
+
+    private static final char[] HOME_SLOT_KEYS = {
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
+            'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+            's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1'
+    };
+
+    private final HomeService service;
+    private final HomeGuiItemFactory itemFactory;
+    private final HomeGuiFactory guiFactory;
+
+    public HomeListGui(HomeService service, HomeGuiItemFactory factory, HomeGuiFactory guiFactory) {
+        this.service = service;
+        this.itemFactory = factory;
+        this.guiFactory = guiFactory;
+    }
+
+    @Override
+    public String titleKey() {
+        return "command.home.ui.title";
+    }
+
+    @Override
+    public Gui buildGui(Player player) {
+        int limit = HomeLimitResolver.resolve(player);
+        var homes = service.all(player.getUniqueId());
+        var orderedHomes = new ArrayList<>(homes);
+
+        Gui.Builder.Normal normal = Gui.normal().setStructure(
+                "a b c d e f g h i",
+                "j k l m n o p q r",
+                "s t u v w x y z 1"
+        );
+
+        HomeGuiItemFactory itemFactory = new HomeGuiItemFactory(player);
+        for (int slot = 0; slot < HOME_SLOT_KEYS.length; slot++) {
+            char key = HOME_SLOT_KEYS[slot];
+
+            if (slot < orderedHomes.size()) {
+                HomeModel model = orderedHomes.get(slot);
+                normal.addIngredient(key, new HomeEntryItem(service, model, this.itemFactory, guiFactory));
+                continue;
+            }
+            if (slot < limit) {
+                normal.addIngredient(key, new SimpleItem(itemFactory.available()));
+            } else {
+                normal.addIngredient(key, new SimpleItem(itemFactory.locked()));
+            }
+        }
+
+        return normal.build();
+    }
+}

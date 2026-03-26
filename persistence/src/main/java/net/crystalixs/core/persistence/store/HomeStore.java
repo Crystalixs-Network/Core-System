@@ -22,6 +22,8 @@ public interface HomeStore {
 
     void updatePosition(long homeId, String worldName, double x, double y, double z, float yaw, float pitch);
 
+    void  updateIcon(long homeId, String icon);
+
     boolean deleteById(long homeId);
 
     boolean deleteByPlayerAndName(UUID playerId, String name);
