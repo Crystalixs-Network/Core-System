@@ -2,11 +2,13 @@ package net.crystalixs.core.paper.home;
 
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
-import net.crystalixs.core.paper.home.gui.*;
+import net.crystalixs.core.paper.home.gui.HomeEditGui;
+import net.crystalixs.core.paper.home.gui.HomeIconSelectionGui;
+import net.crystalixs.core.paper.home.gui.HomeListGui;
+import net.crystalixs.core.paper.home.gui.RenameHomeGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class HomeGuiFactory {
 
@@ -18,34 +20,9 @@ public final class HomeGuiFactory {
         this.service = service;
     }
 
-    private void open(@NotNull Player player, @NotNull Class<? extends HomeGui> guiClass, @Nullable HomeModel model) {
-        HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
-        HomeGui gui;
-
-        if (guiClass == HomeListGui.class) {
-            gui = new HomeListGui(service, factory, this);
-
-        } else if (guiClass == HomeEditGui.class) {
-            if (model == null) {
-                throw new IllegalArgumentException("HomeEditGui requires a home model");
-            }
-            gui = new HomeEditGui(service, factory, this, model);
-
-        } else if (guiClass == HomeIconSelectionGui.class) {
-            if (model == null) {
-                throw new IllegalArgumentException("HomeIconSelectionGui requires a home model");
-            }
-            gui = new HomeIconSelectionGui(factory, this, model);
-
-        } else {
-            throw new IllegalArgumentException("Unsupported GUI class: " + guiClass.getName());
-        }
-
-        gui.open(player);
-    }
-
     public void openIconSelection(@NotNull Player player, @NotNull HomeModel model) {
-        open(player, HomeIconSelectionGui.class, model);
+        HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
+        new HomeIconSelectionGui(factory, this, model).open(player);
     }
 
     public void openRename(@NotNull Player player, @NotNull HomeModel model) {
@@ -54,11 +31,13 @@ public final class HomeGuiFactory {
     }
 
     public void openList(@NotNull Player player) {
-        open(player, HomeListGui.class, null);
+        HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
+        new HomeListGui(service, factory, this).open(player);
     }
 
     public void openEdit(@NotNull Player player, @NotNull HomeModel model) {
-        open(player, HomeEditGui.class, model);
+        HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
+        new HomeEditGui(service, factory, this, model).open(player);
     }
 
     public HomeService service() {
