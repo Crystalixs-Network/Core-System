@@ -58,4 +58,11 @@ public final class HomeGuiItemFactory {
         return new ItemBuilder(Material.NAME_TAG).setDisplayName(new AdventureComponentWrapper(renderedName));
     }
 
+    public ItemProvider selectIcon() {
+        var name = translatable("command.home.ui.edit.item.select-icon");
+        var renderedName = GlobalTranslator.render(name, player.locale());
+
+        return new ItemBuilder(Material.SPYGLASS).setDisplayName(new AdventureComponentWrapper(renderedName));
+    }
+
 }

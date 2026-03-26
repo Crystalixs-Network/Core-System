@@ -7,6 +7,7 @@ import net.crystalixs.core.paper.home.HomeService;
 import net.crystalixs.core.paper.home.gui.item.HomeEditGuiDeleteItem;
 import net.crystalixs.core.paper.home.gui.item.HomeEditGuiRenameItem;
 import net.crystalixs.core.paper.home.gui.item.HomeEditGuiReturnToListItem;
+import net.crystalixs.core.paper.home.gui.item.HomeEditGuiSelectIconItem;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.gui.Gui;
@@ -39,7 +40,7 @@ public final class HomeEditGui implements HomeGui {
                 .setStructure(
                         "x x x x i x x x x",
                         "x x x x x x x x x",
-                        "x x x x r x d x x",
+                        "x x s x r x d x x",
                         "x x x x x x x x x",
                         "b x x x x x x x x"
                 )
@@ -48,6 +49,7 @@ public final class HomeEditGui implements HomeGui {
                 .addIngredient('b', new HomeEditGuiReturnToListItem(itemFactory, guiFactory))
                 .addIngredient('d', new HomeEditGuiDeleteItem(service, itemFactory, model))
                 .addIngredient('r', new HomeEditGuiRenameItem(plugin, service, itemFactory, model))
+                .addIngredient('s', new HomeEditGuiSelectIconItem(itemFactory))
                 .build();
     }
 }
