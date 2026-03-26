@@ -49,7 +49,7 @@ public final class HomeEditGui implements HomeGui {
                 .addIngredient('b', new HomeEditGuiReturnToListItem(itemFactory, guiFactory))
                 .addIngredient('d', new HomeEditGuiDeleteItem(service, itemFactory, model))
                 .addIngredient('r', new HomeEditGuiRenameItem(plugin, service, itemFactory, model))
-                .addIngredient('s', new HomeEditGuiSelectIconItem(itemFactory, guiFactory))
+                .addIngredient('s', new HomeEditGuiSelectIconItem(itemFactory, guiFactory, model))
                 .build();
     }
 }
