@@ -16,6 +16,8 @@ import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.window.AnvilWindow;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
@@ -42,6 +44,9 @@ public final class RenameHomeGui {
     public void open(Player player) {
         var title = translatable("command.home.ui.edit.rename.title");
         var renderedTitle = GlobalTranslator.render(title, player.locale());
+        String originalName = model.name();
+        String normalizedOriginalName = originalName == null ? "" : originalName.trim();
+        AtomicBoolean userChangedInput = new AtomicBoolean(false);
 
         Gui gui = Gui.normal()
                 .setStructure("i x x")
@@ -54,9 +59,15 @@ public final class RenameHomeGui {
                 .setTitle(new AdventureComponentWrapper(renderedTitle))
                 .setGui(gui)
                 .addRenameHandler(renameText -> {
-                    String oldNameInput = model.name();
+                    String normalizedNewName = renameText == null ? "" : renameText.trim();
+                    if (!normalizedNewName.equalsIgnoreCase(normalizedOriginalName)) {
+                        userChangedInput.set(true);
+                    }
+                    if (!userChangedInput.get()) {
+                        return;
+                    }
 
-                    Outcome outcome = renameExecutor.execute(player.getUniqueId(), oldNameInput, renameText);
+                    Outcome outcome = renameExecutor.execute(player.getUniqueId(), originalName, renameText);
                     if (outcome instanceof HomeRenameExecutor.Success(String oldName, HomeModel renamed)) {
                         player.sendMessage(translatable("command.home.rename.success").arguments(
                                 component("old_name", text(oldName)),
