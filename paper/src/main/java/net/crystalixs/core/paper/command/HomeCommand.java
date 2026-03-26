@@ -28,16 +28,14 @@ public final class HomeCommand extends PaperCommand {
     private final HomeService service;
     private final StructuredLogger logger;
     private final HomeGuiFactory factory;
-    private final HomeRenameInputValidator renameInputValidator;
-    private final HomeRenameErrorMapper renameErrorMapper;
+    private final HomeRenameExecutor renameExecutor;
 
     public HomeCommand(CorePlugin plugin, HomeService service, HomeGuiFactory factory) {
         super(plugin);
         this.service = service;
         this.logger = plugin.commandLogger("home");
         this.factory = factory;
-        this.renameInputValidator = new HomeRenameInputValidator();
-        this.renameErrorMapper = new HomeRenameErrorMapper();
+        this.renameExecutor = new HomeRenameExecutor(service);
     }
 
     @Override
@@ -136,10 +134,8 @@ public final class HomeCommand extends PaperCommand {
                     String oldNameInput = context.get("old-name");
                     String newNameInput = context.get("new-name");
 
-                    try {
-                        String oldName = renameInputValidator.normalizeOldName(oldNameInput);
-                        String newName = renameInputValidator.normalizeNewName(newNameInput);
-                        HomeModel renamed = service.rename(sender.getUniqueId(), oldName, newName);
+                    HomeRenameExecutor.Outcome outcome = renameExecutor.execute(sender.getUniqueId(), oldNameInput, newNameInput);
+                    if (outcome instanceof HomeRenameExecutor.Success(String oldName, HomeModel renamed)) {
                         sender.sendMessage(translatable("command.home.rename.success").arguments(
                                 component("old_name", text(oldName)),
                                 component("new_name", text(renamed.name()))));
@@ -148,18 +144,20 @@ public final class HomeCommand extends PaperCommand {
                                 .event("command.home.rename.success")
                                 .and(LogMetadata.Key.ACTOR, sender.getName())
                                 .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
-                                .and(LogMetadata.Key.DESCRIPTION, oldName + " → " + renamed.name()));
-
-                    } catch (HomeException exception) {
-                        if (exception.error() == HomeError.HOME_RENAME_FAILED || exception.error() == HomeError.PLAYER_CREATION_FAILED) {
-                            logger.warn("home rename failed", LogMetadata
-                                    .event("command.home.rename.failed")
-                                    .and(LogMetadata.Key.ACTOR, sender.getName())
-                                    .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
-                                    .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
-                        }
-                        sender.sendMessage(renameErrorMapper.toMessage(exception, oldNameInput, newNameInput));
+                                .and(LogMetadata.Key.DESCRIPTION, oldName + " -> " + renamed.name()));
+                        return;
                     }
+
+                    HomeRenameExecutor.Failure failure = (HomeRenameExecutor.Failure) outcome;
+                    if (failure.shouldLogWarn()) {
+                        HomeException exception = failure.exception();
+                        logger.warn("home rename failed", LogMetadata
+                                .event("command.home.rename.failed")
+                                .and(LogMetadata.Key.ACTOR, sender.getName())
+                                .and(LogMetadata.Key.SUBJECT, sender.getUniqueId().toString())
+                                .and(LogMetadata.Key.DESCRIPTION, exception.error().name()), exception);
+                    }
+                    sender.sendMessage(failure.message());
                 }));
 
         commandManager.command(commandManager.commandBuilder("home")
