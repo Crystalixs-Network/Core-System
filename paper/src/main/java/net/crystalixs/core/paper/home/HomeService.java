@@ -21,6 +21,8 @@ public interface HomeService {
 
     HomeModel updatePosition(UUID playerId, String name, Location location);
 
+    HomeModel updateIcon(UUID playerId, String name, String icon);
+
     void teleport(Player player, String homeName);
 
 }
