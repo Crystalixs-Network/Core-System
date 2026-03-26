@@ -4,7 +4,6 @@ import net.crystalixs.core.paper.home.HomeException;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
 import net.crystalixs.core.paper.home.HomeService;
-import net.crystalixs.core.paper.home.gui.HomeEditGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -39,7 +38,7 @@ public final class HomeEntryItem extends AbstractItem {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (clickType.isRightClick()) {
-            guiFactory.open(player, HomeEditGui.class, home);
+            guiFactory.openEdit(player, home);
             return;
         }
 

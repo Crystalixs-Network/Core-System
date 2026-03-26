@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 
-public final class SelectIconGui implements HomeGui {
+public final class HomeIconSelectionGui implements HomeGui {
 
     private static final char[] ITEM_SLOTS = {
             'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
@@ -22,7 +22,7 @@ public final class SelectIconGui implements HomeGui {
     private final HomeGuiFactory guiFactory;
     private final HomeModel model;
 
-    public SelectIconGui(HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory, HomeModel model) {
+    public HomeIconSelectionGui(HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory, HomeModel model) {
         this.itemFactory = itemFactory;
         this.guiFactory = guiFactory;
         this.model = model;
@@ -44,7 +44,7 @@ public final class SelectIconGui implements HomeGui {
         );
 
         for (int slot = 0; slot < ITEM_SLOTS.length; slot++) {
-            Material material = IconCatalog.ICONS.get(slot);
+            Material material = HomeIconCatalog.ICONS.get(slot);
             normal.addIngredient(ITEM_SLOTS[slot], new HomeIconChoiceItem(itemFactory, guiFactory, model, material, logger));
         }
         normal.addIngredient('2', new HomeEditGuiReturnToEditItem(itemFactory, guiFactory, model));

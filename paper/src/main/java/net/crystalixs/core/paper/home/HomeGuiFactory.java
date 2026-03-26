@@ -3,12 +3,12 @@ package net.crystalixs.core.paper.home;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.home.gui.HomeEditGui;
-import net.crystalixs.core.paper.home.gui.HomeGui;
+import net.crystalixs.core.paper.home.gui.HomeIconSelectionGui;
 import net.crystalixs.core.paper.home.gui.HomeListGui;
+import net.crystalixs.core.paper.home.gui.RenameHomeGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public final class HomeGuiFactory {
 
@@ -20,24 +20,24 @@ public final class HomeGuiFactory {
         this.service = service;
     }
 
-    public void open(@NotNull Player player, @NotNull Class<? extends HomeGui> guiClass, @Nullable HomeModel model) {
+    public void openIconSelection(@NotNull Player player, @NotNull HomeModel model) {
         HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
-        HomeGui gui;
+        new HomeIconSelectionGui(factory, this, model).open(player);
+    }
 
-        if (guiClass == HomeListGui.class) {
-            gui = new HomeListGui(service, factory, this);
+    public void openRename(@NotNull Player player, @NotNull HomeModel model) {
+        HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
+        new RenameHomeGui(plugin, service, factory, model).open(player);
+    }
 
-        } else if (guiClass == HomeEditGui.class) {
-            if (model == null) {
-                throw new IllegalArgumentException("HomeEditGui requires a home model");
-            }
-            gui = new HomeEditGui(plugin, service, factory, this, model);
+    public void openList(@NotNull Player player) {
+        HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
+        new HomeListGui(service, factory, this).open(player);
+    }
 
-        } else {
-            throw new IllegalArgumentException("Unsupported GUI class: " + guiClass.getName());
-        }
-
-        gui.open(player);
+    public void openEdit(@NotNull Player player, @NotNull HomeModel model) {
+        HomeGuiItemFactory factory = new HomeGuiItemFactory(player);
+        new HomeEditGui(service, factory, this, model).open(player);
     }
 
     public HomeService service() {
