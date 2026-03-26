@@ -1,9 +1,7 @@
 package net.crystalixs.core.paper.home.gui.item;
 
-import net.crystalixs.core.paper.CorePlugin;
+import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
-import net.crystalixs.core.paper.home.HomeService;
-import net.crystalixs.core.paper.home.gui.RenameHomeGui;
 import net.crystalixs.core.persistence.model.HomeModel;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -14,15 +12,13 @@ import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 public class HomeEditGuiRenameItem extends AbstractItem {
 
-    private final CorePlugin plugin;
-    private final HomeService service;
     private final HomeGuiItemFactory itemFactory;
+    private final HomeGuiFactory guiFactory;
     private final HomeModel model;
 
-    public HomeEditGuiRenameItem(CorePlugin plugin, HomeService service, HomeGuiItemFactory itemFactory, HomeModel model) {
-        this.plugin = plugin;
-        this.service = service;
+    public HomeEditGuiRenameItem(HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory, HomeModel model) {
         this.itemFactory = itemFactory;
+        this.guiFactory = guiFactory;
         this.model = model;
     }
 
@@ -34,6 +30,6 @@ public class HomeEditGuiRenameItem extends AbstractItem {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         if (!clickType.isLeftClick()) return;
-        new RenameHomeGui(plugin, service, itemFactory, model).open(player);
+        guiFactory.openRename(player, model);
     }
 }

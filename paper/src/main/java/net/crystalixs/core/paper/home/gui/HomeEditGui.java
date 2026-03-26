@@ -1,6 +1,5 @@
 package net.crystalixs.core.paper.home.gui;
 
-import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.home.HomeGuiItemFactory;
 import net.crystalixs.core.paper.home.HomeService;
@@ -15,14 +14,12 @@ import xyz.xenondevs.invui.item.impl.SimpleItem;
 
 public final class HomeEditGui implements HomeGui {
 
-    private final CorePlugin plugin;
     private final HomeService service;
     private final HomeGuiItemFactory itemFactory;
     private final HomeGuiFactory guiFactory;
     private final HomeModel model;
 
-    public HomeEditGui(CorePlugin plugin, HomeService service, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory, HomeModel model) {
-        this.plugin = plugin;
+    public HomeEditGui(HomeService service, HomeGuiItemFactory itemFactory, HomeGuiFactory guiFactory, HomeModel model) {
         this.service = service;
         this.itemFactory = itemFactory;
         this.guiFactory = guiFactory;
@@ -48,7 +45,7 @@ public final class HomeEditGui implements HomeGui {
                 .addIngredient('i', new SimpleItem(itemFactory.icon(model)))
                 .addIngredient('b', new HomeEditGuiReturnToListItem(itemFactory, guiFactory))
                 .addIngredient('d', new HomeEditGuiDeleteItem(service, itemFactory, model))
-                .addIngredient('r', new HomeEditGuiRenameItem(plugin, service, itemFactory, model))
+                .addIngredient('r', new HomeEditGuiRenameItem(itemFactory, guiFactory, model))
                 .addIngredient('s', new HomeEditGuiSelectIconItem(itemFactory, guiFactory, model))
                 .build();
     }
