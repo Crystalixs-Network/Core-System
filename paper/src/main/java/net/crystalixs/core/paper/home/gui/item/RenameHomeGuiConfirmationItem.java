@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 import static net.kyori.adventure.text.Component.*;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
-public final class HomeRenameConfirmItem extends AbstractItem {
+public final class RenameHomeGuiConfirmationItem extends AbstractItem {
 
     private final String oldName;
     private final Supplier<String> newNameSupplier;
@@ -28,7 +28,7 @@ public final class HomeRenameConfirmItem extends AbstractItem {
     private final HomeRenameFailureHandler failureHandler;
     private final StructuredLogger logger;
 
-    public HomeRenameConfirmItem(String oldName, Supplier<String> newNameSupplier, HomeRenameExecutor executor, HomeRenameFailureHandler failureHandler, StructuredLogger logger) {
+    public RenameHomeGuiConfirmationItem(String oldName, Supplier<String> newNameSupplier, HomeRenameExecutor executor, HomeRenameFailureHandler failureHandler, StructuredLogger logger) {
         this.oldName = oldName;
         this.newNameSupplier = newNameSupplier;
         this.executor = executor;

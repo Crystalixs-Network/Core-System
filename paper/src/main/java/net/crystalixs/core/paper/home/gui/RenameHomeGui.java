@@ -6,7 +6,7 @@ import net.crystalixs.core.paper.home.HomeGuiItemFactory;
 import net.crystalixs.core.paper.home.HomeRenameExecutor;
 import net.crystalixs.core.paper.home.HomeRenameFailureHandler;
 import net.crystalixs.core.paper.home.HomeService;
-import net.crystalixs.core.paper.home.gui.item.HomeRenameConfirmItem;
+import net.crystalixs.core.paper.home.gui.item.RenameHomeGuiConfirmationItem;
 import net.crystalixs.core.persistence.model.HomeModel;
 import net.kyori.adventure.translation.GlobalTranslator;
 import org.bukkit.Material;
@@ -49,7 +49,7 @@ public final class RenameHomeGui {
                 .setStructure("i x r")
                 .addIngredient('x', new ItemBuilder(Material.AIR))
                 .addIngredient('i', factory.icon(model))
-                .addIngredient('r', new HomeRenameConfirmItem(originalName, pendingNewName::get, renameExecutor, renameFailureHandler, logger))
+                .addIngredient('r', new RenameHomeGuiConfirmationItem(originalName, pendingNewName::get, renameExecutor, renameFailureHandler, logger))
                 .build();
 
         AnvilWindow.single()
