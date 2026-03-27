@@ -28,7 +28,7 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
     @Override
     public Optional<PlayerSettingModel> findByPlayerId(UUID playerId) {
         try {
-            return config.query("SELECT * FROM player_setting WHERE player_id = ?;")
+            return config.query("SELECT * FROM player_setting WHERE player_uuid = ?;")
                     .single(call().bind(playerId.toString()))
                     .map(PlayerSettingModel.map())
                     .first();
@@ -61,7 +61,7 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
     @Override
     public void updateVanishFlag(UUID playerId, boolean isVanished) {
         try {
-            boolean wasUpdated = config.query("UPDATE player_setting SET is_vanished = ? WHERE player_id = ?;")
+            boolean wasUpdated = config.query("UPDATE player_setting SET is_vanished = ? WHERE player_uuid = ?;")
                     .single(call()
                             .bind(isVanished)
                             .bind(playerId.toString())

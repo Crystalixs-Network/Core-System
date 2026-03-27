@@ -28,7 +28,7 @@ public final class DefaultTransactionStore implements TransactionStore {
         try {
             config.query("""
                             INSERT INTO economy_transactions
-                            (type, currency, amount, from_player_id, to_player_id, actor_player_id, reason)
+                            (type, currency, amount, from_player_uuid, to_player_uuid, actor_player_uuid, reason)
                             VALUES (?, ?, ?, ?, ?, ?, ?);
                             """
                     )
@@ -51,11 +51,11 @@ public final class DefaultTransactionStore implements TransactionStore {
     @Override
     public List<TransactionModel> findByPlayer(UUID playerId, int limit) {
         try {
-            int safeLimit = Math.max(1, Math.min(limit, 500));
+            int safeLimit = Math.clamp(limit, 1, 500);
             return config.query("""
                             SELECT *
                             FROM economy_transactions
-                            WHERE from_player_id = ? OR to_player_id = ? OR actor_player_id = ?
+                            WHERE from_player_uuid = ? OR to_player_uuid = ? OR actor_player_uuid = ?
                             ORDER BY created_at DESC
                             LIMIT ?;
                             """)
