@@ -1,5 +1,5 @@
 ALTER TABLE player_setting
-    DROP COLUMN is_ignored;
+    DROP COLUMN IF EXISTS is_ignored;
 
 CREATE TABLE IF NOT EXISTS player_ignore
 (
