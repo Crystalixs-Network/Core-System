@@ -7,7 +7,6 @@ import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.setting.PlayerSettingService;
-import net.crystalixs.core.paper.setting.SettingError;
 import net.crystalixs.core.paper.setting.SettingException;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
