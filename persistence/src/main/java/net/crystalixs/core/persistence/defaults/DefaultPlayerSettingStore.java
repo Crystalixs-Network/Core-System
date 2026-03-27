@@ -37,6 +37,14 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
         }
     }
 
+    @Override
+    public void updateIgnoreFlag(UUID playerId, boolean isIgnored) {
+    }
+
+    @Override
+    public void updateVanishFlag(UUID playerId, boolean isVanished) {
+    }
+
     private PersistenceException failure(String event, UUID playerId, String message, RuntimeException exception) {
         logger.warn(event, LogMetadata
                 .event(event)

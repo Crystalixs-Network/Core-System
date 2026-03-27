@@ -9,4 +9,8 @@ public interface PlayerSettingStore {
 
     Optional<PlayerSettingModel> findByPlayerId(UUID playerId);
 
+    void updateIgnoreFlag(UUID playerId, boolean isIgnored);
+
+    void updateVanishFlag(UUID playerId, boolean isVanished);
+
 }
