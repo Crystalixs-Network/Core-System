@@ -44,6 +44,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
         return playerStore;
     }
 
+    @Override
     public PlayerSettingStore playerSettings() {
         return playerSettingStore;
     }
