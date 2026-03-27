@@ -6,7 +6,6 @@ import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.persistence.PersistenceException;
 import net.crystalixs.core.persistence.model.Currency;
 import net.crystalixs.core.persistence.model.PlayerModel;
-import net.crystalixs.core.persistence.model.PlayerSettingModel;
 import net.crystalixs.core.persistence.store.PlayerStore;
 
 import javax.sql.DataSource;
@@ -36,18 +35,6 @@ public final class DefaultPlayerStore implements PlayerStore {
                     .first();
         } catch (RuntimeException exception) {
             throw failure("persistence.player.find_failed", playerId, "Could not load player", exception);
-        }
-    }
-
-    @Override
-    public Optional<PlayerSettingModel> findSettingById(UUID playerId) {
-        try {
-            return config.query("SELECT * FROM player_setting WHERE player_id = ?;")
-                    .single(call().bind(playerId.toString()))
-                    .map(PlayerSettingModel.map())
-                    .first();
-        }catch (RuntimeException exception) {
-            throw failure("persistence.player.find_failed", playerId, "Could not load player setting", exception);
         }
     }
 
