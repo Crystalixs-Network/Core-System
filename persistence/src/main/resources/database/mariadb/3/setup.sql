@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS player_ignore
 
 CREATE INDEX IF NOT EXISTS idx_player_ignore_ignored_uuid ON player_ignore (ignored_uuid);
 
-CREATE TABLE IF NOT EXISTS homes
+CREATE TABLE IF NOT EXISTS home
 (
     id          BIGINT      NOT NULL PRIMARY KEY AUTO_INCREMENT,
     player_uuid UUID        NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS homes
     CONSTRAINT uq_homes_player_name UNIQUE (player_uuid, name)
 );
 
-CREATE INDEX IF NOT EXISTS idx_homes_player ON homes (player_uuid);
+CREATE INDEX IF NOT EXISTS idx_homes_player ON home (player_uuid);
 
 CREATE TABLE IF NOT EXISTS economy_transactions
 (
