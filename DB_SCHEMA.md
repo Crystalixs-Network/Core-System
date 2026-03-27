@@ -2,7 +2,7 @@
 
 ## Schema-Grafik
 
-![DB-Schema](assets/db_diagram_v2_2.jpg)
+![DB-Schema](assets/db_diagram_v3.jpg)
 
 ---
 
@@ -11,6 +11,7 @@
 | Bereich                | Beschreibung                                                                   |
 |------------------------|--------------------------------------------------------------------------------|
 | `player`               | Enthält die Basisdaten eines Spielers.                                         |
+| `player_setting`       | Enthält Flags des Spieler                                                      |
 | `homes`                | Speichert benannte Homes eines Spielers inklusive Position.                    |
 | `economy_transactions` | Speichert Economy-Vorgänge wie Transfers und Admin-Änderungen.                 |
 | `economy_audit`        | Speichert Audit-Einträge zu Economy-Aktionen.                                  |
@@ -32,6 +33,17 @@ Die Tabelle `player` bildet die zentralen Stammdaten eines Spielers ab.
 | `playtime` | `bigint`          | Gesammelte Spielzeit         |
 | `coins`    | `bigint unsigned` | Aktueller Coin-Stand         |
 | `gems`     | `bigint unsigned` | Aktueller Gem-Stand          |
+
+### `player_setting`
+
+Die Tabelle `player_setting` speichert Flags des Spielers.
+
+| Spalte        | Typ       | Zweck                                     |
+|---------------|-----------|-------------------------------------------|
+| `id`          | `bigint`  | Primärschlüssel des Flag-Eintrags         |
+| `player_id`   | `uuid`    | Referent auf den Spieler in `player.uuid` |
+| `is_ignored`  | `boolean` | Flag, ob der Spieler im Ignore-Modus ist  |
+| `is_vanished` | `boolean` | Flag, ob der Spieler im Vanish-Modus ist  |
 
 ### `homes`
 
@@ -89,6 +101,7 @@ Die Tabelle `economy_audit` speichert technische und fachliche Audit-Ereignisse.
 | `economy_transactions.from_player_id`  | `player.uuid` | Fremdschlüssel | Optionaler Sender einer Transaktion (`ON DELETE SET NULL`)     |
 | `economy_transactions.to_player_id`    | `player.uuid` | Fremdschlüssel | Optionaler Empfänger einer Transaktion (`ON DELETE SET NULL`)  |
 | `economy_transactions.actor_player_id` | `player.uuid` | Fremdschlüssel | Optionaler Akteur der Transaktion (`ON DELETE SET NULL`)       |
+| `player_setting.player_id`             | `player.uuid` | Fremdschlüssel | Ordnet jedes Flag genau einem Spieler zu (`ON DELETE CASCADE`) |
 
 ---
 
