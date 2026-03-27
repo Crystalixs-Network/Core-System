@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS player_setting
     CONSTRAINT fk_player_setting_player FOREIGN KEY (player_id) REFERENCES player (uuid) ON DELETE CASCADE
 );
 
-CREATE TRIGGER create_player_settings
+CREATE TRIGGER IF NOT EXISTS create_player_settings
     AFTER INSERT
     ON player
     FOR EACH ROW
