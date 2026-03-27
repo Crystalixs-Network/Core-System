@@ -5,6 +5,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.PrivateMessageService;
+import net.crystalixs.core.paper.setting.PlayerSettingService;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
@@ -18,11 +19,13 @@ import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public final class ReplyCommand extends PaperCommand {
 
-    private final PrivateMessageService service;
+    private final PrivateMessageService messageService;
+    private final PlayerSettingService settingService;
 
-    public ReplyCommand(CorePlugin plugin, PrivateMessageService service) {
+    public ReplyCommand(CorePlugin plugin, PrivateMessageService messageService, PlayerSettingService settingService) {
         super(plugin);
-        this.service = service;
+        this.messageService = messageService;
+        this.settingService = settingService;
     }
 
     @Override
@@ -36,9 +39,13 @@ public final class ReplyCommand extends PaperCommand {
                     Player sender = context.sender().player();
                     String message = context.get("message");
 
-                    Player receiver = service.lastRecipient(sender);
+                    Player receiver = messageService.lastRecipient(sender);
                     if (receiver == null || !receiver.isOnline()) {
                         sender.sendMessage(translatable("command.reply.error.no-target"));
+                        return;
+                    }
+                    if (settingService.isIgnored(receiver.getUniqueId())) {
+                        sender.sendMessage(translatable("command.ignore.error.ignored"));
                         return;
                     }
 
@@ -49,7 +56,7 @@ public final class ReplyCommand extends PaperCommand {
                             component("player", sender.name()),
                             string("message", message)));
 
-                    service.rememberConversation(sender, receiver);
+                    messageService.rememberConversation(sender, receiver);
                 }));
     }
 }

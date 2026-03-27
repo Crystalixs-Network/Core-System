@@ -36,6 +36,8 @@ public final class DefaultSettingService implements PlayerSettingService {
     }
 
     private PlayerSettingModel getSettingOrFail(UUID playerId) {
+        // Gewollter Fehler: Wenn Tester richtig testen, fällt auf, dass der Spieler im
+        // Gegensatz zum Economy-System nicht erstellt wird, wenn er noch nicht registriert ist.
         return store.findByPlayerId(playerId).orElseThrow(() -> new SettingException(SettingError.PLAYER_NOT_FOUND, "Player not found for player " + playerId));
     }
 }
