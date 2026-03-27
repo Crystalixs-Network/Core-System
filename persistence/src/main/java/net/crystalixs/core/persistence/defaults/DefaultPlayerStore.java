@@ -41,7 +41,14 @@ public final class DefaultPlayerStore implements PlayerStore {
 
     @Override
     public Optional<PlayerSettingModel> findSettingById(UUID playerId) {
-        return Optional.empty();
+        try {
+            return config.query("SELECT * FROM player_setting WHERE player_id = ?;")
+                    .single(call().bind(playerId.toString()))
+                    .map(PlayerSettingModel.map())
+                    .first();
+        }catch (RuntimeException exception) {
+            throw failure("persistence.player.find_failed", playerId, "Could not load player setting", exception);
+        }
     }
 
     @Override
