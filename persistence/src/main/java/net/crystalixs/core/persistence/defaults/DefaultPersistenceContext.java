@@ -6,16 +6,14 @@ import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import net.crystalixs.core.persistence.config.DatabaseCredentials;
 import net.crystalixs.core.persistence.migration.MigrationRunner;
-import net.crystalixs.core.persistence.store.AuditStore;
-import net.crystalixs.core.persistence.store.HomeStore;
-import net.crystalixs.core.persistence.store.PlayerStore;
-import net.crystalixs.core.persistence.store.TransactionStore;
+import net.crystalixs.core.persistence.store.*;
 
 public final class DefaultPersistenceContext implements PersistenceContext {
 
     private final StructuredLogger logger;
     private final HikariDataSource dataSource;
     private final PlayerStore playerStore;
+    private final PlayerSettingStore playerSettingStore;
     private final HomeStore homeStore;
     private final TransactionStore transactionStore;
     private final AuditStore auditStore;
@@ -33,6 +31,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
         // Initialize stores
         final StructuredLogger storeLogger = this.logger.child("store");
         this.playerStore = new DefaultPlayerStore(storeLogger.child("player"), dataSource);
+        this.playerSettingStore = new DefaultPlayerSettingStore(storeLogger.child("player_setting"), dataSource);
         this.homeStore = new DefaultHomeStore(storeLogger.child("home"), dataSource);
         this.transactionStore = new DefaultTransactionStore(storeLogger.child("transaction"), dataSource);
         this.auditStore = new DefaultAuditStore(storeLogger.child("audit"), dataSource);
@@ -43,6 +42,10 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     @Override
     public PlayerStore players() {
         return playerStore;
+    }
+
+    public PlayerSettingStore playerSettings() {
+        return playerSettingStore;
     }
 
     @Override
