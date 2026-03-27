@@ -1,13 +1,12 @@
 package net.crystalixs.core.persistence.api;
 
-import net.crystalixs.core.persistence.store.AuditStore;
-import net.crystalixs.core.persistence.store.HomeStore;
-import net.crystalixs.core.persistence.store.PlayerStore;
-import net.crystalixs.core.persistence.store.TransactionStore;
+import net.crystalixs.core.persistence.store.*;
 
 public interface PersistenceContext extends AutoCloseable {
 
     PlayerStore players();
+
+    PlayerSettingStore playerSettings();
 
     HomeStore homes();
 
