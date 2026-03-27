@@ -33,7 +33,7 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
                     .map(PlayerSettingModel.map())
                     .first();
         } catch (RuntimeException exception) {
-            throw failure("persistence.player.find_failed", playerId, "Could not load player setting", exception);
+            throw failure("persistence.player_setting.find_failed", playerId, "Could not load player setting", exception);
         }
     }
 
@@ -54,7 +54,7 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
             }
 
         } catch (RuntimeException exception) {
-            throw failure("persistence.player.update_failed", playerId, "Could not update ignore flag", exception);
+            throw failure("persistence.player_setting.update_failed", playerId, "Could not update ignore flag", exception);
         }
     }
 
@@ -75,7 +75,7 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
             }
 
         } catch (RuntimeException exception) {
-            throw failure("persistence.player.update_failed", playerId, "Could not update vanish flag", exception);
+            throw failure("persistence.player_setting.update_failed", playerId, "Could not update vanish flag", exception);
         }
     }
 
