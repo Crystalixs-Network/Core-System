@@ -8,7 +8,7 @@ import static net.crystalixs.core.persistence.model.UuidReader.uuidReader;
 
 public record PlayerSettingModel(
         long id,
-        UUID playerId,
+        UUID playerUuid,
         boolean isVanished
 ) {
 

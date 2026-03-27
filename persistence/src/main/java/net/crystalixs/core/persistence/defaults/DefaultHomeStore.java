@@ -71,7 +71,7 @@ public final class DefaultHomeStore implements HomeStore {
             long homeId = insertHome(model);
             return findById(homeId).orElseThrow(() -> reloadFailure(model, homeId));
         } catch (RuntimeException exception) {
-            throw failure("persistence.home.create_failed", subject(model.playerId(), model.name()), "Could not create home", exception);
+            throw failure("persistence.home.create_failed", subject(model.playerUuid(), model.name()), "Could not create home", exception);
         }
     }
 
@@ -159,7 +159,7 @@ public final class DefaultHomeStore implements HomeStore {
     private long insertHome(HomeModel model) {
         return config.query("INSERT INTO home (player_uuid, name, world_name, x, y, z, yaw, pitch) VALUES (?, ?, ?, ?, ?, ?, ?, ?);")
                 .single(call()
-                        .bind(model.playerId().toString())
+                        .bind(model.playerUuid().toString())
                         .bind(model.name())
                         .bind(model.position().worldName())
                         .bind(model.position().x())
@@ -172,7 +172,7 @@ public final class DefaultHomeStore implements HomeStore {
                 .keys()
                 .stream()
                 .findFirst()
-                .orElseThrow(() -> new PersistenceException("Could not read generated home key", new IllegalStateException(subject(model.playerId(), model.name()))));
+                .orElseThrow(() -> new PersistenceException("Could not read generated home key", new IllegalStateException(subject(model.playerUuid(), model.name()))));
     }
 
     private PersistenceException failure(String event, String subject, String message, RuntimeException exception) {
@@ -181,7 +181,7 @@ public final class DefaultHomeStore implements HomeStore {
     }
 
     private PersistenceException reloadFailure(HomeModel model, long homeId) {
-        String subject = subject(model.playerId(), model.name());
+        String subject = subject(model.playerUuid(), model.name());
         IllegalStateException exception = new IllegalStateException("home:" + homeId);
         logger.warn("persistence.home.reload_failed", LogMetadata
                 .event("persistence.home.reload_failed")

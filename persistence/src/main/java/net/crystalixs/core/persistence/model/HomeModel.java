@@ -9,7 +9,7 @@ import static net.crystalixs.core.persistence.model.UuidReader.uuidReader;
 
 public record HomeModel(
         long id,
-        UUID playerId,
+        UUID playerUuid,
         String name,
         String icon,
         HomePositionModel position,

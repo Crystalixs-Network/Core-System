@@ -12,9 +12,9 @@ public record TransactionModel(
         TransactionType type,
         Currency currency,
         long amount,
-        UUID fromPlayerId,
-        UUID toPlayerId,
-        UUID actorPlayerId,
+        UUID fromPlayerUuid,
+        UUID toPlayerUuid,
+        UUID actorPlayerUuid,
         String reason,
         Instant createdAt) {
 

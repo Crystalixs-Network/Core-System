@@ -36,9 +36,9 @@ public final class DefaultTransactionStore implements TransactionStore {
                             .bind(model.type().name())
                             .bind(model.currency().name())
                             .bind(model.amount())
-                            .bind(model.fromPlayerId() == null ? null : model.fromPlayerId().toString())
-                            .bind(model.toPlayerId() == null ? null : model.toPlayerId().toString())
-                            .bind(model.actorPlayerId() == null ? null : model.actorPlayerId().toString())
+                            .bind(model.fromPlayerUuid() == null ? null : model.fromPlayerUuid().toString())
+                            .bind(model.toPlayerUuid() == null ? null : model.toPlayerUuid().toString())
+                            .bind(model.actorPlayerUuid() == null ? null : model.actorPlayerUuid().toString())
                             .bind(model.reason())
                     )
                     .insert();
