@@ -74,6 +74,11 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
                 throw failure("persistence.player_setting.update_is_vanished_failed", playerId, "Could not update is_vanished: player does not exist", exception);
             }
 
+            logger.info("persistence.player_setting.update_vanish.success", LogMetadata
+                    .event("persistence.player_setting.update_vanish.success")
+                    .and(LogMetadata.Key.SUBJECT, "player:" + playerId)
+                    .and(LogMetadata.Key.STATE, isVanished ? "enabled" : "disabled"));
+
         } catch (RuntimeException exception) {
             throw failure("persistence.player_setting.update_failed", playerId, "Could not update vanish flag", exception);
         }
