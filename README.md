@@ -16,6 +16,7 @@
 | Konfigurations-Reload    | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.                                   |
 | Economy (Paper)          | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.                                         |
 | Home-System (Paper)      | Verwaltet Homes inklusive GUI, Umbenennen per Amboss und Icon-Auswahl mit Persistenz.                      |
+| Ignore-System (Paper)    | Blockiert direkte Interaktionen wie Nachrichten, Zahlungen und Teleport-Requests auf Spielerbasis.         |
 | Utility Commands (Paper) | Stellt QoL-Commands wie Hat, Enderchest, Trash, Sit, Sign, Skull, Invsee, Vanish und Teleport bereit.      |
 
 ---
@@ -111,6 +112,18 @@ Enthalten sind:
 - Icon-Auswahl pro Home mit persistenter Speicherung
 - Strukturierte Logs für Home-Operationen
 
+### Ignore-System (Paper)
+
+Das Paper-Modul enthält ein einfaches Ignore-System auf Spielerbasis.
+
+Enthalten sind:
+
+- Aktivieren und Deaktivieren über `/ignore` und `/unignore`
+- Persistente Speicherung des Flags `is_ignored` in `player_setting`
+- Blockieren eingehender Interaktionen für ignorierende Spieler bei privaten Nachrichten (`/message`, `/reply`)
+- Blockieren eingehender Interaktionen für ignorierende Spieler bei Coin-Transfers (`/pay`)
+- Blockieren eingehender Interaktionen für ignorierende Spieler bei Teleport-Requests (`/tpa`, `/tpahere`)
+
 ### Logging im Hintergrund
 
 Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und Fehler nachvollziehbar bleiben. Die Details dazu stehen in `LOGGING.md`.
@@ -154,6 +167,8 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 | `/home delete <name>`                                             | Löscht ein bestehendes Home.                                                            | Aufräumen/Entfernen alter Homes              |
 | `/home rename <old-name> <new-name>`                              | Benennt ein Home um.                                                                    | Umstrukturierung von Home-Namen              |
 | `/home update <name>`                                             | Aktualisiert die gespeicherte Position eines Homes auf die aktuelle Position.           | Bestehendes Home verschieben                 |
+| `/ignore`                                                         | Aktiviert den Ignore-Modus für den eigenen Spieler.                                     | Unerwünschte Interaktionen blockieren        |
+| `/unignore`                                                       | Deaktiviert den Ignore-Modus für den eigenen Spieler.                                   | Interaktionen wieder zulassen                |
 | `/hat`                                                            | Setzt das Item in der Hand als Helm.                                                    | Cosmetic/QoL                                 |
 | `/enderchest` oder `/ec`                                          | Öffnet die eigene Enderchest.                                                           | Schneller Zugriff                            |
 | `/enderchest <player>` oder `/ec <player>`                        | Öffnet die Enderchest eines anderen Spielers.                                           | Moderation/Support                           |
@@ -195,6 +210,8 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 | `core.command.pay`                       | Erlaubt das Senden von Coins an andere Spieler.                      |
 | `core.command.economy`                   | Erlaubt administrative Economy-Befehle (`give`, `set`, `take`).      |
 | `core.command.home`                      | Erlaubt die Nutzung des Home-Systems (`/home` + Subcommands).        |
+| `core.command.ignore`                    | Erlaubt `/ignore` zum Aktivieren des Ignore-Modus.                   |
+| `core.command.unignore`                  | Erlaubt `/unignore` zum Deaktivieren des Ignore-Modus.               |
 | `core.command.hat`                       | Erlaubt `/hat`.                                                      |
 | `core.command.enderchest`                | Erlaubt das Öffnen der eigenen Enderchest (`/ec`).                   |
 | `core.command.enderchest.other`          | Erlaubt das Öffnen fremder Enderchests.                              |
