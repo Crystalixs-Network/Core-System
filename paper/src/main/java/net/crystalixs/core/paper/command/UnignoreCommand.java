@@ -44,7 +44,7 @@ public final class UnignoreCommand extends PaperCommand {
                             return;
                         }
 
-                        service.updateIgnoreSetting(sender.getUniqueId(), true);
+                        service.updateIgnoreSetting(sender.getUniqueId(), false);
                         sender.sendMessage(translatable("command.unignore.success"));
 
                     } catch (SettingException exception) {
