@@ -1,8 +1,7 @@
 package net.crystalixs.core.paper.ignore;
 
 import net.crystalixs.core.persistence.store.PlayerIgnoreStore;
-
-import java.util.UUID;
+import org.bukkit.entity.Player;
 
 public final class DefaultPlayerIgnoreService implements PlayerIgnoreService {
 
@@ -13,12 +12,12 @@ public final class DefaultPlayerIgnoreService implements PlayerIgnoreService {
     }
 
     @Override
-    public void ignorePlayer(UUID actor, UUID target) {
-        store.create(actor, target);
+    public void ignorePlayer(Player actor, Player target) {
+        store.create(actor.getUniqueId(), target.getUniqueId());
     }
 
     @Override
-    public boolean isIgnoredByPlayer(UUID actor, UUID target) {
-        return store.findByPlayer(actor).stream().anyMatch(model -> model.ignoredUuid().equals(target));
+    public boolean isIgnoring(Player actor, Player target) {
+        return store.exists(actor.getUniqueId(), target.getUniqueId());
     }
 }

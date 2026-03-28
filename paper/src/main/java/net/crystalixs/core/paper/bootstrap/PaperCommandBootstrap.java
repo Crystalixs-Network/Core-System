@@ -66,7 +66,7 @@ public final class PaperCommandBootstrap {
 
         new CoinsCommand(plugin, economyService).registerTo(commandManager);
         new BalanceCommand(plugin, economyService).registerTo(commandManager);
-        new PayCommand(plugin, economyService).registerTo(commandManager);
+        new PayCommand(plugin, economyService, ignoreService).registerTo(commandManager);
         new EconomyCommand(plugin, economyService).registerTo(commandManager);
         new HatCommand(plugin).registerTo(commandManager);
         new EnderchestCommand(plugin).registerTo(commandManager);
@@ -77,10 +77,10 @@ public final class PaperCommandBootstrap {
         new TrashCommand(plugin, trashService).registerTo(commandManager);
         new SitCommand(plugin, sitService).registerTo(commandManager);
         new SignCommand(plugin).registerTo(commandManager);
-        new MessageCommand(plugin, messageService).registerTo(commandManager);
-        new ReplyCommand(plugin, messageService).registerTo(commandManager);
-        new TeleportRequestCommand(plugin, teleportService).registerTo(commandManager);
-        new TeleportRequestHereCommand(plugin, teleportService).registerTo(commandManager);
+        new MessageCommand(plugin, messageService, ignoreService).registerTo(commandManager);
+        new ReplyCommand(plugin, messageService, ignoreService).registerTo(commandManager);
+        new TeleportRequestCommand(plugin, teleportService, ignoreService).registerTo(commandManager);
+        new TeleportRequestHereCommand(plugin, teleportService, ignoreService).registerTo(commandManager);
         new TeleportRequestAcceptCommand(plugin, teleportService).registerTo(commandManager);
         new TeleportRequestDenyCommand(plugin, teleportService).registerTo(commandManager);
         new TeleportOverrideCommand(plugin).registerTo(commandManager);
@@ -88,6 +88,7 @@ public final class PaperCommandBootstrap {
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
         new HomeCommand(plugin, homeService, homeGuiFactory).registerTo(commandManager);
+        new IgnoreCommand(plugin, ignoreService).registerTo(commandManager);
 
         StructuredLogger helpSyncLogger = runtime.componentLogger("help-sync");
         String redisUri = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().uri();
