@@ -12,6 +12,7 @@ import org.incendo.cloud.permission.Permission;
 import org.incendo.cloud.suggestion.SuggestionProvider;
 import org.jetbrains.annotations.NotNull;
 
+import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.Component.translatable;
 import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static org.incendo.cloud.parser.standard.StringParser.stringParser;
@@ -37,19 +38,14 @@ public final class UnignoreCommand extends PaperCommand {
                 )
                 .handler(context -> {
                     Player sender = context.sender().player();
-                    Player target = context.get("player");
+                    String targetName = context.get("player");
 
-                    if (sender.getUniqueId().equals(target.getUniqueId())) {
-                        sender.sendMessage(translatable("command.unignore.error.self"));
-                        return;
-                    }
-                    if (!service.isIgnoring(sender, target)) {
+                    if (!service.unignorePlayer(sender, targetName)) {
                         sender.sendMessage(translatable("command.unignore.error.not-ignored"));
                         return;
                     }
 
-                    service.unignorePlayer(sender, target);
-                    sender.sendMessage(translatable("command.unignore.success").arguments(component("name", target.name())));
+                    sender.sendMessage(translatable("command.unignore.success").arguments(component("name", text(targetName))));
                 }));
     }
 
