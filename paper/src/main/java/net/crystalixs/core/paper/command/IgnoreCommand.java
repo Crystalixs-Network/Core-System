@@ -11,6 +11,8 @@ import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
+import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
 public final class IgnoreCommand extends PaperCommand {
@@ -33,7 +35,17 @@ public final class IgnoreCommand extends PaperCommand {
                     Player sender = context.sender().player();
                     Player target = context.get("player");
 
+                    if (sender.getUniqueId().equals(target.getUniqueId())) {
+                        sender.sendMessage(translatable("command.ignore.error.self"));
+                        return;
+                    }
+                    if (service.isIgnoredByPlayer(sender, target)) {
+                        sender.sendMessage(translatable("command.ignore.error.already-ignored"));
+                        return;
+                    }
+
                     service.ignorePlayer(sender, target);
+                    sender.sendMessage(translatable("command.ignore.success").arguments(component("name", target.name())));
                 }));
     }
 }
