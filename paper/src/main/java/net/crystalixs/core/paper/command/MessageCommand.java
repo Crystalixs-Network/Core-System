@@ -5,6 +5,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.PrivateMessageService;
+import net.crystalixs.core.paper.ignore.PlayerIgnoreService;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
@@ -20,11 +21,13 @@ import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 
 public final class MessageCommand extends PaperCommand {
 
-    private final PrivateMessageService service;
+    private final PrivateMessageService messageService;
+    private final PlayerIgnoreService ignoreService;
 
-    public MessageCommand(CorePlugin plugin, PrivateMessageService service) {
+    public MessageCommand(CorePlugin plugin, PrivateMessageService messageService, PlayerIgnoreService ignoreService) {
         super(plugin);
-        this.service = service;
+        this.messageService = messageService;
+        this.ignoreService = ignoreService;
     }
 
     @Override
@@ -47,6 +50,10 @@ public final class MessageCommand extends PaperCommand {
             sender.sendMessage(translatable("command.message.error.self"));
             return;
         }
+        if (ignoreService.isIgnoredByPlayer(sender, receiver)) {
+            sender.sendMessage(translatable("command.ignore.error.ignored"));
+            return;
+        }
 
         sender.sendMessage(translatable("command.message.sent").arguments(
                 component("player", receiver.name()),
@@ -55,6 +62,6 @@ public final class MessageCommand extends PaperCommand {
                 component("player", sender.name()),
                 string("message", message)));
 
-        service.rememberConversation(sender, receiver);
+        messageService.rememberConversation(sender, receiver);
     }
 }

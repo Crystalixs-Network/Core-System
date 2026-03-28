@@ -6,6 +6,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.TeleportRequestService;
 import net.crystalixs.core.paper.command.util.TeleportRequestService.RequestType;
+import net.crystalixs.core.paper.ignore.PlayerIgnoreService;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
@@ -18,11 +19,13 @@ import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
 public final class TeleportRequestCommand extends PaperCommand {
 
-    private final TeleportRequestService service;
+    private final TeleportRequestService requestService;
+    private final PlayerIgnoreService ignoreService;
 
-    public TeleportRequestCommand(CorePlugin plugin, TeleportRequestService service) {
+    public TeleportRequestCommand(CorePlugin plugin, TeleportRequestService requestService, PlayerIgnoreService ignoreService) {
         super(plugin);
-        this.service = service;
+        this.requestService = requestService;
+        this.ignoreService = ignoreService;
     }
 
     @Override
@@ -40,8 +43,12 @@ public final class TeleportRequestCommand extends PaperCommand {
                         requester.sendMessage(translatable("command.tpa.error.self"));
                         return;
                     }
+                    if (ignoreService.isIgnoredByPlayer(requester, target)) {
+                        requester.sendMessage(translatable("command.ignore.error.ignored"));
+                        return;
+                    }
 
-                    service.create(requester, target, RequestType.TPA);
+                    requestService.create(requester, target, RequestType.TPA);
 
                     requester.sendMessage(translatable("command.tpa.sent").arguments(component("player", target.name())));
                     target.sendMessage(translatable("command.tpa.received").arguments(component("player", requester.name())));
