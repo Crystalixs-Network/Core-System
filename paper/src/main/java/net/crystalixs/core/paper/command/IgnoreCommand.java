@@ -30,7 +30,7 @@ public final class IgnoreCommand extends PaperCommand {
                 .commandDescription(RichDescription.translatable("command.ignore.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
                 .permission(Permission.of("core.command.ignore"))
-                .required("player", playerParser())
+                .required("player", playerParser(), RichDescription.translatable("command.ignore.description.player"))
                 .handler(context -> {
                     // Hier ist ein Test für die Tester eingebaut: Man kann aktuell nur online Spieler ignorieren.
                     // Im Live-Betrieb soll man natürlich auch offline Spieler ignorieren können, sofern diese
