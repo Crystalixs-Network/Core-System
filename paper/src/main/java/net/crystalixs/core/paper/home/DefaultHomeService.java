@@ -94,7 +94,7 @@ public final class DefaultHomeService implements HomeService {
                 return failAsAlreadyExistent(playerId, normalizedNewName);
             }
 
-            HomeModel renamed = new HomeModel(existing.id(), existing.playerId(), normalizedNewName, existing.icon(), existing.position(), existing.createdAt());
+            HomeModel renamed = new HomeModel(existing.id(), existing.playerUuid(), normalizedNewName, existing.icon(), existing.position(), existing.createdAt());
             try {
                 homes.rename(playerId, normalizedOldName, normalizedNewName);
                 return homes.findById(existing.id()).orElse(renamed);
@@ -123,7 +123,7 @@ public final class DefaultHomeService implements HomeService {
             return existing;
         }
 
-        HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), existing.icon(), position, existing.createdAt());
+        HomeModel updated = new HomeModel(existing.id(), existing.playerUuid(), existing.name(), existing.icon(), position, existing.createdAt());
         try {
             homes.updatePosition(existing.id(), position.worldName(), position.x(), position.y(), position.z(), position.yaw(), position.pitch());
             return homes.findById(existing.id()).orElse(updated);
@@ -141,7 +141,7 @@ public final class DefaultHomeService implements HomeService {
                 .findByPlayerAndName(playerId, normalizedName)
                 .orElseThrow(() -> failAsNotExistent(playerId, normalizedName));
 
-        HomeModel updated = new HomeModel(existing.id(), existing.playerId(), existing.name(), normalizedIcon, existing.position(), existing.createdAt());
+        HomeModel updated = new HomeModel(existing.id(), existing.playerUuid(), existing.name(), normalizedIcon, existing.position(), existing.createdAt());
         try {
             homes.updateIcon(existing.id(), normalizedIcon);
             return homes.findById(existing.id()).orElse(updated);
