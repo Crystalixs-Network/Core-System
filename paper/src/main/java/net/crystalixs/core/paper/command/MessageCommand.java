@@ -50,7 +50,7 @@ public final class MessageCommand extends PaperCommand {
             sender.sendMessage(translatable("command.message.error.self"));
             return;
         }
-        if (ignoreService.isIgnoring(sender, receiver)) {
+        if (ignoreService.isIgnoring(receiver, sender)) {
             sender.sendMessage(translatable("command.ignore.error.ignored"));
             return;
         }

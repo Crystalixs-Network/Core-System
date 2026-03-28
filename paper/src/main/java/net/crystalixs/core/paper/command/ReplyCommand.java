@@ -44,7 +44,7 @@ public final class ReplyCommand extends PaperCommand {
                         sender.sendMessage(translatable("command.reply.error.no-target"));
                         return;
                     }
-                    if (ignoreService.isIgnoring(sender, receiver)) {
+                    if (ignoreService.isIgnoring(receiver, sender)) {
                         sender.sendMessage(translatable("command.ignore.error.ignored"));
                         return;
                     }
