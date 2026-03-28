@@ -89,6 +89,7 @@ public final class PaperCommandBootstrap {
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
         new HomeCommand(plugin, homeService, homeGuiFactory).registerTo(commandManager);
         new IgnoreCommand(plugin, ignoreService).registerTo(commandManager);
+        new UnignoreCommand(plugin, ignoreService).registerTo(commandManager);
 
         StructuredLogger helpSyncLogger = runtime.componentLogger("help-sync");
         String redisUri = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().uri();
