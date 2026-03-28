@@ -10,4 +10,6 @@ public interface PlayerIgnoreStore {
 
     void create(@NotNull UUID playerUuid, @NotNull UUID ignoredUuid);
 
+    void delete(@NotNull UUID playerUuid, @NotNull UUID ignoredUuid);
+
 }

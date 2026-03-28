@@ -51,6 +51,19 @@ public final class DefaultPlayerIgnoreStore implements PlayerIgnoreStore {
         }
     }
 
+    @Override
+    public void delete(@NotNull UUID playerUuid, @NotNull UUID ignoredUuid) {
+        try {
+            config.query("DELETE FROM player_ignore WHERE player_uuid = ? AND ignored_uuid = ?;")
+                    .single(call()
+                            .bind(playerUuid.toString())
+                            .bind(ignoredUuid.toString()))
+                    .delete();
+        } catch (RuntimeException exception) {
+            throw failure("persistence.player_ignore.delete_failed", "Could not delete ignored player", exception, playerUuid);
+        }
+    }
+
     private PersistenceException failure(String event, String message, RuntimeException exception, UUID playerUuid) {
         logger.warn(event, LogMetadata.event(event).and(LogMetadata.Key.SUBJECT, "player:" + playerUuid));
         throw new PersistenceException(message, exception);
