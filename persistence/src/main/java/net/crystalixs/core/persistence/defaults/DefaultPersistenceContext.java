@@ -14,6 +14,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     private final HikariDataSource dataSource;
     private final PlayerStore playerStore;
     private final PlayerSettingStore playerSettingStore;
+    private final PlayerIgnoreStore playerIgnoreStore;
     private final HomeStore homeStore;
     private final TransactionStore transactionStore;
     private final AuditStore auditStore;
@@ -32,6 +33,7 @@ public final class DefaultPersistenceContext implements PersistenceContext {
         final StructuredLogger storeLogger = this.logger.child("store");
         this.playerStore = new DefaultPlayerStore(storeLogger.child("player"), dataSource);
         this.playerSettingStore = new DefaultPlayerSettingStore(storeLogger.child("player_setting"), dataSource);
+        this.playerIgnoreStore = new DefaultPlayerIgnoreStore(storeLogger.child("player_ignore"), dataSource);
         this.homeStore = new DefaultHomeStore(storeLogger.child("home"), dataSource);
         this.transactionStore = new DefaultTransactionStore(storeLogger.child("transaction"), dataSource);
         this.auditStore = new DefaultAuditStore(storeLogger.child("audit"), dataSource);
@@ -47,6 +49,11 @@ public final class DefaultPersistenceContext implements PersistenceContext {
     @Override
     public PlayerSettingStore playerSettings() {
         return playerSettingStore;
+    }
+
+    @Override
+    public PlayerIgnoreStore ignores() {
+        return playerIgnoreStore;
     }
 
     @Override
