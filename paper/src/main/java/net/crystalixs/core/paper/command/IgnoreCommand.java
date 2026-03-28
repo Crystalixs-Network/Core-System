@@ -33,6 +33,10 @@ public final class IgnoreCommand extends PaperCommand {
                     Player sender = context.sender().player();
                     Player target = context.get("player");
 
+                    if (sender.getUniqueId().equals(target.getUniqueId())) {
+                        return;
+                    }
+
                     service.ignorePlayer(sender, target);
                 }));
     }
