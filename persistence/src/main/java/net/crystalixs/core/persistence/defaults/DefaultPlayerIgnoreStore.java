@@ -40,6 +40,20 @@ public final class DefaultPlayerIgnoreStore implements PlayerIgnoreStore {
     }
 
     @Override
+    public boolean exists(@NotNull UUID playerUuid, @NotNull UUID ignoredUuid) {
+        try {
+            return config.query("SELECT 1 FROM player_ignore WHERE player_uuid = ? AND ignored_uuid = ? LIMIT 1;")
+                    .single(call()
+                            .bind(playerUuid.toString())
+                            .bind(ignoredUuid.toString()))
+                    .map(row -> true)
+                    .first().orElse(false);
+        } catch (RuntimeException exception) {
+            throw failure("persistence.player_ignore.exists_failed", "Could not check ignored player relation", exception, playerUuid);
+        }
+    }
+
+    @Override
     public void create(@NotNull UUID playerUuid, @NotNull UUID ignoredUuid) {
         try {
             config.query("INSERT INTO player_ignore (player_uuid, ignored_uuid) VALUES (?, ?);")

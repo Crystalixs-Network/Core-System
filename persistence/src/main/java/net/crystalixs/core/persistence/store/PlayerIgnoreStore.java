@@ -13,6 +13,8 @@ public interface PlayerIgnoreStore {
     @UnmodifiableView
     Collection<PlayerIgnoreModel> findByPlayer(@NotNull UUID playerUuid);
 
+    boolean exists(@NotNull UUID playerUuid, @NotNull UUID ignoredUuid);
+
     void create(@NotNull UUID playerUuid, @NotNull UUID ignoredUuid);
 
 }
