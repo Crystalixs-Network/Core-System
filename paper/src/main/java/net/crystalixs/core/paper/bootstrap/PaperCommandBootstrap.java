@@ -12,6 +12,7 @@ import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import net.crystalixs.core.paper.home.DefaultHomeService;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
+import net.crystalixs.core.paper.ignore.DefaultPlayerIgnoreService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -61,6 +62,7 @@ public final class PaperCommandBootstrap {
         var economyService = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
         var homeService = new DefaultHomeService(persistence.players(), persistence.homes());
         var homeGuiFactory = new HomeGuiFactory(plugin, homeService);
+        var ignoreService = new DefaultPlayerIgnoreService(persistence.ignores());
 
         new CoinsCommand(plugin, economyService).registerTo(commandManager);
         new BalanceCommand(plugin, economyService).registerTo(commandManager);
