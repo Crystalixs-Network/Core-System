@@ -43,7 +43,7 @@ public final class TeleportRequestHereCommand extends PaperCommand {
                         requester.sendMessage(translatable("command.tpa.error.self"));
                         return;
                     }
-                    if (ignoreService.isIgnoredByPlayer(requester, target)) {
+                    if (ignoreService.isIgnoring(requester, target)) {
                         requester.sendMessage(translatable("command.ignore.error.ignored"));
                         return;
                     }

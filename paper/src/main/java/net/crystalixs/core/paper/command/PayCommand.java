@@ -43,7 +43,7 @@ public final class PayCommand extends PaperCommand {
                     Player target = context.get("player");
                     long amount = context.get("amount");
 
-                    if (ignoreService.isIgnoredByPlayer(sender, target)) {
+                    if (ignoreService.isIgnoring(sender, target)) {
                         sender.sendMessage(translatable("command.ignore.error.ignored"));
                         return;
                     }

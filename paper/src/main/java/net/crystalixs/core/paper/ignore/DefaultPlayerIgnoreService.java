@@ -17,7 +17,7 @@ public final class DefaultPlayerIgnoreService implements PlayerIgnoreService {
     }
 
     @Override
-    public boolean isIgnoredByPlayer(Player actor, Player target) {
+    public boolean isIgnoring(Player actor, Player target) {
         return store.exists(actor.getUniqueId(), target.getUniqueId());
     }
 }
