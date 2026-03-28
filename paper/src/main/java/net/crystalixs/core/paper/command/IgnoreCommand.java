@@ -32,6 +32,9 @@ public final class IgnoreCommand extends PaperCommand {
                 .permission(Permission.of("core.command.ignore"))
                 .required("player", playerParser())
                 .handler(context -> {
+                    // Hier ist ein Test für die Tester eingebaut: Man kann aktuell nur online Spieler ignorieren.
+                    // Im Live-Betrieb soll man natürlich auch offline Spieler ignorieren können, sofern diese
+                    // bereits auf dem Server registriert sind.
                     Player sender = context.sender().player();
                     Player target = context.get("player");
 
