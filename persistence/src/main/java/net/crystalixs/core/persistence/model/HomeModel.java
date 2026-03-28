@@ -9,7 +9,7 @@ import static net.crystalixs.core.persistence.model.UuidReader.uuidReader;
 
 public record HomeModel(
         long id,
-        UUID playerId,
+        UUID playerUuid,
         String name,
         String icon,
         HomePositionModel position,
@@ -19,7 +19,7 @@ public record HomeModel(
     public static RowMapping<HomeModel> map() {
         return row -> new HomeModel(
                 row.getLong("id"),
-                row.get("player_id", uuidReader()),
+                row.get("player_uuid", uuidReader()),
                 row.getString("name"),
                 row.getString("icon"),
                 HomePositionModel.fromRow(row),

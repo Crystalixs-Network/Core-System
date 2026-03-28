@@ -12,9 +12,9 @@ public record TransactionModel(
         TransactionType type,
         Currency currency,
         long amount,
-        UUID fromPlayerId,
-        UUID toPlayerId,
-        UUID actorPlayerId,
+        UUID fromPlayerUuid,
+        UUID toPlayerUuid,
+        UUID actorPlayerUuid,
         String reason,
         Instant createdAt) {
 
@@ -24,9 +24,9 @@ public record TransactionModel(
                 TransactionType.valueOf(row.getString("type")),
                 Currency.valueOf(row.getString("currency")),
                 row.getLong("amount"),
-                row.get("from_player_id", uuidReader()),
-                row.get("to_player_id", uuidReader()),
-                row.get("actor_player_id", uuidReader()),
+                row.get("from_player_uuid", uuidReader()),
+                row.get("to_player_uuid", uuidReader()),
+                row.get("actor_player_uuid", uuidReader()),
                 row.getString("reason"),
                 row.getTimestamp("created_at").toInstant());
     }

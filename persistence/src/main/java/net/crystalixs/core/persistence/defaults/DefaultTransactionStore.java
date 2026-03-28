@@ -28,7 +28,7 @@ public final class DefaultTransactionStore implements TransactionStore {
         try {
             config.query("""
                             INSERT INTO economy_transactions
-                            (type, currency, amount, from_player_id, to_player_id, actor_player_id, reason)
+                            (type, currency, amount, from_player_uuid, to_player_uuid, actor_player_uuid, reason)
                             VALUES (?, ?, ?, ?, ?, ?, ?);
                             """
                     )
@@ -36,9 +36,9 @@ public final class DefaultTransactionStore implements TransactionStore {
                             .bind(model.type().name())
                             .bind(model.currency().name())
                             .bind(model.amount())
-                            .bind(model.fromPlayerId() == null ? null : model.fromPlayerId().toString())
-                            .bind(model.toPlayerId() == null ? null : model.toPlayerId().toString())
-                            .bind(model.actorPlayerId() == null ? null : model.actorPlayerId().toString())
+                            .bind(model.fromPlayerUuid() == null ? null : model.fromPlayerUuid().toString())
+                            .bind(model.toPlayerUuid() == null ? null : model.toPlayerUuid().toString())
+                            .bind(model.actorPlayerUuid() == null ? null : model.actorPlayerUuid().toString())
                             .bind(model.reason())
                     )
                     .insert();
@@ -51,11 +51,11 @@ public final class DefaultTransactionStore implements TransactionStore {
     @Override
     public List<TransactionModel> findByPlayer(UUID playerId, int limit) {
         try {
-            int safeLimit = Math.max(1, Math.min(limit, 500));
+            int safeLimit = Math.clamp(limit, 1, 500);
             return config.query("""
                             SELECT *
                             FROM economy_transactions
-                            WHERE from_player_id = ? OR to_player_id = ? OR actor_player_id = ?
+                            WHERE from_player_uuid = ? OR to_player_uuid = ? OR actor_player_uuid = ?
                             ORDER BY created_at DESC
                             LIMIT ?;
                             """)

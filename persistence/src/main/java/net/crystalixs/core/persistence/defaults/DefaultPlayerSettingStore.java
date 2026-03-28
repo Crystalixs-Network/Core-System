@@ -28,7 +28,7 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
     @Override
     public Optional<PlayerSettingModel> findByPlayerId(UUID playerId) {
         try {
-            return config.query("SELECT * FROM player_setting WHERE player_id = ?;")
+            return config.query("SELECT * FROM player_setting WHERE player_uuid = ?;")
                     .single(call().bind(playerId.toString()))
                     .map(PlayerSettingModel.map())
                     .first();
@@ -38,30 +38,9 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
     }
 
     @Override
-    public void updateIgnoreFlag(UUID playerId, boolean isIgnored) {
-        try {
-            boolean wasUpdated = config.query("UPDATE player_setting SET is_ignored = ? WHERE player_id = ?;")
-                    .single(call()
-                            .bind(isIgnored)
-                            .bind(playerId.toString())
-                    )
-                    .update()
-                    .changed();
-
-            if (!wasUpdated) {
-                IllegalStateException exception = new IllegalStateException("No player setting row found for player=" + playerId);
-                throw failure("persistence.player_setting.update_is_ignored_failed", playerId, "Could not update is_ignored: player does not exist", exception);
-            }
-
-        } catch (RuntimeException exception) {
-            throw failure("persistence.player_setting.update_failed", playerId, "Could not update ignore flag", exception);
-        }
-    }
-
-    @Override
     public void updateVanishFlag(UUID playerId, boolean isVanished) {
         try {
-            boolean wasUpdated = config.query("UPDATE player_setting SET is_vanished = ? WHERE player_id = ?;")
+            boolean wasUpdated = config.query("UPDATE player_setting SET is_vanished = ? WHERE player_uuid = ?;")
                     .single(call()
                             .bind(isVanished)
                             .bind(playerId.toString())

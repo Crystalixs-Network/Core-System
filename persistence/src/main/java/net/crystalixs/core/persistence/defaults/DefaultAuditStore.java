@@ -43,7 +43,7 @@ public class DefaultAuditStore implements AuditStore {
     @Override
     public List<AuditModel> findByAction(String action, int limit) {
         try {
-            int safeLimit = Math.max(1, Math.min(limit, 500));
+            int safeLimit = Math.clamp(limit, 1, 500);
             return config.query("""
                             SELECT *
                             FROM economy_audit
