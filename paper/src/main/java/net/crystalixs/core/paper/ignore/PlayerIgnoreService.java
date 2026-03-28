@@ -6,6 +6,6 @@ public interface PlayerIgnoreService {
 
     void ignorePlayer(Player actor, Player target);
 
-    boolean isIgnoredByPlayer(Player actor, Player target);
+    boolean isIgnoring(Player actor, Player target);
 
 }

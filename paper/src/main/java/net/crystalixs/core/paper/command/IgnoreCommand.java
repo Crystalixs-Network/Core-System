@@ -39,7 +39,7 @@ public final class IgnoreCommand extends PaperCommand {
                         sender.sendMessage(translatable("command.ignore.error.self"));
                         return;
                     }
-                    if (service.isIgnoredByPlayer(sender, target)) {
+                    if (service.isIgnoring(sender, target)) {
                         sender.sendMessage(translatable("command.ignore.error.already-ignored"));
                         return;
                     }
