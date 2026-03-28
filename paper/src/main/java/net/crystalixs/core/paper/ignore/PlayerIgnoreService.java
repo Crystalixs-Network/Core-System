@@ -1,11 +1,11 @@
 package net.crystalixs.core.paper.ignore;
 
-import java.util.UUID;
+import org.bukkit.entity.Player;
 
 public interface PlayerIgnoreService {
 
-    void ignorePlayer(UUID actor, UUID target);
+    void ignorePlayer(Player actor, Player target);
 
-    boolean isIgnoredByPlayer(UUID actor, UUID target);
+    boolean isIgnoredByPlayer(Player actor, Player target);
 
 }
