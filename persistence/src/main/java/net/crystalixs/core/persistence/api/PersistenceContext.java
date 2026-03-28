@@ -8,6 +8,8 @@ public interface PersistenceContext extends AutoCloseable {
 
     PlayerSettingStore playerSettings();
 
+    PlayerIgnoreStore ignores();
+
     HomeStore homes();
 
     TransactionStore transactions();

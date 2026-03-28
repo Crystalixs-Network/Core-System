@@ -14,19 +14,8 @@ public final class DefaultSettingService implements PlayerSettingService {
     }
 
     @Override
-    public boolean isIgnored(UUID playerId) {
-        return getSettingOrFail(playerId).isIgnored();
-    }
-
-    @Override
     public boolean isVanished(UUID playerId) {
         return getSettingOrFail(playerId).isVanished();
-    }
-
-    @Override
-    public void updateIgnoreSetting(UUID playerId, boolean isIgnored) {
-        getSettingOrFail(playerId);
-        store.updateIgnoreFlag(playerId, isIgnored);
     }
 
     @Override

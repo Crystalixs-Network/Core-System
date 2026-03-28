@@ -6,7 +6,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.TeleportRequestService;
 import net.crystalixs.core.paper.command.util.TeleportRequestService.RequestType;
-import net.crystalixs.core.paper.setting.PlayerSettingService;
+import net.crystalixs.core.paper.ignore.PlayerIgnoreService;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
@@ -20,12 +20,12 @@ import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 public final class TeleportRequestHereCommand extends PaperCommand {
 
     private final TeleportRequestService requestService;
-    private final PlayerSettingService settingService;
+    private final PlayerIgnoreService ignoreService;
 
-    public TeleportRequestHereCommand(CorePlugin plugin, TeleportRequestService requestService, PlayerSettingService settingService) {
+    public TeleportRequestHereCommand(CorePlugin plugin, TeleportRequestService requestService, PlayerIgnoreService ignoreService) {
         super(plugin);
         this.requestService = requestService;
-        this.settingService = settingService;
+        this.ignoreService = ignoreService;
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class TeleportRequestHereCommand extends PaperCommand {
                         requester.sendMessage(translatable("command.tpa.error.self"));
                         return;
                     }
-                    if (settingService.isIgnored(target.getUniqueId())) {
+                    if (ignoreService.isIgnoring(target, requester)) {
                         requester.sendMessage(translatable("command.ignore.error.ignored"));
                         return;
                     }

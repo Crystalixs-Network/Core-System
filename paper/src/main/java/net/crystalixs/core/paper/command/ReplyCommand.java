@@ -5,7 +5,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommand;
 import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.PrivateMessageService;
-import net.crystalixs.core.paper.setting.PlayerSettingService;
+import net.crystalixs.core.paper.ignore.PlayerIgnoreService;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
@@ -20,12 +20,12 @@ import static org.incendo.cloud.parser.standard.StringParser.greedyStringParser;
 public final class ReplyCommand extends PaperCommand {
 
     private final PrivateMessageService messageService;
-    private final PlayerSettingService settingService;
+    private final PlayerIgnoreService ignoreService;
 
-    public ReplyCommand(CorePlugin plugin, PrivateMessageService messageService, PlayerSettingService settingService) {
+    public ReplyCommand(CorePlugin plugin, PrivateMessageService messageService, PlayerIgnoreService ignoreService) {
         super(plugin);
         this.messageService = messageService;
-        this.settingService = settingService;
+        this.ignoreService = ignoreService;
     }
 
     @Override
@@ -44,7 +44,7 @@ public final class ReplyCommand extends PaperCommand {
                         sender.sendMessage(translatable("command.reply.error.no-target"));
                         return;
                     }
-                    if (settingService.isIgnored(receiver.getUniqueId())) {
+                    if (ignoreService.isIgnoring(receiver, sender)) {
                         sender.sendMessage(translatable("command.ignore.error.ignored"));
                         return;
                     }

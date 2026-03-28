@@ -6,18 +6,18 @@
 
 ## Überblick
 
-| Bereich                  | Nutzen                                                                                                     |
-|--------------------------|------------------------------------------------------------------------------------------------------------|
-| Wartungsmodus            | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch.                               |
-| MOTD-Steuerung           | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.                                 |
-| Dynamische Tablist       | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen.                                 |
-| Netzwerk-Commands        | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.                                       |
-| Unified Help             | Zeigt Proxy- und Backend-Befehle in einem gemeinsamen Help-Menü mit Paging, Server- und Permission-Filter. |
-| Konfigurations-Reload    | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.                                   |
-| Economy (Paper)          | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.                                         |
-| Home-System (Paper)      | Verwaltet Homes inklusive GUI, Umbenennen per Amboss und Icon-Auswahl mit Persistenz.                      |
-| Ignore-System (Paper)    | Blockiert direkte Interaktionen wie Nachrichten, Zahlungen und Teleport-Requests auf Spielerbasis.         |
-| Utility Commands (Paper) | Stellt QoL-Commands wie Hat, Enderchest, Trash, Sit, Sign, Skull, Invsee, Vanish und Teleport bereit.      |
+| Bereich                  | Nutzen                                                                                                           |
+|--------------------------|------------------------------------------------------------------------------------------------------------------|
+| Wartungsmodus            | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch.                                     |
+| MOTD-Steuerung           | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.                                       |
+| Dynamische Tablist       | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen.                                       |
+| Netzwerk-Commands        | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.                                             |
+| Unified Help             | Zeigt Proxy- und Backend-Befehle in einem gemeinsamen Help-Menü mit Paging, Server- und Permission-Filter.       |
+| Konfigurations-Reload    | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.                                         |
+| Economy (Paper)          | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.                                               |
+| Home-System (Paper)      | Verwaltet Homes inklusive GUI, Umbenennen per Amboss und Icon-Auswahl mit Persistenz.                            |
+| Ignore-System (Paper)    | Verwaltet Ignore-Beziehungen zwischen Spielern und blockiert direkte Interaktionen inkl. `unignore`-Vorschlägen. |
+| Utility Commands (Paper) | Stellt QoL-Commands wie Hat, Enderchest, Trash, Sit, Sign, Skull, Invsee, Vanish und Teleport bereit.            |
 
 ---
 <br>
@@ -114,12 +114,14 @@ Enthalten sind:
 
 ### Ignore-System (Paper)
 
-Das Paper-Modul enthält ein einfaches Ignore-System auf Spielerbasis.
+Das Paper-Modul enthält ein Ignore-System auf Basis von Spieler-zu-Spieler-Beziehungen.
 
 Enthalten sind:
 
-- Aktivieren und Deaktivieren über `/ignore` und `/unignore`
-- Persistente Speicherung des Flags `is_ignored` in `player_setting`
+- Ignorieren einzelner Spieler über `/ignore <player>`
+- Aufheben über `/unignore <player>`
+- Tab-Completion bei `/unignore` aus der gespeicherten Ignore-Liste (auch wenn der Spieler aktuell offline ist)
+- Persistente Speicherung der Ignore-Beziehungen in `player_ignore`
 - Blockieren eingehender Interaktionen für ignorierende Spieler bei privaten Nachrichten (`/message`, `/reply`)
 - Blockieren eingehender Interaktionen für ignorierende Spieler bei Coin-Transfers (`/pay`)
 - Blockieren eingehender Interaktionen für ignorierende Spieler bei Teleport-Requests (`/tpa`, `/tpahere`)
@@ -145,51 +147,51 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 
 ## Commands
 
-| Command                                                           | Zweck                                                                                   | Typischer Einsatz                            |
-|-------------------------------------------------------------------|-----------------------------------------------------------------------------------------|----------------------------------------------|
-| `/maintenance <true\|false>`                                      | Aktiviert oder deaktiviert den Wartungsmodus.                                           | Updates, Tests, Notfallarbeiten              |
-| `/core reload --config`                                           | Lädt nur die Konfiguration neu.                                                         | Nach Änderungen an `config.json`             |
-| `/core reload --messages`                                         | Lädt nur die Nachrichten neu.                                                           | Nach Änderungen an Texten oder Übersetzungen |
-| `/core reload --all`                                              | Lädt Config und Nachrichten gemeinsam neu.                                              | Nach größeren inhaltlichen Anpassungen       |
-| `/help [query] [--page <page>]` oder `/? [query] [--page <page>]` | Zeigt das vereinheitlichte Hilfemenü (Proxy + Backend) mit optionaler Suche und Paging. | Zum Nachschlagen verfügbarer Befehle         |
-| `/global-find <player>` oder `/gfind <player>`                    | Zeigt, auf welchem Server ein Spieler ist.                                              | Support, Moderation, Teamarbeit              |
-| `/global-teleport <player>` oder `/gtp <player>`                  | Verbindet dich auf den Server des Zielspielers.                                         | Direktes Wechseln zu einem Spieler           |
-| `/online <server>`                                                | Prüft, ob ein registrierter Backend-Server erreichbar ist.                              | Betriebscheck, Fehlersuche                   |
-| `/proxy-stop`                                                     | Stoppt den Proxy kontrolliert.                                                          | Geplante Eingriffe oder Wartung              |
-| `/coins`                                                          | Zeigt den aktuellen Coin-Kontostand.                                                    | Schnelle Kontostandsprüfung                  |
-| `/balance` oder `/bal`                                            | Zeigt Coins und Gems an.                                                                | Gesamtübersicht für Spieler                  |
-| `/pay <player> <amount>`                                          | Überweist Coins an einen anderen Spieler.                                               | Spieler-zu-Spieler-Transfer                  |
-| `/economy give <player> <currency> <amount>`                      | Fügt Coins oder Gems hinzu.                                                             | Admin-Korrekturen, Rewards                   |
-| `/economy set <player> <currency> <amount>`                       | Setzt Coins oder Gems auf einen festen Wert.                                            | Moderation, Datenkorrekturen                 |
-| `/economy take <player> <currency> <amount>`                      | Zieht Coins oder Gems ab.                                                               | Moderation, Rückabwicklung                   |
-| `/home`                                                           | Öffnet die Home-GUI mit Home-Liste und Schnellzugriff.                                  | Navigation und Teleport über GUI             |
-| `/home create <name>`                                             | Erstellt ein neues Home an der aktuellen Position.                                      | Neues Teleport-Ziel speichern                |
-| `/home delete <name>`                                             | Löscht ein bestehendes Home.                                                            | Aufräumen/Entfernen alter Homes              |
-| `/home rename <old-name> <new-name>`                              | Benennt ein Home um.                                                                    | Umstrukturierung von Home-Namen              |
-| `/home update <name>`                                             | Aktualisiert die gespeicherte Position eines Homes auf die aktuelle Position.           | Bestehendes Home verschieben                 |
-| `/ignore`                                                         | Aktiviert den Ignore-Modus für den eigenen Spieler.                                     | Unerwünschte Interaktionen blockieren        |
-| `/unignore`                                                       | Deaktiviert den Ignore-Modus für den eigenen Spieler.                                   | Interaktionen wieder zulassen                |
-| `/hat`                                                            | Setzt das Item in der Hand als Helm.                                                    | Cosmetic/QoL                                 |
-| `/enderchest` oder `/ec`                                          | Öffnet die eigene Enderchest.                                                           | Schneller Zugriff                            |
-| `/enderchest <player>` oder `/ec <player>`                        | Öffnet die Enderchest eines anderen Spielers.                                           | Moderation/Support                           |
-| `/workbench` oder `/wb`                                           | Öffnet eine mobile Werkbank.                                                            | Crafting ohne Block                          |
-| `/anvil`                                                          | Öffnet einen mobilen Amboss.                                                            | Umbenennen/Reparieren                        |
-| `/repair`                                                         | Repariert das Item in der Haupthand.                                                    | Admin-/Team-QoL                              |
-| `/skull <player>`                                                 | Gibt den Kopf eines (auch offline) Spielers.                                            | Build/Decoration                             |
-| `/trash`                                                          | Öffnet den Mülleimer (Items werden zeitgesteuert gelöscht).                             | Inventar aufräumen                           |
-| `/sit`                                                            | Setzt den Spieler auf den Boden.                                                        | Roleplay/QoL                                 |
-| `/sign`                                                           | Signiert das Item in der Haupthand einmalig.                                            | Item-Historie                                |
-| `/message <player> <text>`                                        | Sendet eine private Nachricht.                                                          | Direkte Kommunikation                        |
-| `/reply <text>`                                                   | Antwortet auf die letzte private Nachricht.                                             | Direkte Kommunikation                        |
-| `/tpa <player>`                                                   | Sendet Teleport-Anfrage zu einem Spieler.                                               | Spieler-zu-Spieler-Teleport                  |
-| `/tpahere <player>`                                               | Sendet Teleport-Anfrage, damit der Spieler zu dir kommt.                                | Spieler-zu-Spieler-Teleport                  |
-| `/tpaccept`                                                       | Nimmt die letzte Teleport-Anfrage an.                                                   | Abschluss Teleport-Request                   |
-| `/tpdeny`                                                         | Lehnt die letzte Teleport-Anfrage ab.                                                   | Ablehnen Teleport-Request                    |
-| `/tpo <player>`                                                   | Teleportiert dich direkt zu einem Spieler.                                              | Team-/Admin-Moderation                       |
-| `/tpohere <player>`                                               | Teleportiert einen Spieler direkt zu dir.                                               | Team-/Admin-Moderation                       |
-| `/invsee <player>`                                                | Öffnet das Inventar eines Spielers (read-only/modify).                                  | Moderation/Support                           |
-| `/vanish` oder `/v`                                               | Aktiviert/Deaktiviert Vanish für dich.                                                  | Moderation                                   |
-| `/vanish <player>` oder `/v <player>`                             | Schaltet Vanish für einen anderen Spieler.                                              | Team-Management                              |
+| Command                                                           | Zweck                                                                                   | Typischer Einsatz                             |
+|-------------------------------------------------------------------|-----------------------------------------------------------------------------------------|-----------------------------------------------|
+| `/maintenance <true\|false>`                                      | Aktiviert oder deaktiviert den Wartungsmodus.                                           | Updates, Tests, Notfallarbeiten               |
+| `/core reload --config`                                           | Lädt nur die Konfiguration neu.                                                         | Nach Änderungen an `config.json`              |
+| `/core reload --messages`                                         | Lädt nur die Nachrichten neu.                                                           | Nach Änderungen an Texten oder Übersetzungen  |
+| `/core reload --all`                                              | Lädt Config und Nachrichten gemeinsam neu.                                              | Nach größeren inhaltlichen Anpassungen        |
+| `/help [query] [--page <page>]` oder `/? [query] [--page <page>]` | Zeigt das vereinheitlichte Hilfemenü (Proxy + Backend) mit optionaler Suche und Paging. | Zum Nachschlagen verfügbarer Befehle          |
+| `/global-find <player>` oder `/gfind <player>`                    | Zeigt, auf welchem Server ein Spieler ist.                                              | Support, Moderation, Teamarbeit               |
+| `/global-teleport <player>` oder `/gtp <player>`                  | Verbindet dich auf den Server des Zielspielers.                                         | Direktes Wechseln zu einem Spieler            |
+| `/online <server>`                                                | Prüft, ob ein registrierter Backend-Server erreichbar ist.                              | Betriebscheck, Fehlersuche                    |
+| `/proxy-stop`                                                     | Stoppt den Proxy kontrolliert.                                                          | Geplante Eingriffe oder Wartung               |
+| `/coins`                                                          | Zeigt den aktuellen Coin-Kontostand.                                                    | Schnelle Kontostandsprüfung                   |
+| `/balance` oder `/bal`                                            | Zeigt Coins und Gems an.                                                                | Gesamtübersicht für Spieler                   |
+| `/pay <player> <amount>`                                          | Überweist Coins an einen anderen Spieler.                                               | Spieler-zu-Spieler-Transfer                   |
+| `/economy give <player> <currency> <amount>`                      | Fügt Coins oder Gems hinzu.                                                             | Admin-Korrekturen, Rewards                    |
+| `/economy set <player> <currency> <amount>`                       | Setzt Coins oder Gems auf einen festen Wert.                                            | Moderation, Datenkorrekturen                  |
+| `/economy take <player> <currency> <amount>`                      | Zieht Coins oder Gems ab.                                                               | Moderation, Rückabwicklung                    |
+| `/home`                                                           | Öffnet die Home-GUI mit Home-Liste und Schnellzugriff.                                  | Navigation und Teleport über GUI              |
+| `/home create <name>`                                             | Erstellt ein neues Home an der aktuellen Position.                                      | Neues Teleport-Ziel speichern                 |
+| `/home delete <name>`                                             | Löscht ein bestehendes Home.                                                            | Aufräumen/Entfernen alter Homes               |
+| `/home rename <old-name> <new-name>`                              | Benennt ein Home um.                                                                    | Umstrukturierung von Home-Namen               |
+| `/home update <name>`                                             | Aktualisiert die gespeicherte Position eines Homes auf die aktuelle Position.           | Bestehendes Home verschieben                  |
+| `/ignore <player>`                                                | Ignoriert einen bestimmten Spieler.                                                     | Unerwünschte Interaktionen gezielt blockieren |
+| `/unignore <player>`                                              | Hebt das Ignorieren für einen bestimmten Spieler wieder auf.                            | Interaktionen gezielt wieder zulassen         |
+| `/hat`                                                            | Setzt das Item in der Hand als Helm.                                                    | Cosmetic/QoL                                  |
+| `/enderchest` oder `/ec`                                          | Öffnet die eigene Enderchest.                                                           | Schneller Zugriff                             |
+| `/enderchest <player>` oder `/ec <player>`                        | Öffnet die Enderchest eines anderen Spielers.                                           | Moderation/Support                            |
+| `/workbench` oder `/wb`                                           | Öffnet eine mobile Werkbank.                                                            | Crafting ohne Block                           |
+| `/anvil`                                                          | Öffnet einen mobilen Amboss.                                                            | Umbenennen/Reparieren                         |
+| `/repair`                                                         | Repariert das Item in der Haupthand.                                                    | Admin-/Team-QoL                               |
+| `/skull <player>`                                                 | Gibt den Kopf eines (auch offline) Spielers.                                            | Build/Decoration                              |
+| `/trash`                                                          | Öffnet den Mülleimer (Items werden zeitgesteuert gelöscht).                             | Inventar aufräumen                            |
+| `/sit`                                                            | Setzt den Spieler auf den Boden.                                                        | Roleplay/QoL                                  |
+| `/sign`                                                           | Signiert das Item in der Haupthand einmalig.                                            | Item-Historie                                 |
+| `/message <player> <text>`                                        | Sendet eine private Nachricht.                                                          | Direkte Kommunikation                         |
+| `/reply <text>`                                                   | Antwortet auf die letzte private Nachricht.                                             | Direkte Kommunikation                         |
+| `/tpa <player>`                                                   | Sendet Teleport-Anfrage zu einem Spieler.                                               | Spieler-zu-Spieler-Teleport                   |
+| `/tpahere <player>`                                               | Sendet Teleport-Anfrage, damit der Spieler zu dir kommt.                                | Spieler-zu-Spieler-Teleport                   |
+| `/tpaccept`                                                       | Nimmt die letzte Teleport-Anfrage an.                                                   | Abschluss Teleport-Request                    |
+| `/tpdeny`                                                         | Lehnt die letzte Teleport-Anfrage ab.                                                   | Ablehnen Teleport-Request                     |
+| `/tpo <player>`                                                   | Teleportiert dich direkt zu einem Spieler.                                              | Team-/Admin-Moderation                        |
+| `/tpohere <player>`                                               | Teleportiert einen Spieler direkt zu dir.                                               | Team-/Admin-Moderation                        |
+| `/invsee <player>`                                                | Öffnet das Inventar eines Spielers (read-only/modify).                                  | Moderation/Support                            |
+| `/vanish` oder `/v`                                               | Aktiviert/Deaktiviert Vanish für dich.                                                  | Moderation                                    |
+| `/vanish <player>` oder `/v <player>`                             | Schaltet Vanish für einen anderen Spieler.                                              | Team-Management                               |
 
 ---
 <br>
@@ -210,8 +212,8 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 | `core.command.pay`                       | Erlaubt das Senden von Coins an andere Spieler.                      |
 | `core.command.economy`                   | Erlaubt administrative Economy-Befehle (`give`, `set`, `take`).      |
 | `core.command.home`                      | Erlaubt die Nutzung des Home-Systems (`/home` + Subcommands).        |
-| `core.command.ignore`                    | Erlaubt `/ignore` zum Aktivieren des Ignore-Modus.                   |
-| `core.command.unignore`                  | Erlaubt `/unignore` zum Deaktivieren des Ignore-Modus.               |
+| `core.command.ignore`                    | Erlaubt `/ignore <player>` zum Ignorieren bestimmter Spieler.        |
+| `core.command.unignore`                  | Erlaubt `/unignore <player>` zum Aufheben pro Spieler.               |
 | `core.command.hat`                       | Erlaubt `/hat`.                                                      |
 | `core.command.enderchest`                | Erlaubt das Öffnen der eigenen Enderchest (`/ec`).                   |
 | `core.command.enderchest.other`          | Erlaubt das Öffnen fremder Enderchests.                              |

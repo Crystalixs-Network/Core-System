@@ -12,7 +12,7 @@ import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
 import net.crystalixs.core.paper.home.DefaultHomeService;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
-import net.crystalixs.core.paper.setting.DefaultSettingService;
+import net.crystalixs.core.paper.ignore.DefaultPlayerIgnoreService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -62,11 +62,11 @@ public final class PaperCommandBootstrap {
         var economyService = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
         var homeService = new DefaultHomeService(persistence.players(), persistence.homes());
         var homeGuiFactory = new HomeGuiFactory(plugin, homeService);
-        var settingService = new DefaultSettingService(persistence.playerSettings());
+        var ignoreService = new DefaultPlayerIgnoreService(persistence.ignores());
 
         new CoinsCommand(plugin, economyService).registerTo(commandManager);
         new BalanceCommand(plugin, economyService).registerTo(commandManager);
-        new PayCommand(plugin, economyService, settingService).registerTo(commandManager);
+        new PayCommand(plugin, economyService, ignoreService).registerTo(commandManager);
         new EconomyCommand(plugin, economyService).registerTo(commandManager);
         new HatCommand(plugin).registerTo(commandManager);
         new EnderchestCommand(plugin).registerTo(commandManager);
@@ -77,10 +77,10 @@ public final class PaperCommandBootstrap {
         new TrashCommand(plugin, trashService).registerTo(commandManager);
         new SitCommand(plugin, sitService).registerTo(commandManager);
         new SignCommand(plugin).registerTo(commandManager);
-        new MessageCommand(plugin, messageService, settingService).registerTo(commandManager);
-        new ReplyCommand(plugin, messageService, settingService).registerTo(commandManager);
-        new TeleportRequestCommand(plugin, teleportService, settingService).registerTo(commandManager);
-        new TeleportRequestHereCommand(plugin, teleportService, settingService).registerTo(commandManager);
+        new MessageCommand(plugin, messageService, ignoreService).registerTo(commandManager);
+        new ReplyCommand(plugin, messageService, ignoreService).registerTo(commandManager);
+        new TeleportRequestCommand(plugin, teleportService, ignoreService).registerTo(commandManager);
+        new TeleportRequestHereCommand(plugin, teleportService, ignoreService).registerTo(commandManager);
         new TeleportRequestAcceptCommand(plugin, teleportService).registerTo(commandManager);
         new TeleportRequestDenyCommand(plugin, teleportService).registerTo(commandManager);
         new TeleportOverrideCommand(plugin).registerTo(commandManager);
@@ -88,8 +88,8 @@ public final class PaperCommandBootstrap {
         new InventorySeeCommand(plugin, inventorySeeService).registerTo(commandManager);
         new VanishCommand(plugin, vanishService).registerTo(commandManager);
         new HomeCommand(plugin, homeService, homeGuiFactory).registerTo(commandManager);
-        new IgnoreCommand(plugin, settingService).registerTo(commandManager);
-        new UnignoreCommand(plugin, settingService).registerTo(commandManager);
+        new IgnoreCommand(plugin, ignoreService).registerTo(commandManager);
+        new UnignoreCommand(plugin, ignoreService).registerTo(commandManager);
 
         StructuredLogger helpSyncLogger = runtime.componentLogger("help-sync");
         String redisUri = configUpdater.current().redisSync() == null ? null : configUpdater.current().redisSync().uri();

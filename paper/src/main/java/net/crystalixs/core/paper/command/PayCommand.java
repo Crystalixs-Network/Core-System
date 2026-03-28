@@ -6,7 +6,7 @@ import net.crystalixs.core.paper.command.cloud.PaperCommandSource;
 import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.economy.EconomyException;
 import net.crystalixs.core.paper.economy.EconomyService;
-import net.crystalixs.core.paper.setting.PlayerSettingService;
+import net.crystalixs.core.paper.ignore.PlayerIgnoreService;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.minecraft.extras.RichDescription;
@@ -22,12 +22,12 @@ import static org.incendo.cloud.suggestion.SuggestionProvider.noSuggestions;
 public final class PayCommand extends PaperCommand {
 
     private final EconomyService economyService;
-    private final PlayerSettingService settingService;
+    private final PlayerIgnoreService ignoreService;
 
-    public PayCommand(CorePlugin plugin, EconomyService economyService, PlayerSettingService settingService) {
+    public PayCommand(CorePlugin plugin, EconomyService economyService, PlayerIgnoreService ignoreService) {
         super(plugin);
         this.economyService = economyService;
-        this.settingService = settingService;
+        this.ignoreService = ignoreService;
     }
 
     @Override
@@ -43,7 +43,7 @@ public final class PayCommand extends PaperCommand {
                     Player target = context.get("player");
                     long amount = context.get("amount");
 
-                    if (settingService.isIgnored(target.getUniqueId())) {
+                    if (ignoreService.isIgnoring(target, sender)) {
                         sender.sendMessage(translatable("command.ignore.error.ignored"));
                         return;
                     }
