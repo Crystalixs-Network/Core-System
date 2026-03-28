@@ -10,7 +10,7 @@ import org.incendo.cloud.minecraft.extras.RichDescription;
 import org.incendo.cloud.permission.Permission;
 import org.jetbrains.annotations.NotNull;
 
-import static org.incendo.cloud.parser.standard.StringParser.stringParser;
+import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
 
 public final class UnignoreCommand extends PaperCommand {
 
@@ -27,8 +27,9 @@ public final class UnignoreCommand extends PaperCommand {
                 .commandDescription(RichDescription.translatable("command.unignore.description.main"))
                 .senderType(PaperPlayerCommandSource.class)
                 .permission(Permission.of("core.command.unignore"))
-                .required("player", stringParser())
+                .required("player", playerParser())
                 .handler(context -> {
+
                 }));
     }
 }
