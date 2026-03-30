@@ -289,3 +289,32 @@ Die SQL-Struktur liegt im Modul `persistence` unter:
 ## Status
 
 Das Projekt deckt die zentralen Netzwerkfunktionen für den Proxy-Betrieb bereits ab und erweitert diese auf Paper um Economy, Home-System und Utility-Commands.
+
+---
+<br>
+
+## Jira-Zeiterfassung über Commits
+
+Für die automatische Zeiterfassung gibt es zwei Bausteine:
+
+1. Lokale Git-Hooks unter `.githooks/`
+2. GitHub Workflow `.github/workflows/sync-jira-worklogs.yml`
+
+### Hooks aktivieren
+
+- Windows (PowerShell): `.\scripts\setup-git-hooks.ps1`
+
+Danach ergänzt `prepare-commit-msg` Commit-Messages automatisch um:
+
+- `Refers to: CR-123` (aus Branchname oder bestehender Message)
+- `Time-Spent: 1h 20m`
+
+`post-commit` setzt den Startzeitpunkt für den nächsten Commit.
+
+### Jira-API Konfiguration (GitHub Secrets)
+
+- `JIRA_BASE_URL` (z. B. `https://crystalixs.atlassian.net/`)
+- `JIRA_USER_EMAIL`
+- `JIRA_API_TOKEN`
+
+Der Workflow verarbeitet Push-Commits, liest `Refers to` + `Time-Spent` aus der Commit-Message und schreibt die Zeit als Jira-Worklog auf das jeweilige Ticket.
