@@ -50,7 +50,6 @@ jobs:
               sys.exit(1)
 
           refers_to_footer_pattern = re.compile(r"(?im)^Refers to:\s*([A-Z][A-Z0-9]+-\d+)\s*$")
-          issue_inline_pattern = re.compile(r"\b([A-Z][A-Z0-9]+-\d+)\b")
           time_spent_pattern = re.compile(r"(?im)^Time-Spent:\s*([^\r\n]+)\s*$")
           jira_time_pattern = re.compile(r"^\d+[wdhm](?:\s+\d+[wdhm])*$")
 
@@ -142,9 +141,6 @@ jobs:
 
               footer_issue_match = refers_to_footer_pattern.search(message)
               issue_key = footer_issue_match.group(1) if footer_issue_match else ""
-              if not issue_key:
-                  inline_issue_match = issue_inline_pattern.search(message)
-                  issue_key = inline_issue_match.group(1) if inline_issue_match else ""
 
               time_match = time_spent_pattern.search(message)
               if not issue_key or not time_match:
