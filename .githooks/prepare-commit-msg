@@ -73,11 +73,19 @@ if [[ -z "${issue_key}" ]]; then
   issue_key="$(printf '%s' "${branch_name}" | grep -Eio '[A-Za-z][A-Za-z0-9]+-[0-9]+' | head -n1 | tr '[:lower:]' '[:upper:]' || true)"
 fi
 
-{
-  printf '\n'
-  if [[ -n "${issue_key}" ]] && ! grep -Eiq '^[[:space:]]*Refers to[[:space:]]*:' "${msg_file}"; then
-    printf 'Refers to: %s\n' "${issue_key}"
-  fi
-  printf 'Time-Spent: %s\n' "${time_spent}"
-} >> "${msg_file}"
+has_refers_footer=0
+if grep -Eiq '^[[:space:]]*Refers to[[:space:]]*:' "${msg_file}"; then
+  has_refers_footer=1
+fi
 
+if (( has_refers_footer == 1 )); then
+  printf 'Time-Spent: %s\n' "${time_spent}" >> "${msg_file}"
+else
+  {
+    printf '\n'
+    if [[ -n "${issue_key}" ]]; then
+      printf 'Refers to: %s\n' "${issue_key}"
+    fi
+    printf 'Time-Spent: %s\n' "${time_spent}"
+  } >> "${msg_file}"
+fi
