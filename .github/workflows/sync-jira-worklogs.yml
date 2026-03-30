@@ -1,0 +1,189 @@
+name: Sync Jira Worklogs From Commits
+
+on:
+  push:
+    branches:
+      - "**"
+
+permissions:
+  contents: read
+
+jobs:
+  sync_jira_worklogs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Log commit times to Jira
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+        run: |
+          set -euo pipefail
+
+          python - <<'PY'
+          import base64
+          import datetime as dt
+          import json
+          import os
+          import re
+          import subprocess
+          import sys
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          jira_base_url = os.getenv("JIRA_BASE_URL", "").rstrip("/")
+          jira_user_email = os.getenv("JIRA_USER_EMAIL", "")
+          jira_api_token = os.getenv("JIRA_API_TOKEN", "")
+
+          if not jira_base_url or not jira_user_email or not jira_api_token:
+              print("::error title=Missing Jira secrets::Please configure JIRA_BASE_URL, JIRA_USER_EMAIL and JIRA_API_TOKEN.")
+              sys.exit(1)
+
+          refers_to_footer_pattern = re.compile(r"(?im)^Refers to:\s*([A-Z][A-Z0-9]+-\d+)\s*$")
+          time_spent_pattern = re.compile(r"(?im)^Time-Spent:\s*([^\r\n]+)\s*$")
+          jira_time_pattern = re.compile(r"^\d+[wdhm](?:\s+\d+[wdhm])*$")
+
+          auth = base64.b64encode(f"{jira_user_email}:{jira_api_token}".encode("utf-8")).decode("ascii")
+
+          def git_show(sha: str, fmt: str) -> str:
+              return subprocess.check_output(
+                  ["git", "show", "-s", f"--format={fmt}", sha],
+                  text=True,
+                  encoding="utf-8",
+              ).strip()
+
+          def jira_request(method: str, url: str, payload: dict | None = None) -> dict:
+              data = None if payload is None else json.dumps(payload).encode("utf-8")
+              req = urllib.request.Request(url, method=method, data=data)
+              req.add_header("Authorization", f"Basic {auth}")
+              req.add_header("Accept", "application/json")
+              if payload is not None:
+                  req.add_header("Content-Type", "application/json")
+
+              try:
+                  with urllib.request.urlopen(req, timeout=30) as response:
+                      content = response.read().decode("utf-8")
+                      return json.loads(content) if content else {}
+              except urllib.error.HTTPError as exc:
+                  body = exc.read().decode("utf-8", errors="replace")
+                  raise RuntimeError(f"HTTP {exc.code} {exc.reason}: {body}") from exc
+
+          def normalize_jira_time(raw: str) -> str:
+              compact = " ".join(raw.strip().split())
+              compact = re.sub(r"(?i)(\d+)\s*([wdhm])", r"\1\2", compact).lower()
+              if not jira_time_pattern.fullmatch(compact):
+                  return ""
+              return compact
+
+          def to_jira_started(iso_value: str) -> str:
+              parsed = dt.datetime.fromisoformat(iso_value.replace("Z", "+00:00"))
+              return parsed.strftime("%Y-%m-%dT%H:%M:%S.000%z")
+
+          def worklog_exists(issue_key: str, marker: str) -> bool:
+              start_at = 0
+              max_results = 100
+              while True:
+                  encoded_issue = urllib.parse.quote(issue_key, safe="")
+                  url = (
+                      f"{jira_base_url}/rest/api/2/issue/{encoded_issue}/worklog"
+                      f"?startAt={start_at}&maxResults={max_results}"
+                  )
+                  payload = jira_request("GET", url)
+                  worklogs = payload.get("worklogs", [])
+                  for worklog in worklogs:
+                      comment = worklog.get("comment") or ""
+                      if isinstance(comment, str) and marker in comment:
+                          return True
+
+                  total = int(payload.get("total", 0))
+                  returned = int(payload.get("maxResults", max_results))
+                  start_at += returned
+                  if start_at >= total or not worklogs:
+                      return False
+
+          event_path = os.getenv("GITHUB_EVENT_PATH")
+          if not event_path or not os.path.isfile(event_path):
+              print("::error title=Missing GitHub event payload::GITHUB_EVENT_PATH is not available.")
+              sys.exit(1)
+
+          with open(event_path, "r", encoding="utf-8") as handle:
+              event = json.load(handle)
+
+          commits = [entry.get("id") for entry in event.get("commits", []) if entry.get("id")]
+          if not commits:
+              print("No commits in push payload. Skipping Jira sync.")
+              sys.exit(0)
+
+          repository = os.getenv("GITHUB_REPOSITORY", "")
+          server_url = os.getenv("GITHUB_SERVER_URL", "https://github.com").rstrip("/")
+
+          logged_count = 0
+          skipped_count = 0
+          failed = []
+
+          for sha in commits:
+              try:
+                  message = git_show(sha, "%B")
+                  commit_date_iso = git_show(sha, "%cI")
+              except subprocess.CalledProcessError as exc:
+                  failed.append(f"{sha}: unable to read commit metadata ({exc})")
+                  continue
+
+              footer_issue_match = refers_to_footer_pattern.search(message)
+              issue_key = footer_issue_match.group(1) if footer_issue_match else ""
+
+              time_match = time_spent_pattern.search(message)
+              if not issue_key or not time_match:
+                  skipped_count += 1
+                  print(f"Skipping {sha[:7]}: no Refers to and/or Time-Spent footer.")
+                  continue
+
+              jira_time = normalize_jira_time(time_match.group(1))
+              if not jira_time:
+                  skipped_count += 1
+                  print(f"Skipping {sha[:7]}: invalid Time-Spent format '{time_match.group(1)}'.")
+                  continue
+
+              marker = f"[commit:{sha}]"
+              try:
+                  if worklog_exists(issue_key, marker):
+                      skipped_count += 1
+                      print(f"Skipping {sha[:7]}: worklog already exists in {issue_key}.")
+                      continue
+              except Exception as exc:  # noqa: BLE001
+                  failed.append(f"{sha}: unable to check existing worklog ({exc})")
+                  continue
+
+              commit_url = f"{server_url}/{repository}/commit/{sha}"
+              started = to_jira_started(commit_date_iso)
+              encoded_issue = urllib.parse.quote(issue_key, safe="")
+              post_url = f"{jira_base_url}/rest/api/2/issue/{encoded_issue}/worklog"
+              payload = {
+                  "comment": f"{marker} Auto logged from GitHub commit {sha[:7]} ({commit_url})",
+                  "started": started,
+                  "timeSpent": jira_time,
+              }
+
+              try:
+                  jira_request("POST", post_url, payload)
+                  logged_count += 1
+                  print(f"Logged {jira_time} to {issue_key} from {sha[:7]}.")
+              except Exception as exc:  # noqa: BLE001
+                  failed.append(f"{sha}: failed to create Jira worklog ({exc})")
+
+          print(f"Summary: logged={logged_count}, skipped={skipped_count}, failed={len(failed)}")
+          if failed:
+              for entry in failed:
+                  print(f"::error::{entry}")
+              sys.exit(1)
+          PY

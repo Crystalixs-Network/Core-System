@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+msg_file="${1:-}"
+source_type="${2:-}"
+
+if [[ -z "${msg_file}" || ! -f "${msg_file}" ]]; then
+  exit 0
+fi
+
+case "${source_type}" in
+  merge|squash|commit)
+    exit 0
+    ;;
+esac
+
+if grep -Eiq '^[[:space:]]*Time-Spent[[:space:]]*:' "${msg_file}"; then
+  exit 0
+fi
+
+git_dir="$(git rev-parse --git-dir 2>/dev/null || true)"
+if [[ -z "${git_dir}" ]]; then
+  exit 0
+fi
+
+state_file="${git_dir}/.time-tracker-start-epoch"
+now_epoch="$(date +%s)"
+
+start_epoch=""
+if [[ -f "${state_file}" ]]; then
+  start_epoch="$(tr -d '\r\n' < "${state_file}")"
+fi
+
+if [[ -z "${start_epoch}" ]]; then
+  start_epoch="$(git log -1 --format=%ct 2>/dev/null || true)"
+fi
+
+if [[ ! "${start_epoch}" =~ ^[0-9]+$ ]]; then
+  start_epoch="${now_epoch}"
+fi
+
+if (( start_epoch > now_epoch )); then
+  start_epoch="${now_epoch}"
+fi
+
+delta_seconds=$(( now_epoch - start_epoch ))
+minutes=$(( (delta_seconds + 59) / 60 ))
+
+if (( minutes < 1 )); then
+  minutes=1
+fi
+
+max_minutes="${CODEX_MAX_TRACKED_MINUTES:-480}"
+if [[ "${max_minutes}" =~ ^[0-9]+$ ]] && (( minutes > max_minutes )); then
+  minutes="${max_minutes}"
+fi
+
+hours=$(( minutes / 60 ))
+remaining_minutes=$(( minutes % 60 ))
+
+if (( hours > 0 && remaining_minutes > 0 )); then
+  time_spent="${hours}h ${remaining_minutes}m"
+elif (( hours > 0 )); then
+  time_spent="${hours}h"
+else
+  time_spent="${minutes}m"
+fi
+
+issue_key="$(grep -Eio '^[[:space:]]*Refers to[[:space:]]*:[[:space:]]*[A-Za-z][A-Za-z0-9]+-[0-9]+' "${msg_file}" | head -n1 | grep -Eio '[A-Za-z][A-Za-z0-9]+-[0-9]+' | tr '[:lower:]' '[:upper:]' || true)"
+
+if [[ -z "${issue_key}" ]]; then
+  branch_name="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || true)"
+  issue_key="$(printf '%s' "${branch_name}" | grep -Eio '[A-Za-z][A-Za-z0-9]+-[0-9]+' | head -n1 | tr '[:lower:]' '[:upper:]' || true)"
+fi
+
+has_refers_footer=0
+if grep -Eiq '^[[:space:]]*Refers to[[:space:]]*:' "${msg_file}"; then
+  has_refers_footer=1
+fi
+
+if (( has_refers_footer == 1 )); then
+  printf 'Time-Spent: %s\n' "${time_spent}" >> "${msg_file}"
+else
+  {
+    printf '\n'
+    if [[ -n "${issue_key}" ]]; then
+      printf 'Refers to: %s\n' "${issue_key}"
+    fi
+    printf 'Time-Spent: %s\n' "${time_spent}"
+  } >> "${msg_file}"
+fi
