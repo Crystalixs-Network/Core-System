@@ -49,7 +49,7 @@ jobs:
               print("::error title=Missing Jira secrets::Please configure JIRA_BASE_URL, JIRA_USER_EMAIL and JIRA_API_TOKEN.")
               sys.exit(1)
 
-          issue_footer_pattern = re.compile(r"(?im)^Issue:\s*([A-Z][A-Z0-9]+-\d+)\s*$")
+          refers_to_footer_pattern = re.compile(r"(?im)^Refers to:\s*([A-Z][A-Z0-9]+-\d+)\s*$")
           issue_inline_pattern = re.compile(r"\b([A-Z][A-Z0-9]+-\d+)\b")
           time_spent_pattern = re.compile(r"(?im)^Time-Spent:\s*([^\r\n]+)\s*$")
           jira_time_pattern = re.compile(r"^\d+[wdhm](?:\s+\d+[wdhm])*$")
@@ -140,7 +140,7 @@ jobs:
                   failed.append(f"{sha}: unable to read commit metadata ({exc})")
                   continue
 
-              footer_issue_match = issue_footer_pattern.search(message)
+              footer_issue_match = refers_to_footer_pattern.search(message)
               issue_key = footer_issue_match.group(1) if footer_issue_match else ""
               if not issue_key:
                   inline_issue_match = issue_inline_pattern.search(message)
@@ -149,7 +149,7 @@ jobs:
               time_match = time_spent_pattern.search(message)
               if not issue_key or not time_match:
                   skipped_count += 1
-                  print(f"Skipping {sha[:7]}: no Issue and/or Time-Spent footer.")
+                  print(f"Skipping {sha[:7]}: no Refers to and/or Time-Spent footer.")
                   continue
 
               jira_time = normalize_jira_time(time_match.group(1))
@@ -191,4 +191,3 @@ jobs:
                   print(f"::error::{entry}")
               sys.exit(1)
           PY
-
