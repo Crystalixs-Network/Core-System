@@ -6,18 +6,18 @@
 
 ## Überblick
 
-| Bereich                  | Nutzen                                                                                                           |
-|--------------------------|------------------------------------------------------------------------------------------------------------------|
-| Wartungsmodus            | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch.                                     |
-| MOTD-Steuerung           | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.                                       |
-| Dynamische Tablist       | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen.                                       |
-| Netzwerk-Commands        | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.                                             |
-| Unified Help             | Zeigt Proxy- und Backend-Befehle in einem gemeinsamen Help-Menü mit Paging, Server- und Permission-Filter.       |
-| Konfigurations-Reload    | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.                                         |
-| Economy (Paper)          | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.                                               |
-| Home-System (Paper)      | Verwaltet Homes inklusive GUI, Umbenennen per Amboss und Icon-Auswahl mit Persistenz.                            |
-| Ignore-System (Paper)    | Verwaltet Ignore-Beziehungen zwischen Spielern und blockiert direkte Interaktionen inkl. `unignore`-Vorschlägen. |
-| Utility Commands (Paper) | Stellt QoL-Commands wie Hat, Enderchest, Trash, Sit, Sign, Skull, Invsee, Vanish und Teleport bereit.            |
+| Feature               | Environment    | Nutzen                                                                                                           |
+|-----------------------|----------------|------------------------------------------------------------------------------------------------------------------|
+| Wartungsmodus         | Proxy          | Schließt das Netzwerk kontrolliert und lässt nur berechtigte Personen durch.                                     |
+| MOTD-Steuerung        | Proxy          | Zeigt automatisch die passende Darstellung für Normalbetrieb oder Wartung.                                       |
+| Dynamische Tablist    | Proxy          | Befüllt Header und Footer mit aktuellen Netzwerk- und Serverinformationen sowie mit Prefixen der Ränge           |
+| Netzwerk-Commands     | Proxy          | Stellt zentrale Admin- und Team-Befehle direkt auf dem Proxy bereit.                                             |
+| Unified Help          | Proxy, Backend | Zeigt Proxy- und Backend-Befehle in einem gemeinsamen Help-Menü mit Paging, Server- und Permission-Filter.       |
+| Konfigurations-Reload | Proxy          | Übernimmt Änderungen an Config und Nachrichten ohne kompletten Neustart.                                         |
+| Economy               | Backend        | Verwaltet Coins/Gems mit Transfers, Admin-Befehlen und Persistenz.                                               |
+| Home-System           | Backend        | Verwaltet Homes inklusive GUI, Umbenennen per Amboss und Icon-Auswahl mit Persistenz.                            |
+| Ignore-System         | Backend        | Verwaltet Ignore-Beziehungen zwischen Spielern und blockiert direkte Interaktionen inkl. `unignore`-Vorschlägen. |
+| Utility Commands      | Backend        | Stellt QoL-Commands wie Hat, Enderchest, Trash, Sit, Sign, Skull, Invsee, Vanish und Teleport bereit.            |
 
 ---
 <br>
