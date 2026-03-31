@@ -2,6 +2,7 @@ package net.crystalixs.core.paper.bootstrap;
 
 import net.crystalixs.core.common.bootstrap.AbstractPluginBootstrap;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
+import net.crystalixs.core.paper.tablist.TablistService;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.invui.InvUI;
@@ -50,8 +51,15 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     protected void enableInternal() {
         configUpdater = config.load(runtime());
         persistenceContext = persistence.create(runtime(), configUpdater);
-        listeners.register(runtime(), commands.sitService(), commands.inventorySeeService(), commands.vanishService());
-         commands.registerCommands(configUpdater);
+
+        TablistService tablistService = TablistService.create(runtime().plugin(), runtime().componentLogger("tablist"));
+        if (tablistService != null) {
+            tablistService.subscribe();
+            tablistService.refreshAll();
+        }
+
+        listeners.register(runtime(), commands.sitService(), commands.inventorySeeService(), commands.vanishService(), tablistService);
+        commands.registerCommands(configUpdater);
 
         InvUI.getInstance().setPlugin(runtime().plugin());
     }

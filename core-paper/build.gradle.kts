@@ -9,6 +9,7 @@ plugins {
 dependencies {
     compileOnly(libs.paper)
     compileOnly(libs.brigadier)
+    compileOnly(libs.luckPerms.api)
 
     implementation(project(":core-common"))
     implementation(project(":core-persistence"))
@@ -69,6 +70,9 @@ fun registerBackendServer(name: String, runDirName: String, port: String) {
         dependsOn(copyTask)
         doFirst {
             configurePaperServer(runDirName, port)
+        }
+        downloadPlugins {
+            url("https://download.luckperms.net/1631/bukkit/loader/LuckPerms-Bukkit-5.5.42.jar")
         }
     }
 }
