@@ -21,13 +21,11 @@ public final class TablistService {
 
     private final LuckPerms luckPerms;
     private final PlayerAdapter<Player> adapter;
-    private final StructuredLogger logger;
     private final JavaPlugin plugin;
     private EventSubscription<UserDataRecalculateEvent> subscription;
 
-    private TablistService(LuckPerms luckPerms, StructuredLogger logger, JavaPlugin plugin) {
+    private TablistService(LuckPerms luckPerms, JavaPlugin plugin) {
         this.luckPerms = luckPerms;
-        this.logger = logger;
         this.plugin = plugin;
         this.adapter = luckPerms.getPlayerAdapter(Player.class);
     }
@@ -37,7 +35,7 @@ public final class TablistService {
             logger.warn("LuckPerms is required for rank based tablist sorting", LogMetadata.event("tablist.missing_dependency"));
             return null;
         }
-        return new TablistService(LuckPermsProvider.get(), logger, plugin);
+        return new TablistService(LuckPermsProvider.get(), plugin);
     }
 
     public void refresh(Player player) {
