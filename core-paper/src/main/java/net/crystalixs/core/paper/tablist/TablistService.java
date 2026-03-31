@@ -2,13 +2,13 @@ package net.crystalixs.core.paper.tablist;
 
 import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
-import net.crystalixs.core.paper.CorePlugin;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.platform.PlayerAdapter;
 import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -28,7 +28,7 @@ public final class TablistService {
         this.adapter = luckPerms.getPlayerAdapter(Player.class);
     }
 
-    public static TablistService create(CorePlugin plugin, StructuredLogger logger) {
+    public static TablistService create(JavaPlugin plugin, StructuredLogger logger) {
         if (plugin.getServer().getPluginManager().getPlugin("LuckPerms") == null) {
             logger.warn("LuckPerms is required for rank based tablist sorting", LogMetadata.event("tablist.missing_dependency"));
             return null;
@@ -36,10 +36,19 @@ public final class TablistService {
         return new TablistService(logger, LuckPermsProvider.get());
     }
 
+    public void shutdown() {
+        Bukkit.getOnlinePlayers().forEach(this::remove);
+        assignedTeams.clear();
+    }
+
     public void refresh(Player player) {
         QueryOptions options = adapter.getQueryOptions(player);
         int weight = resolveWeight(player, options);
         assignTeam(player, weight);
+    }
+
+    public void refreshAll() {
+        Bukkit.getOnlinePlayers().forEach(this::refresh);
     }
 
     public void remove(Player player) {
