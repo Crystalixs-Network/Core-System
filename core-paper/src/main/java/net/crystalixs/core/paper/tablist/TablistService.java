@@ -5,15 +5,18 @@ import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.platform.PlayerAdapter;
+import net.luckperms.api.query.QueryOptions;
+import org.bukkit.entity.Player;
 
 public final class TablistService {
 
     private final StructuredLogger logger;
-    private final LuckPerms luckPerms;
+    private final PlayerAdapter<Player> adapter;
 
     private TablistService(StructuredLogger logger, LuckPerms luckPerms) {
         this.logger = logger;
-        this.luckPerms = luckPerms;
+        this.adapter = luckPerms.getPlayerAdapter(Player.class);
     }
 
     public static TablistService create(CorePlugin plugin, StructuredLogger logger) {
@@ -22,5 +25,11 @@ public final class TablistService {
             return null;
         }
         return new TablistService(logger, LuckPermsProvider.get());
+    }
+
+    private int resolveWeight(Player player, QueryOptions options) {
+        return adapter.getUser(player).getInheritedGroups(options).stream()
+                .mapToInt(group -> group.getWeight().orElse(0))
+                .max().orElse(0);
     }
 }
