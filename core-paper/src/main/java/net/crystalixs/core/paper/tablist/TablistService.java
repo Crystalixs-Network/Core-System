@@ -3,6 +3,7 @@ package net.crystalixs.core.paper.tablist;
 import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -14,6 +15,8 @@ import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import static net.kyori.adventure.text.Component.empty;
 
@@ -39,13 +42,15 @@ public final class TablistService {
     }
 
     public void refresh(Player player) {
-        Component displayName = resolvePrefix(player).append(player.name());
+        Component prefix = resolvePrefix(player);
+        Component displayName = prefix.append(player.name().color(NamedTextColor.GRAY));
         QueryOptions options = adapter.getQueryOptions(player);
         int weight = resolveWeight(player, options);
 
         player.setPlayerListOrder(weight);
         player.playerListName(displayName);
         player.displayName(displayName);
+        applyOverhead(player, prefix);
     }
 
     public void refreshAll() {
@@ -63,6 +68,18 @@ public final class TablistService {
         if (player != null && player.isOnline()) {
             refresh(player);
         }
+    }
+
+    private void applyOverhead(Player player, Component prefix) {
+        String teamName = "core-" + player.getUniqueId().toString().replace("-", "").substring(0, 12);
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        Team team = scoreboard.getTeam(teamName);
+        if (team == null) {
+            team = scoreboard.registerNewTeam(teamName);
+        }
+        team.color(NamedTextColor.GRAY);
+        team.addEntry(player.getName());
+        team.prefix(prefix);
     }
 
     private Component resolvePrefix(Player player) {
