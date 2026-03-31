@@ -18,7 +18,6 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     private final PaperListenerBootstrap listeners;
     private PaperConfigUpdater configUpdater;
     private PersistenceContext persistenceContext;
-    private TablistService tablistService;
 
     private PaperPluginBootstrap(PaperPluginRuntime runtime, PaperConfigBootstrap config, PaperPersistenceBootstrap persistence, PaperTranslationBootstrap translations, PaperCommandBootstrap commands, PaperListenerBootstrap listeners) {
         super(runtime);
@@ -53,7 +52,7 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
         configUpdater = config.load(runtime());
         persistenceContext = persistence.create(runtime(), configUpdater);
 
-        tablistService = TablistService.create(runtime().plugin(), runtime().componentLogger("tablist"));
+        TablistService tablistService = TablistService.create(runtime().plugin(), runtime().componentLogger("tablist"));
         if (tablistService != null) {
             tablistService.refreshAll();
         }
@@ -69,10 +68,6 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
         try {
             translations.close();
             commands.shutdown();
-            if(tablistService != null) {
-                tablistService.shutdown();
-                tablistService = null;
-            }
         } finally {
             try {
                 if (persistenceContext != null) {
