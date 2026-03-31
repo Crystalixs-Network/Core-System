@@ -57,10 +57,7 @@ public final class TablistService {
     public void subscribe() {
         if (subscription != null) return;
 
-        subscription = luckPerms.getEventBus().subscribe(UserDataRecalculateEvent.class, event -> {
-            Bukkit.getScheduler().runTask(plugin, () -> refresh(event.getUser()));
-            logger.info("Subscribed to LuckPerms UserDataRecalculateEvent", LogMetadata.event("tablist.luckperms_event_subscription"));
-        });
+        subscription = luckPerms.getEventBus().subscribe(UserDataRecalculateEvent.class, event -> Bukkit.getScheduler().runTask(plugin, () -> refresh(event.getUser())));
     }
 
     private void refresh(User user) {
