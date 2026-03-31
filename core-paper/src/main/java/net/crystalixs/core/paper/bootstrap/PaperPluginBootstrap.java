@@ -54,6 +54,7 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
 
         TablistService tablistService = TablistService.create(runtime().plugin(), runtime().componentLogger("tablist"));
         if (tablistService != null) {
+            tablistService.subscribe();
             tablistService.refreshAll();
         }
 
