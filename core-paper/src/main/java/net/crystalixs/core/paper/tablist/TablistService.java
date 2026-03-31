@@ -13,6 +13,7 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -109,6 +110,6 @@ public final class TablistService {
     private String teamName(int weight) {
         int boundedWeight = Math.clamp(weight, 0, 9999);
         int sortKey = 9999 - boundedWeight;
-        return "lp-" + sortKey;
+        return "lp-" + String.format(Locale.ROOT, "%04d", sortKey);
     }
 }
