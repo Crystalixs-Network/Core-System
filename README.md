@@ -86,7 +86,7 @@ Das Help-Menü aggregiert Befehle aus Velocity und den angebundenen Paper-Backen
 
 Wichtige Voraussetzung:
 
-- `paper/config.json` → `redis-sync.backend-id` muss exakt dem Velocity-Servernamen entsprechen (z. B. `lobby-1`), sonst werden Backend-Befehle nicht dem richtigen Server zugeordnet.
+- `core-paper/config.json` → `redis-sync.backend-id` muss exakt dem Velocity-Servernamen entsprechen (z. B. `lobby-1`), sonst werden Backend-Befehle nicht dem richtigen Server zugeordnet.
 
 ### Economy (Paper)
 
@@ -135,12 +135,12 @@ Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und
 
 ## Projektstruktur
 
-| Modul         | Rolle                                                                       |
-|---------------|-----------------------------------------------------------------------------|
-| `velocity`    | Zentrale Netzwerkfunktionen wie Commands, MOTD, Join-Kontrolle und Wartung. |
-| `paper`       | Backend-seitige Erweiterungen auf Paper inklusive Economy-Commands.         |
-| `persistence` | Datenmodelle, Stores und SQL-Migrationen.                                   |
-| `common`      | Gemeinsame Infrastruktur (Logging, Translation, Bootstrap).                 |
+| Modul              | Rolle                                                                       |
+|--------------------|-----------------------------------------------------------------------------|
+| `core-velocity`    | Zentrale Netzwerkfunktionen wie Commands, MOTD, Join-Kontrolle und Wartung. |
+| `core-paper`       | Backend-seitige Erweiterungen auf Paper inklusive Economy-Commands.         |
+| `core-persistence` | Datenmodelle, Stores und SQL-Migrationen.                                   |
+| `core-common`      | Gemeinsame Infrastruktur (Logging, Translation, Bootstrap).                 |
 
 ---
 <br>
@@ -255,7 +255,7 @@ Die wichtigste Runtime-Datei im Velocity-Modul ist `config.json`. Dort werden un
 
 Im Paper-Modul werden Nachrichten aus `plugins/Core/lang/messages_<locale>.conf` geladen.
 Die Zahlendarstellung in Commands ist an die aufgelöste Translation-Locale gekoppelt.
-Zusätzlich wird in `paper/config.json` für den Help-Sync konfiguriert:
+Zusätzlich wird in `core-paper/config.json` für den Help-Sync konfiguriert:
 
 > [!TIP]
 > Die Texte unterstützen [MiniMessage](https://docs.papermc.io/adventure/minimessage/format/) und lassen sich dadurch flexibel gestalten.
@@ -266,7 +266,7 @@ Zusätzlich wird in `paper/config.json` für den Help-Sync konfiguriert:
 
 ## Persistenz und Migrationen
 
-Die SQL-Struktur liegt im Modul `persistence` unter:
+Die SQL-Struktur liegt im Modul `core-persistence` unter:
 
 - `database/mariadb/<major>/setup.sql`
 - `database/mariadb/<major>/migrate.sql`
@@ -302,12 +302,12 @@ Für die automatische Zeiterfassung gibt es zwei Bausteine:
 
 ### Hooks aktivieren
 
-- Windows (PowerShell): `.\scripts\setup-git-hooks.ps1`
+- Windows (PowerShell): `./scripts/setup-git-hooks.ps1`
 
 Danach ergänzt `prepare-commit-msg` Commit-Messages automatisch um:
 
-- `Refers to: CR-123` (aus Branchname oder bestehender Message)
-- `Time-Spent: 1h 20m`
+- `Refers to: CR-<id>` (id aus Branchname zb. feature/CR-123)
+- `Time-Spent: <time>` (z.B. 1h 20m)
 
 `post-commit` setzt den Startzeitpunkt für den nächsten Commit.
 
