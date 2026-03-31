@@ -9,6 +9,7 @@ plugins {
 dependencies {
     compileOnly(libs.paper)
     compileOnly(libs.brigadier)
+    compileOnly(libs.luckPerms.api)
 
     implementation(project(":core-common"))
     implementation(project(":core-persistence"))
