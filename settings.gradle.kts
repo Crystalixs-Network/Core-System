@@ -1,6 +1,6 @@
 rootProject.name = "core"
 
-include("common")
-include("paper")
-include("velocity")
-include("persistence")
+include("core-common")
+include("core-paper")
+include("core-velocity")
+include("core-persistence")
