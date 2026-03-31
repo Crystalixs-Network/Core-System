@@ -65,7 +65,7 @@ public final class TablistService {
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 
         String entry = player.getName();
-        String targetTeamName = teamName(player, weight);
+        String targetTeamName = teamName(weight);
         String previousTeamName = assignedTeams.get(player.getUniqueId());
 
         if (previousTeamName != null && !previousTeamName.equals(targetTeamName)) {
@@ -97,7 +97,7 @@ public final class TablistService {
                 .max().orElse(0);
     }
 
-    private String teamName(Player player, int weight) {
+    private String teamName(int weight) {
         int boundedWeight = Math.clamp(weight, 0, 9999);
         int sortKey = 9999 - boundedWeight;
         return "lp-" + sortKey;
