@@ -32,4 +32,10 @@ public final class TablistService {
                 .mapToInt(group -> group.getWeight().orElse(0))
                 .max().orElse(0);
     }
+
+    private String teamName(Player player, int weight) {
+        int boundedWeight = Math.clamp(weight, 0, 9999);
+        int sortKey = 9999 - boundedWeight;
+        return "lp-" + sortKey;
+    }
 }
