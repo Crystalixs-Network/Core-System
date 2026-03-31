@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.model.user.User;
 import net.luckperms.api.platform.PlayerAdapter;
 import net.luckperms.api.query.QueryOptions;
 import org.bukkit.Bukkit;
@@ -40,6 +41,13 @@ public final class TablistService {
         player.playerListName(displayName);
 
         player.displayName(displayName);
+    }
+
+    public void refresh(User user) {
+        Player player = Bukkit.getPlayer(user.getUniqueId());
+        if (player != null && player.isOnline()) {
+            refresh(player);
+        }
     }
 
     public void refreshAll() {
