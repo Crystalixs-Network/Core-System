@@ -99,14 +99,18 @@ public final class ScoreboardService {
     }
 
     public void refreshAllActive() {
-        Bukkit.getScheduler().runTask(plugin, () -> activeBoards.forEach((uuid, scoreboard) -> {
-            Player player = Bukkit.getPlayer(uuid);
-            if (player == null || !player.isOnline()) {
-                return;
-            }
-            scoreboard.updateTitle(resolveTitle());
-            scoreboard.updateLines(resolveLines());
-        }));
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            Component title = resolveTitle();
+            List<Component> lines = resolveLines();
+
+            activeBoards.forEach((uuid, scoreboard) -> {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null || !player.isOnline()) {
+                    return;
+                }
+                applyLayout(scoreboard, title, lines);
+            });
+        });
     }
 
     public void subscribe() {
@@ -142,8 +146,12 @@ public final class ScoreboardService {
         if (scoreboard == null) {
             return;
         }
-        scoreboard.updateTitle(resolveTitle());
-        scoreboard.updateLines(resolveLines());
+        applyLayout(scoreboard, resolveTitle(), resolveLines());
+    }
+
+    private void applyLayout(Scoreboard scoreboard, Component title, List<Component> lines) {
+        scoreboard.updateTitle(title);
+        scoreboard.updateLines(lines);
     }
 
     private Component resolveTitle() {
