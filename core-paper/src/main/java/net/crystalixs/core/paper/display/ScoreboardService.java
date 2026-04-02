@@ -1,4 +1,4 @@
-package net.crystalixs.core.paper.scoreboard;
+package net.crystalixs.core.paper.display;
 
 import net.crystalixs.celestial.api.Scoreboard;
 import net.crystalixs.core.common.logging.StructuredLogger;

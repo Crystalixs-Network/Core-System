@@ -1,4 +1,4 @@
-package net.crystalixs.core.paper.tablist;
+package net.crystalixs.core.paper.display;
 
 import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;

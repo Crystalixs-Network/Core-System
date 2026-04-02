@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.listener;
 
+import net.crystalixs.core.paper.display.ScoreboardService;
 import net.crystalixs.core.paper.economy.EconomyMutationEvent;
-import net.crystalixs.core.paper.scoreboard.ScoreboardService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;

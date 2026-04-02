@@ -3,9 +3,9 @@ package net.crystalixs.core.paper.bootstrap;
 import net.crystalixs.core.paper.command.util.InventorySeeService;
 import net.crystalixs.core.paper.command.util.SitService;
 import net.crystalixs.core.paper.command.util.VanishService;
+import net.crystalixs.core.paper.display.ScoreboardService;
+import net.crystalixs.core.paper.display.TablistService;
 import net.crystalixs.core.paper.listener.*;
-import net.crystalixs.core.paper.scoreboard.ScoreboardService;
-import net.crystalixs.core.paper.tablist.TablistService;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 

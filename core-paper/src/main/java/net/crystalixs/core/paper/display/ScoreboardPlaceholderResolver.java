@@ -1,4 +1,4 @@
-package net.crystalixs.core.paper.scoreboard;
+package net.crystalixs.core.paper.display;
 
 import net.kyori.adventure.text.ComponentLike;
 import org.bukkit.entity.Player;

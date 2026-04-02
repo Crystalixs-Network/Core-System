@@ -1,4 +1,4 @@
-package net.crystalixs.core.paper.scoreboard;
+package net.crystalixs.core.paper.display;
 
 import net.crystalixs.core.paper.CorePlugin;
 import net.kyori.adventure.text.ComponentLike;

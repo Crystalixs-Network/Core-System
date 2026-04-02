@@ -1,6 +1,6 @@
 package net.crystalixs.core.paper.listener;
 
-import net.crystalixs.core.paper.tablist.TablistService;
+import net.crystalixs.core.paper.display.TablistService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
