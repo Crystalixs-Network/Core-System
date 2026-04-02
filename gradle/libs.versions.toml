@@ -38,7 +38,7 @@ adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minim
 
 # UI
 invui = { group = "xyz.xenondevs.invui", name = "invui", version = "1.49" }
-celestial = { group = "net.crystalixs", name = "celestial-api", version = "1.0.0" }
+celestial = { group = "net.crystalixs", name = "celestial-api", version = "1.0.1" }
 
 # Sync
 lettuce = { group = "io.lettuce", name = "lettuce-core", version = "7.5.0.RELEASE" }
