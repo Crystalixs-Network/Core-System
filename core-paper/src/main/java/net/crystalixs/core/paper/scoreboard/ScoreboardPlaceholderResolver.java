@@ -1,9 +1,9 @@
 package net.crystalixs.core.paper.scoreboard;
 
-import net.kyori.adventure.text.Component;
+import org.bukkit.entity.Player;
 
 public interface ScoreboardPlaceholderResolver<T> {
 
-    Component resolve(T t);
+    T resolve(Player player);
 
 }

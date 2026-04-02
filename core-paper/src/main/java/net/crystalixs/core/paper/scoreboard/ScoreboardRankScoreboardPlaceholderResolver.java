@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 
 import static net.kyori.adventure.text.Component.empty;
 
-public final class ScoreboardRankScoreboardPlaceholderResolver implements ScoreboardPlaceholderResolver<Player> {
+public final class ScoreboardRankScoreboardPlaceholderResolver implements ScoreboardPlaceholderResolver<Component> {
 
     private final LuckPerms luckPerms;
 
