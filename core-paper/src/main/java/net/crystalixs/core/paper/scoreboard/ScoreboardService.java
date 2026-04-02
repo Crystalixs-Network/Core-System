@@ -4,6 +4,11 @@ import net.crystalixs.celestial.api.Scoreboard;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.config.PaperConfig;
 import net.kyori.adventure.text.Component;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.event.EventSubscription;
+import net.luckperms.api.event.user.UserDataRecalculateEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,11 +29,16 @@ public final class ScoreboardService {
     private final JavaPlugin plugin;
     private final StructuredLogger logger;
     private final PaperConfig config;
+    private final LuckPerms luckPerms;
+    private EventSubscription<UserDataRecalculateEvent> subscription;
 
     private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config) {
         this.plugin = plugin;
         this.logger = logger;
         this.config = config;
+        this.luckPerms = plugin.getServer().getPluginManager().getPlugin("LuckPerms") == null
+                ? null
+                : LuckPermsProvider.get();
     }
 
     public static ScoreboardService create(JavaPlugin plugin, StructuredLogger logger, PaperConfig config) {
@@ -64,8 +74,29 @@ public final class ScoreboardService {
     }
 
     public void shutdown() {
+        if (subscription != null) {
+            subscription.close();
+        }
         activeBoards.values().forEach(Scoreboard::destroy);
         activeBoards.clear();
+    }
+
+    public void subscribe() {
+        if (luckPerms == null || subscription != null) {
+            return;
+        }
+
+        subscription = luckPerms.getEventBus().subscribe(
+                UserDataRecalculateEvent.class,
+                event -> Bukkit.getScheduler().runTask(plugin, () -> refresh(event.getUser().getUniqueId())));
+    }
+
+    private void refresh(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null || !player.isOnline() || !activeBoards.containsKey(uuid)) {
+            return;
+        }
+        display(player);
     }
 
     private Component resolveTitle() {
