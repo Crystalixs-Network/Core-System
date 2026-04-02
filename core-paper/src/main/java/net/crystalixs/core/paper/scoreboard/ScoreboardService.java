@@ -2,8 +2,11 @@ package net.crystalixs.core.paper.scoreboard;
 
 import net.crystalixs.celestial.api.Scoreboard;
 import net.crystalixs.core.common.logging.StructuredLogger;
+import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.config.PaperConfig;
+import net.crystalixs.core.paper.economy.EconomyService;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.event.EventSubscription;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.empty;
@@ -24,6 +28,7 @@ import static net.kyori.adventure.text.Component.translatable;
 
 public final class ScoreboardService {
 
+    private static final Pattern UNRESOLVED_PLACEHOLDER_PATTERN = Pattern.compile("<[a-zA-Z0-9_]+>");
     private final Map<UUID, Scoreboard> activeBoards = new ConcurrentHashMap<>();
     private final Map<UUID, Integer> lastRefresh = new ConcurrentHashMap<>();
 
@@ -31,22 +36,34 @@ public final class ScoreboardService {
     private final StructuredLogger logger;
     private final PaperConfig config;
     private final LuckPerms luckPerms;
+    private final ScoreboardPlaceholderResolver rankResolver;
+    private final ScoreboardPlaceholderResolver coinsResolver;
+    private final ScoreboardPlaceholderResolver gemsResolver;
+    private final ScoreboardPlaceholderResolver onlineResolver;
     private EventSubscription<UserDataRecalculateEvent> subscription;
 
-    private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config) {
+    private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config, EconomyService service) {
         this.plugin = plugin;
         this.logger = logger;
         this.config = config;
         this.luckPerms = plugin.getServer().getPluginManager().getPlugin("LuckPerms") == null
                 ? null
                 : LuckPermsProvider.get();
+        this.rankResolver = luckPerms == null
+                ? null
+                : new ScoreboardRankScoreboardPlaceholderResolver(luckPerms);
+
+        CorePlugin core = (CorePlugin) plugin;
+        this.coinsResolver = new ScoreboardCoinsPlaceholderResolver(core, service);
+        this.gemsResolver = new ScoreboardGemsPlaceholderResolver(core, service);
+        this.onlineResolver = new ScoreboardOnlineCountPlaceholderResolver(core);
     }
 
-    public static ScoreboardService create(JavaPlugin plugin, StructuredLogger logger, PaperConfig config) {
+    public static ScoreboardService create(JavaPlugin plugin, StructuredLogger logger, PaperConfig config, EconomyService service) {
         if (config == null || config.scoreboard() == null) {
             return null;
         }
-        return new ScoreboardService(plugin, logger, config);
+        return new ScoreboardService(plugin, logger, config, service);
     }
 
     public void display(Player player) {
@@ -55,7 +72,7 @@ public final class ScoreboardService {
         }
 
         Component title = resolveTitle();
-        List<Component> lines = resolveLines();
+        List<Component> lines = resolveLines(player);
 
         Scoreboard scoreboard = activeBoards.get(player.getUniqueId());
         if (scoreboard != null) {
@@ -91,17 +108,18 @@ public final class ScoreboardService {
 
     public void refreshAllActive() {
         Bukkit.getScheduler().runTask(plugin, () -> {
-            Component title = resolveTitle();
-            List<Component> lines = resolveLines();
-
             activeBoards.forEach((uuid, scoreboard) -> {
                 Player player = Bukkit.getPlayer(uuid);
+
                 if (player == null || !player.isOnline()) {
                     scoreboard.destroy();
                     activeBoards.remove(uuid);
                     lastRefresh.remove(uuid);
                     return;
                 }
+
+                Component title = resolveTitle();
+                List<Component> lines = resolveLines(player);
                 updateScoreboard(scoreboard, title, lines);
             });
         });
@@ -140,7 +158,7 @@ public final class ScoreboardService {
         if (scoreboard == null) {
             return;
         }
-        updateScoreboard(scoreboard, resolveTitle(), resolveLines());
+        updateScoreboard(scoreboard, resolveTitle(), resolveLines(player));
     }
 
     private void createAndDisplay(Player player, Component title, List<Component> lines) {
@@ -167,7 +185,7 @@ public final class ScoreboardService {
         return translatable(translationKey);
     }
 
-    private List<Component> resolveLines() {
+    private List<Component> resolveLines(Player player) {
         if (config.scoreboard().lines() == null) {
             return Collections.emptyList();
         }
@@ -175,7 +193,28 @@ public final class ScoreboardService {
                 .map(line -> line == null || line.isBlank()
                         ? empty()
                         : translatable(line)
+                          .arguments(
+                                  rankResolver.resolve(player),
+                                  coinsResolver.resolve(player),
+                                  gemsResolver.resolve(player),
+                                  onlineResolver.resolve(player)
+                          )
                 )
+                .map(this::stripUnresolvedPlaceholders)
                 .collect(Collectors.toList());
+    }
+
+    private Component stripUnresolvedPlaceholders(Component component) {
+        Component cleaned = component;
+        if (component instanceof TextComponent textComponent) {
+            String sanitized = UNRESOLVED_PLACEHOLDER_PATTERN.matcher(textComponent.content()).replaceAll("");
+            cleaned = textComponent.content(sanitized);
+        }
+        if (!cleaned.children().isEmpty()) {
+            cleaned = cleaned.children(cleaned.children().stream()
+                    .map(this::stripUnresolvedPlaceholders)
+                    .collect(Collectors.toList()));
+        }
+        return cleaned;
     }
 }

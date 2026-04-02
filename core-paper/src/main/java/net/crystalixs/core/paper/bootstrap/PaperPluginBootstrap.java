@@ -64,10 +64,13 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
             tablistService.refreshAll();
         }
 
+        commands.registerCommands(configUpdater);
+
         scoreboardService = ScoreboardService.create(
                 runtime().plugin(),
                 runtime().componentLogger("scoreboard"),
-                configUpdater.current()
+                configUpdater.current(),
+                commands.economyService()
         );
         if (scoreboardService != null) {
             scoreboardService.subscribe();
@@ -81,8 +84,6 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
                 tablistService,
                 scoreboardService
         );
-
-        commands.registerCommands(configUpdater);
 
         if (configUpdater.current().isHotReloadingEnabled()) {
             configWatcher = new PaperConfigHotReloadWatcher(
