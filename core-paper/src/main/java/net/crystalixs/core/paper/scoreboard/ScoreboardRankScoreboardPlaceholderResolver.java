@@ -10,11 +10,11 @@ import org.bukkit.entity.Player;
 
 import static net.kyori.adventure.text.Component.empty;
 
-public final class ScoreboardRankPlaceholderResolver implements PlaceholderResolver<Player> {
+public final class ScoreboardRankScoreboardPlaceholderResolver implements ScoreboardPlaceholderResolver<Player> {
 
     private final LuckPerms luckPerms;
 
-    public ScoreboardRankPlaceholderResolver(LuckPerms luckPerms) {
+    public ScoreboardRankScoreboardPlaceholderResolver(LuckPerms luckPerms) {
         this.luckPerms = luckPerms;
     }
 
