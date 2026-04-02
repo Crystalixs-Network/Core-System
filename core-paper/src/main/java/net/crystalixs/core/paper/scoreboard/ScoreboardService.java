@@ -32,7 +32,7 @@ public final class ScoreboardService {
     private final StructuredLogger logger;
     private final PaperConfig config;
     private final LuckPerms luckPerms;
-    private final ScoreboardPlaceholderResolver<Player> rankResolver;
+    private final ScoreboardPlaceholderResolver<Component> rankResolver;
     private EventSubscription<UserDataRecalculateEvent> subscription;
 
     private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config) {
