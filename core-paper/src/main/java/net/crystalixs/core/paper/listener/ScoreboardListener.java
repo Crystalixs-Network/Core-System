@@ -1,5 +1,6 @@
 package net.crystalixs.core.paper.listener;
 
+import net.crystalixs.core.paper.economy.EconomyMutationEvent;
 import net.crystalixs.core.paper.scoreboard.ScoreboardService;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,5 +30,10 @@ public final class ScoreboardListener implements Listener {
     public void onQuit(PlayerQuitEvent event) {
         service.remove(event.getPlayer());
         service.refreshAllActive();
+    }
+
+    @EventHandler
+    public void onEconomyMutation(EconomyMutationEvent event) {
+        event.affectedPlayers().forEach(service::refreshIfActive);
     }
 }
