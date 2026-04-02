@@ -1,0 +1,36 @@
+package net.crystalixs.core.paper.scoreboard;
+
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.model.user.User;
+import net.luckperms.api.query.QueryOptions;
+import org.bukkit.entity.Player;
+
+import static net.kyori.adventure.text.Component.empty;
+
+public final class ScoreboardRankPlaceholderResolver implements PlaceholderResolver<Player> {
+
+    private final LuckPerms luckPerms;
+
+    public ScoreboardRankPlaceholderResolver(LuckPerms luckPerms) {
+        this.luckPerms = luckPerms;
+    }
+
+    @Override
+    public Component resolve(Player player) {
+        User user = luckPerms.getPlayerAdapter(Player.class).getUser(player);
+        QueryOptions options = user.getQueryOptions();
+        CachedMetaData metaData = user.getCachedData().getMetaData(options);
+
+        String group = metaData.getPrimaryGroup();
+        String display = metaData.getMetaValue("displayname");
+        String value = (display == null || display.isBlank()) ? group : display;
+
+        if (value == null || value.isBlank()) {
+            return empty();
+        }
+        return MiniMessage.miniMessage().deserialize(value);
+    }
+}
