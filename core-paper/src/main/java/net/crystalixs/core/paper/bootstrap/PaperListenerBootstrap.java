@@ -26,8 +26,6 @@ public final class PaperListenerBootstrap {
         pluginManager.registerEvents(new InventorySeeListener(inventorySeeService), plugin);
         pluginManager.registerEvents(new VanishListener(plugin, vanishService), plugin);
         if (tablistService != null) pluginManager.registerEvents(new TablistListener(plugin, tablistService), plugin);
-        if (scoreboardService != null) {
-            // Listener wiring follows in CR-133
-        }
+        if (scoreboardService != null) pluginManager.registerEvents(new ScoreboardListener(plugin, scoreboardService), plugin);
     }
 }
