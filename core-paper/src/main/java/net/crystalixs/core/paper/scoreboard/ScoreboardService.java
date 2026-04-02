@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
 public final class ScoreboardService {
 
@@ -31,6 +32,7 @@ public final class ScoreboardService {
     private final StructuredLogger logger;
     private final PaperConfig config;
     private final LuckPerms luckPerms;
+    private final ScoreboardPlaceholderResolver<Player> rankResolver;
     private EventSubscription<UserDataRecalculateEvent> subscription;
 
     private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config) {
@@ -40,6 +42,9 @@ public final class ScoreboardService {
         this.luckPerms = plugin.getServer().getPluginManager().getPlugin("LuckPerms") == null
                 ? null
                 : LuckPermsProvider.get();
+        this.rankResolver = luckPerms == null
+                ? null
+                : new ScoreboardRankScoreboardPlaceholderResolver(luckPerms);
     }
 
     public static ScoreboardService create(JavaPlugin plugin, StructuredLogger logger, PaperConfig config) {
@@ -55,7 +60,7 @@ public final class ScoreboardService {
         }
 
         Component title = resolveTitle();
-        List<Component> lines = resolveLines();
+        List<Component> lines = resolveLines(player);
 
         Scoreboard scoreboard = activeBoards.get(player.getUniqueId());
         if (scoreboard != null) {
@@ -91,17 +96,18 @@ public final class ScoreboardService {
 
     public void refreshAllActive() {
         Bukkit.getScheduler().runTask(plugin, () -> {
-            Component title = resolveTitle();
-            List<Component> lines = resolveLines();
-
             activeBoards.forEach((uuid, scoreboard) -> {
                 Player player = Bukkit.getPlayer(uuid);
+
                 if (player == null || !player.isOnline()) {
                     scoreboard.destroy();
                     activeBoards.remove(uuid);
                     lastRefresh.remove(uuid);
                     return;
                 }
+
+                Component title = resolveTitle();
+                List<Component> lines = resolveLines(player);
                 updateScoreboard(scoreboard, title, lines);
             });
         });
@@ -140,7 +146,7 @@ public final class ScoreboardService {
         if (scoreboard == null) {
             return;
         }
-        updateScoreboard(scoreboard, resolveTitle(), resolveLines());
+        updateScoreboard(scoreboard, resolveTitle(), resolveLines(player));
     }
 
     private void createAndDisplay(Player player, Component title, List<Component> lines) {
@@ -167,15 +173,22 @@ public final class ScoreboardService {
         return translatable(translationKey);
     }
 
-    private List<Component> resolveLines() {
+    private List<Component> resolveLines(Player player) {
         if (config.scoreboard().lines() == null) {
             return Collections.emptyList();
         }
         return config.scoreboard().lines().stream()
                 .map(line -> line == null || line.isBlank()
                         ? empty()
-                        : translatable(line)
+                        : translatable(line).arguments(component("rang", resolveRankPlaceholder(player)))
                 )
                 .collect(Collectors.toList());
+    }
+
+    private Component resolveRankPlaceholder(Player player) {
+        if (rankResolver == null) {
+            return empty();
+        }
+        return rankResolver.resolve(player);
     }
 }
