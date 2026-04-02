@@ -97,6 +97,9 @@ public final class ScoreboardService {
             activeBoards.forEach((uuid, scoreboard) -> {
                 Player player = Bukkit.getPlayer(uuid);
                 if (player == null || !player.isOnline()) {
+                    scoreboard.destroy();
+                    activeBoards.remove(uuid);
+                    lastRefresh.remove(uuid);
                     return;
                 }
                 updateScoreboard(scoreboard, title, lines);
