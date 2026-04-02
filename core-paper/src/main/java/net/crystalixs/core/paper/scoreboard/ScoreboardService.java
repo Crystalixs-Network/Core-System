@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.empty;
 import static net.kyori.adventure.text.Component.translatable;
+import static net.kyori.adventure.text.minimessage.translation.Argument.component;
 
 public final class ScoreboardService {
 
@@ -95,7 +96,7 @@ public final class ScoreboardService {
 
     public void refreshAllActive() {
         Bukkit.getScheduler().runTask(plugin, () -> {
-             activeBoards.forEach((uuid, scoreboard) -> {
+            activeBoards.forEach((uuid, scoreboard) -> {
                 Player player = Bukkit.getPlayer(uuid);
 
                 if (player == null || !player.isOnline()) {
@@ -105,8 +106,8 @@ public final class ScoreboardService {
                     return;
                 }
 
-                 Component title = resolveTitle();
-                 List<Component> lines = resolveLines(player);
+                Component title = resolveTitle();
+                List<Component> lines = resolveLines(player);
                 updateScoreboard(scoreboard, title, lines);
             });
         });
@@ -179,8 +180,15 @@ public final class ScoreboardService {
         return config.scoreboard().lines().stream()
                 .map(line -> line == null || line.isBlank()
                         ? empty()
-                        : translatable(line)
+                        : translatable(line).arguments(component("rang", resolveRankPlaceholder(player)))
                 )
                 .collect(Collectors.toList());
+    }
+
+    private Component resolveRankPlaceholder(Player player) {
+        if (rankResolver == null) {
+            return empty();
+        }
+        return rankResolver.resolve(player);
     }
 }
