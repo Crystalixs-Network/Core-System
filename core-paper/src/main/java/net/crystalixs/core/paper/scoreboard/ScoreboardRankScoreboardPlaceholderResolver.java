@@ -1,7 +1,8 @@
 package net.crystalixs.core.paper.scoreboard;
 
-import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.translation.Argument;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.cacheddata.CachedMetaData;
 import net.luckperms.api.model.user.User;
@@ -10,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import static net.kyori.adventure.text.Component.empty;
 
-public final class ScoreboardRankScoreboardPlaceholderResolver implements ScoreboardPlaceholderResolver<Player> {
+public final class ScoreboardRankScoreboardPlaceholderResolver implements ScoreboardPlaceholderResolver {
 
     private final LuckPerms luckPerms;
 
@@ -19,7 +20,11 @@ public final class ScoreboardRankScoreboardPlaceholderResolver implements Scoreb
     }
 
     @Override
-    public Component resolve(Player player) {
+    public ComponentLike resolve(Player player) {
+        if (player == null || !player.isOnline()) {
+            return empty();
+        }
+
         User user = luckPerms.getPlayerAdapter(Player.class).getUser(player);
         QueryOptions options = user.getQueryOptions();
         CachedMetaData metaData = user.getCachedData().getMetaData(options);
@@ -31,6 +36,6 @@ public final class ScoreboardRankScoreboardPlaceholderResolver implements Scoreb
         if (value == null || value.isBlank()) {
             return empty();
         }
-        return MiniMessage.miniMessage().deserialize(value);
+        return Argument.component("rang", MiniMessage.miniMessage().deserialize(value));
     }
 }
