@@ -86,6 +86,17 @@ public final class ScoreboardService {
         lastRefresh.clear();
     }
 
+    public void refreshIfActive(UUID uuid) {
+        if (uuid == null || !activeBoards.containsKey(uuid)) {
+            return;
+        }
+        Bukkit.getScheduler().runTask(plugin, () -> refresh(uuid));
+    }
+
+    public void refreshAllActive() {
+        Bukkit.getScheduler().runTask(plugin, () -> activeBoards.keySet().forEach(this::refresh));
+    }
+
     public void subscribe() {
         if (luckPerms == null || subscription != null) {
             return;
