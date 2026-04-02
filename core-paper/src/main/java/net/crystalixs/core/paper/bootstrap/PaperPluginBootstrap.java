@@ -65,13 +65,8 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
         }
 
         commands.registerCommands(configUpdater);
+        scoreboardService = ScoreboardService.create(runtime().plugin(), configUpdater.current(), commands.economyService());
 
-        scoreboardService = ScoreboardService.create(
-                runtime().plugin(),
-                runtime().componentLogger("scoreboard"),
-                configUpdater.current(),
-                commands.economyService()
-        );
         if (scoreboardService != null) {
             scoreboardService.subscribe();
         }
