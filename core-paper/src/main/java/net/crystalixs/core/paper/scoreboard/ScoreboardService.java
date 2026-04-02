@@ -53,20 +53,16 @@ public final class ScoreboardService {
         if (!player.isOnline()) {
             return;
         }
-        remove(player);
-        activeBoards.computeIfAbsent(player.getUniqueId(), ignored -> {
-            Component title = resolveTitle();
-            List<Component> lines = resolveLines();
 
-            Scoreboard scoreboard = Scoreboard.sidebar()
-                    .withPlayer(player)
-                    .title(title)
-                    .lines(lines)
-                    .build();
+        Component title = resolveTitle();
+        List<Component> lines = resolveLines();
 
-            scoreboard.display();
-            return scoreboard;
-        });
+        Scoreboard scoreboard = activeBoards.get(player.getUniqueId());
+        if (scoreboard != null) {
+            updateScoreboard(scoreboard, title, lines);
+            return;
+        }
+        createAndDisplay(player, title, lines);
     }
 
     public void remove(Player player) {
@@ -94,7 +90,21 @@ public final class ScoreboardService {
     }
 
     public void refreshAllActive() {
-        Bukkit.getScheduler().runTask(plugin, () -> activeBoards.keySet().forEach(this::refresh));
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            Component title = resolveTitle();
+            List<Component> lines = resolveLines();
+
+            activeBoards.forEach((uuid, scoreboard) -> {
+                Player player = Bukkit.getPlayer(uuid);
+                if (player == null || !player.isOnline()) {
+                    scoreboard.destroy();
+                    activeBoards.remove(uuid);
+                    lastRefresh.remove(uuid);
+                    return;
+                }
+                updateScoreboard(scoreboard, title, lines);
+            });
+        });
     }
 
     public void subscribe() {
@@ -122,10 +132,31 @@ public final class ScoreboardService {
 
     private void refresh(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null || !player.isOnline() || !activeBoards.containsKey(uuid)) {
+        if (player == null || !player.isOnline()) {
             return;
         }
-        display(player);
+
+        Scoreboard scoreboard = activeBoards.get(uuid);
+        if (scoreboard == null) {
+            return;
+        }
+        updateScoreboard(scoreboard, resolveTitle(), resolveLines());
+    }
+
+    private void createAndDisplay(Player player, Component title, List<Component> lines) {
+        Scoreboard scoreboard = Scoreboard.sidebar()
+                .withPlayer(player)
+                .title(title)
+                .lines(lines)
+                .build();
+
+        scoreboard.display();
+        activeBoards.put(player.getUniqueId(), scoreboard);
+    }
+
+    private void updateScoreboard(Scoreboard scoreboard, Component title, List<Component> lines) {
+        scoreboard.updateTitle(title);
+        scoreboard.updateLines(lines);
     }
 
     private Component resolveTitle() {
