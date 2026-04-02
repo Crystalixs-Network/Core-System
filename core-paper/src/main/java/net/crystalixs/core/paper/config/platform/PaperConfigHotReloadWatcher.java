@@ -4,10 +4,14 @@ import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.common.logging.StructuredLogger;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 public final class PaperConfigHotReloadWatcher implements Runnable, AutoCloseable {
 
@@ -42,10 +46,49 @@ public final class PaperConfigHotReloadWatcher implements Runnable, AutoCloseabl
 
     @Override
     public void run() {
+        if (!isRunning) {
+            return;
+        }
+
+        try {
+            if (watcher == null) {
+                Files.createDirectories(directory);
+                watcher = directory.getFileSystem().newWatchService();
+                directory.register(watcher, ENTRY_MODIFY);
+            }
+
+            WatchKey key;
+            while ((key = watcher.poll()) != null) {
+                for (var event : key.pollEvents()) {
+                    Path changed = (Path) event.context();
+                    if (!fileName.equals(changed.toString())) {
+                        continue;
+                    }
+
+                    long now = System.currentTimeMillis();
+                    if (now - lastReloaded <= debounceMs) {
+                        continue;
+                    }
+
+                    logger.info("config change detected", LogMetadata
+                            .event("config.watch.changed")
+                            .and(LogMetadata.Key.FILE, changed)
+                            .and(LogMetadata.Key.DIRECTORY, directory));
+
+                    callback.run();
+                    lastReloaded = now;
+                }
+            }
+
+        } catch (IOException exception) {
+            logger.error("config watcher failed", LogMetadata
+                    .event("config.watch.failed")
+                    .and(LogMetadata.Key.DIRECTORY, directory), exception);
+        }
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         isRunning = false;
         if (watcher == null) {
             return;
