@@ -53,20 +53,25 @@ public final class ScoreboardService {
         if (!player.isOnline()) {
             return;
         }
-        remove(player);
-        activeBoards.computeIfAbsent(player.getUniqueId(), ignored -> {
-            Component title = resolveTitle();
-            List<Component> lines = resolveLines();
 
-            Scoreboard scoreboard = Scoreboard.sidebar()
-                    .withPlayer(player)
-                    .title(title)
-                    .lines(lines)
-                    .build();
+        Component title = resolveTitle();
+        List<Component> lines = resolveLines();
 
-            scoreboard.display();
-            return scoreboard;
-        });
+        Scoreboard scoreboard = activeBoards.get(player.getUniqueId());
+        if (scoreboard != null) {
+            scoreboard.updateTitle(title);
+            scoreboard.updateLines(lines);
+            return;
+        }
+
+        scoreboard = Scoreboard.sidebar()
+                .withPlayer(player)
+                .title(title)
+                .lines(lines)
+                .build();
+
+        scoreboard.display();
+        activeBoards.put(player.getUniqueId(), scoreboard);
     }
 
     public void remove(Player player) {
