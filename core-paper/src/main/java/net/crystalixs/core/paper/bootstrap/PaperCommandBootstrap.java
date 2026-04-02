@@ -10,9 +10,11 @@ import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.*;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
+import net.crystalixs.core.paper.economy.EconomyService;
 import net.crystalixs.core.paper.home.DefaultHomeService;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.ignore.DefaultPlayerIgnoreService;
+import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -28,6 +30,9 @@ import static net.kyori.adventure.text.Component.translatable;
 public final class PaperCommandBootstrap {
 
     private final PaperPluginRuntime runtime;
+    private final PersistenceContext context;
+    private final EconomyService economyService;
+
     private final TrashService trashService;
     private final SitService sitService;
     private final PrivateMessageService messageService;
@@ -39,6 +44,8 @@ public final class PaperCommandBootstrap {
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
+        this.context = ((CorePlugin) runtime.plugin()).persistence();
+        this.economyService = new DefaultEconomyService(context.players(), context.transactions(), context.audits());
         this.trashService = new TrashService(runtime.plugin());
         this.sitService = new SitService(runtime.plugin());
         this.messageService = new PrivateMessageService();
@@ -58,11 +65,9 @@ public final class PaperCommandBootstrap {
                 .registerTo(commandManager);
 
         CorePlugin plugin = (CorePlugin) runtime.plugin();
-        var persistence = plugin.persistence();
-        var economyService = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
-        var homeService = new DefaultHomeService(persistence.players(), persistence.homes());
+        var homeService = new DefaultHomeService(context.players(), context.homes());
         var homeGuiFactory = new HomeGuiFactory(plugin, homeService);
-        var ignoreService = new DefaultPlayerIgnoreService(persistence.ignores());
+        var ignoreService = new DefaultPlayerIgnoreService(context.ignores());
 
         new CoinsCommand(plugin, economyService).registerTo(commandManager);
         new BalanceCommand(plugin, economyService).registerTo(commandManager);
@@ -125,6 +130,10 @@ public final class PaperCommandBootstrap {
         sitService.shutdown();
         messageService.shutdown();
         teleportService.shutdown();
+    }
+
+    public EconomyService economyService() {
+        return economyService;
     }
 
     public SitService sitService() {
