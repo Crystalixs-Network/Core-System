@@ -1,4 +1,5 @@
 {
+  "enable-hot-reloading": true,
   "database": {
     "host": "localhost",
     "port": 3306,
