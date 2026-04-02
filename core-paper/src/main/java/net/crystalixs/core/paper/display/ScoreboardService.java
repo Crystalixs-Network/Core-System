@@ -33,7 +33,6 @@ public final class ScoreboardService {
     private final Map<UUID, Integer> lastRefresh = new ConcurrentHashMap<>();
 
     private final JavaPlugin plugin;
-    private final StructuredLogger logger;
     private final PaperConfig config;
     private final LuckPerms luckPerms;
     private final ScoreboardPlaceholderResolver rankResolver;
@@ -42,9 +41,8 @@ public final class ScoreboardService {
     private final ScoreboardPlaceholderResolver onlineResolver;
     private EventSubscription<UserDataRecalculateEvent> subscription;
 
-    private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config, EconomyService service) {
+    private ScoreboardService(JavaPlugin plugin, PaperConfig config, EconomyService service) {
         this.plugin = plugin;
-        this.logger = logger;
         this.config = config;
         this.luckPerms = plugin.getServer().getPluginManager().getPlugin("LuckPerms") == null
                 ? null
@@ -63,7 +61,7 @@ public final class ScoreboardService {
         if (config == null || config.scoreboard() == null) {
             return null;
         }
-        return new ScoreboardService(plugin, logger, config, service);
+        return new ScoreboardService(plugin, config, service);
     }
 
     public void display(Player player) {
