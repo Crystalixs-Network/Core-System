@@ -18,6 +18,10 @@ public final class PaperConfigUpdater {
         return facade.current();
     }
 
+    public void reload() throws IOException {
+        facade.reload();
+    }
+
     public void save() throws IOException {
         facade.save();
     }

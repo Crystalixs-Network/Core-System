@@ -1,7 +1,11 @@
 package net.crystalixs.core.paper.bootstrap;
 
 import net.crystalixs.core.common.bootstrap.AbstractPluginBootstrap;
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.paper.config.platform.PaperConfigHotReloadWatcher;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
+import net.crystalixs.core.paper.display.ScoreboardService;
+import net.crystalixs.core.paper.display.TablistService;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.invui.InvUI;
@@ -15,8 +19,11 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     private final PaperTranslationBootstrap translations;
     private final PaperCommandBootstrap commands;
     private final PaperListenerBootstrap listeners;
+
     private PaperConfigUpdater configUpdater;
+    private PaperConfigHotReloadWatcher configWatcher;
     private PersistenceContext persistenceContext;
+    private ScoreboardService scoreboardService;
 
     private PaperPluginBootstrap(PaperPluginRuntime runtime, PaperConfigBootstrap config, PaperPersistenceBootstrap persistence, PaperTranslationBootstrap translations, PaperCommandBootstrap commands, PaperListenerBootstrap listeners) {
         super(runtime);
@@ -50,8 +57,56 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     protected void enableInternal() {
         configUpdater = config.load(runtime());
         persistenceContext = persistence.create(runtime(), configUpdater);
-        listeners.register(runtime(), commands.sitService(), commands.inventorySeeService(), commands.vanishService());
-         commands.registerCommands(configUpdater);
+
+        TablistService tablistService = TablistService.create(runtime().plugin(), runtime().componentLogger("tablist"));
+        if (tablistService != null) {
+            tablistService.subscribe();
+            tablistService.refreshAll();
+        } else {
+            runtime().componentLogger("display").warn(
+                    "tablist service disabled due to missing dependency or setup",
+                    LogMetadata.event("display.tablist.disabled"));
+        }
+
+        commands.registerCommands(configUpdater);
+        scoreboardService = ScoreboardService.create(runtime().plugin(), configUpdater.current(), commands.economyService());
+
+        if (scoreboardService != null) {
+            scoreboardService.subscribe();
+        } else {
+            runtime().componentLogger("display").warn(
+                    "scoreboard service disabled because scoreboard config is missing",
+                    LogMetadata.event("display.scoreboard.disabled"));
+        }
+
+        listeners.register(
+                runtime(),
+                commands.sitService(),
+                commands.inventorySeeService(),
+                commands.vanishService(),
+                tablistService,
+                scoreboardService
+        );
+
+        if (configUpdater.current().isHotReloadingEnabled()) {
+            configWatcher = new PaperConfigHotReloadWatcher(
+                    runtime().componentLogger("config"),
+                    runtime().scheduler(),
+                    runtime().plugin().getDataPath().resolve("config.json"),
+                    1_000L,
+                    () -> {
+                        try {
+                            configUpdater.reload();
+                        } catch (Exception exception) {
+                            runtime().componentLogger("config").warn(
+                                    "config reload failed via hot-reloading",
+                                    LogMetadata.event("config.watch.reload_failed"),
+                                    exception);
+                        }
+                    }
+            );
+            configWatcher.start();
+        }
 
         InvUI.getInstance().setPlugin(runtime().plugin());
     }
@@ -59,8 +114,15 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     @Override
     protected void disableInternal() {
         try {
+            if (configWatcher != null) {
+                configWatcher.close();
+            }
             translations.close();
             commands.shutdown();
+
+            if (scoreboardService != null) {
+                scoreboardService.shutdown();
+            }
         } finally {
             try {
                 if (persistenceContext != null) {

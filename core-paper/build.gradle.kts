@@ -9,6 +9,7 @@ plugins {
 dependencies {
     compileOnly(libs.paper)
     compileOnly(libs.brigadier)
+    compileOnly(libs.luckPerms.api)
 
     implementation(project(":core-common"))
     implementation(project(":core-persistence"))
@@ -16,6 +17,7 @@ dependencies {
     implementation(libs.configurate.hocon)
     implementation(libs.invui)
     implementation(libs.lettuce)
+    implementation(libs.celestial)
 }
 
 tasks {
@@ -23,14 +25,23 @@ tasks {
 
     shadowJar {
         val mapping = mapOf(
-            libs.cloud.paper to "cloud",
-            libs.configurate.hocon to "configurate.hocon",
-            libs.invui to "invui",
-            libs.lettuce to "lettuce",
+            "org.incendo" to "cloud",
+            "org.spongepowered.configurate" to "configurate",
+            "xyz.xenondevs.invui" to "invui",
+            "io.lettuce" to "lettuce",
+            "net.crystalixs.celestial" to "celestial"
         )
 
         val base = "$group.$artifact.paper.libs"
-        for ((dependency, name) in mapping) relocate(dependency.get().group, "$base.$name")
+        for ((source, name) in mapping) {
+            if (source.startsWith(project.group.toString())) {
+                relocate(source, "$base.$name") {
+                    exclude("net/crystalixs/core/**")
+                }
+            } else {
+                relocate(source, "$base.$name")
+            }
+        }
     }
 
     jar {
@@ -69,6 +80,9 @@ fun registerBackendServer(name: String, runDirName: String, port: String) {
         dependsOn(copyTask)
         doFirst {
             configurePaperServer(runDirName, port)
+        }
+        downloadPlugins {
+            url("https://download.luckperms.net/1631/bukkit/loader/LuckPerms-Bukkit-5.5.42.jar")
         }
     }
 }

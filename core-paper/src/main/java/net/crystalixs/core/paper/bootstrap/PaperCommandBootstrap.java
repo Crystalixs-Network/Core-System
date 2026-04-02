@@ -10,6 +10,7 @@ import net.crystalixs.core.paper.command.cloud.PaperPlayerCommandSource;
 import net.crystalixs.core.paper.command.util.*;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.economy.DefaultEconomyService;
+import net.crystalixs.core.paper.economy.EconomyService;
 import net.crystalixs.core.paper.home.DefaultHomeService;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.ignore.DefaultPlayerIgnoreService;
@@ -36,6 +37,7 @@ public final class PaperCommandBootstrap {
     private final VanishService vanishService;
     private PaperHelpCatalogTransport helpCatalogTransport;
     private BukkitTask helpCatalogRepublishTask;
+    private EconomyService economyService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
@@ -58,11 +60,12 @@ public final class PaperCommandBootstrap {
                 .registerTo(commandManager);
 
         CorePlugin plugin = (CorePlugin) runtime.plugin();
-        var persistence = plugin.persistence();
-        var economyService = new DefaultEconomyService(persistence.players(), persistence.transactions(), persistence.audits());
-        var homeService = new DefaultHomeService(persistence.players(), persistence.homes());
+        var context = plugin.persistence();
+        economyService = new DefaultEconomyService(context.players(), context.transactions(), context.audits());
+
+        var homeService = new DefaultHomeService(context.players(), context.homes());
         var homeGuiFactory = new HomeGuiFactory(plugin, homeService);
-        var ignoreService = new DefaultPlayerIgnoreService(persistence.ignores());
+        var ignoreService = new DefaultPlayerIgnoreService(context.ignores());
 
         new CoinsCommand(plugin, economyService).registerTo(commandManager);
         new BalanceCommand(plugin, economyService).registerTo(commandManager);
@@ -125,6 +128,10 @@ public final class PaperCommandBootstrap {
         sitService.shutdown();
         messageService.shutdown();
         teleportService.shutdown();
+    }
+
+    public EconomyService economyService() {
+        return economyService;
     }
 
     public SitService sitService() {
