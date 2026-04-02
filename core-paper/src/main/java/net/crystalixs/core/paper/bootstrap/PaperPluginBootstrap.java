@@ -4,6 +4,7 @@ import net.crystalixs.core.common.bootstrap.AbstractPluginBootstrap;
 import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.paper.config.platform.PaperConfigHotReloadWatcher;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
+import net.crystalixs.core.paper.scoreboard.ScoreboardService;
 import net.crystalixs.core.paper.tablist.TablistService;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,6 +23,7 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     private PaperConfigUpdater configUpdater;
     private PaperConfigHotReloadWatcher configWatcher;
     private PersistenceContext persistenceContext;
+    private ScoreboardService scoreboardService;
 
     private PaperPluginBootstrap(PaperPluginRuntime runtime, PaperConfigBootstrap config, PaperPersistenceBootstrap persistence, PaperTranslationBootstrap translations, PaperCommandBootstrap commands, PaperListenerBootstrap listeners) {
         super(runtime);
@@ -62,9 +64,21 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
             tablistService.refreshAll();
         }
 
-        listeners.register(runtime(), commands.sitService(), commands.inventorySeeService(), commands.vanishService(), tablistService);
-        commands.registerCommands(configUpdater);
+        scoreboardService = ScoreboardService.create(
+                runtime().plugin(),
+                runtime().componentLogger("scoreboard"),
+                configUpdater.current()
+        );
+        listeners.register(
+                runtime(),
+                commands.sitService(),
+                commands.inventorySeeService(),
+                commands.vanishService(),
+                tablistService,
+                scoreboardService
+        );
 
+        commands.registerCommands(configUpdater);
 
         if (configUpdater.current().isHotReloadingEnabled()) {
             configWatcher = new PaperConfigHotReloadWatcher(
@@ -97,6 +111,10 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
             }
             translations.close();
             commands.shutdown();
+
+            if (scoreboardService != null) {
+                scoreboardService.shutdown();
+            }
         } finally {
             try {
                 if (persistenceContext != null) {
