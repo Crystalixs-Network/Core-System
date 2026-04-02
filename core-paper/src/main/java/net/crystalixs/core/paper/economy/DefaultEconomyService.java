@@ -4,7 +4,9 @@ import net.crystalixs.core.persistence.model.*;
 import net.crystalixs.core.persistence.store.AuditStore;
 import net.crystalixs.core.persistence.store.PlayerStore;
 import net.crystalixs.core.persistence.store.TransactionStore;
+import org.bukkit.Bukkit;
 
+import java.util.Set;
 import java.util.UUID;
 
 public final class DefaultEconomyService implements EconomyService {
@@ -44,6 +46,7 @@ public final class DefaultEconomyService implements EconomyService {
         getOrCreatePlayer(playerId);
         store.addCurrency(playerId, currency, amount);
 
+        publishMutation(EconomyMutationType.ADD, currency, playerId);
         transaction(TransactionType.ADMIN_GIVE, currency, amount, null, playerId, null, "admin_give");
         audit("economy.addCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_give");
     }
@@ -67,6 +70,7 @@ public final class DefaultEconomyService implements EconomyService {
         UUID fromPlayerId = amount >= previous ? null : playerId;
         UUID toPlayerId = amount >= previous ? playerId : null;
 
+        publishMutation(EconomyMutationType.SET, currency, playerId);
         transaction(type, currency, delta, fromPlayerId, toPlayerId, null, "admin_set");
         audit("economy.setCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_set");
     }
@@ -83,6 +87,7 @@ public final class DefaultEconomyService implements EconomyService {
             throw new EconomyException(EconomyError.INSUFFICIENT_FUNDS, "Insufficient " + currency.name().toLowerCase());
         }
 
+        publishMutation(EconomyMutationType.TAKE, currency, playerId);
         transaction(TransactionType.ADMIN_TAKE, currency, amount, playerId, null, null, "admin_take");
         audit("economy.takeCurrency", "playerId", playerId, "currency", currency, "amount", amount, "reason", "admin_take");
     }
@@ -100,8 +105,14 @@ public final class DefaultEconomyService implements EconomyService {
         if (!success) {
             throw new EconomyException(EconomyError.INSUFFICIENT_FUNDS, "Insufficient coins");
         }
+
+        publishMutation(EconomyMutationType.TRANSFER, Currency.COINS, fromPlayerId, toPlayerId);
         transaction(TransactionType.PAY, Currency.COINS, amount, fromPlayerId, toPlayerId, fromPlayerId, "player_transfer");
         audit("economy.transferCoins", "fromPlayerId", fromPlayerId, "toPlayerId", toPlayerId, "amount", amount, "reason", "player_transfer");
+    }
+
+    private void publishMutation(EconomyMutationType type, Currency currency, UUID... players) {
+        Bukkit.getPluginManager().callEvent(new EconomyMutationEvent(type, currency, Set.of(players)));
     }
 
     private void audit(String action, Object... payloadPairs) {

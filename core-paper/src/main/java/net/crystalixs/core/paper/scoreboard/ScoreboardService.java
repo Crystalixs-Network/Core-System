@@ -4,6 +4,11 @@ import net.crystalixs.celestial.api.Scoreboard;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.config.PaperConfig;
 import net.kyori.adventure.text.Component;
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.event.EventSubscription;
+import net.luckperms.api.event.user.UserDataRecalculateEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,15 +25,21 @@ import static net.kyori.adventure.text.Component.translatable;
 public final class ScoreboardService {
 
     private final Map<UUID, Scoreboard> activeBoards = new ConcurrentHashMap<>();
+    private final Map<UUID, Integer> lastRefresh = new ConcurrentHashMap<>();
 
     private final JavaPlugin plugin;
     private final StructuredLogger logger;
     private final PaperConfig config;
+    private final LuckPerms luckPerms;
+    private EventSubscription<UserDataRecalculateEvent> subscription;
 
     private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config) {
         this.plugin = plugin;
         this.logger = logger;
         this.config = config;
+        this.luckPerms = plugin.getServer().getPluginManager().getPlugin("LuckPerms") == null
+                ? null
+                : LuckPermsProvider.get();
     }
 
     public static ScoreboardService create(JavaPlugin plugin, StructuredLogger logger, PaperConfig config) {
@@ -39,8 +50,10 @@ public final class ScoreboardService {
     }
 
     public void display(Player player) {
-        remove(player); // Destroy previous scoreboard
-
+        if (!player.isOnline()) {
+            return;
+        }
+        remove(player);
         activeBoards.computeIfAbsent(player.getUniqueId(), ignored -> {
             Component title = resolveTitle();
             List<Component> lines = resolveLines();
@@ -61,11 +74,58 @@ public final class ScoreboardService {
         if (scoreboard != null) {
             scoreboard.destroy();
         }
+        lastRefresh.remove(player.getUniqueId());
     }
 
     public void shutdown() {
+        if (subscription != null) {
+            subscription.close();
+        }
         activeBoards.values().forEach(Scoreboard::destroy);
         activeBoards.clear();
+        lastRefresh.clear();
+    }
+
+    public void refreshIfActive(UUID uuid) {
+        if (uuid == null || !activeBoards.containsKey(uuid)) {
+            return;
+        }
+        Bukkit.getScheduler().runTask(plugin, () -> refresh(uuid));
+    }
+
+    public void refreshAllActive() {
+        Bukkit.getScheduler().runTask(plugin, () -> activeBoards.keySet().forEach(this::refresh));
+    }
+
+    public void subscribe() {
+        if (luckPerms == null || subscription != null) {
+            return;
+        }
+
+        subscription = luckPerms.getEventBus().subscribe(UserDataRecalculateEvent.class,
+                event -> {
+                    UUID uuid = event.getUser().getUniqueId();
+                    if (!activeBoards.containsKey(uuid)) {
+                        return;
+                    }
+
+                    int currentTick = plugin.getServer().getCurrentTick();
+                    Integer previousTick = lastRefresh.put(uuid, currentTick);
+                    if (previousTick != null && previousTick == currentTick) {
+                        return;
+                    }
+
+                    Bukkit.getScheduler().runTask(plugin, () -> refresh(uuid));
+                }
+        );
+    }
+
+    private void refresh(UUID uuid) {
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null || !player.isOnline() || !activeBoards.containsKey(uuid)) {
+            return;
+        }
+        display(player);
     }
 
     private Component resolveTitle() {
