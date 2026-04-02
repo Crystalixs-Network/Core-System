@@ -134,10 +134,16 @@ public final class ScoreboardService {
 
     private void refresh(UUID uuid) {
         Player player = Bukkit.getPlayer(uuid);
-        if (player == null || !player.isOnline() || !activeBoards.containsKey(uuid)) {
+        if (player == null || !player.isOnline()) {
             return;
         }
-        display(player);
+
+        Scoreboard scoreboard = activeBoards.get(uuid);
+        if (scoreboard == null) {
+            return;
+        }
+        scoreboard.updateTitle(resolveTitle());
+        scoreboard.updateLines(resolveLines());
     }
 
     private Component resolveTitle() {
