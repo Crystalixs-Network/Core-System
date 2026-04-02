@@ -4,6 +4,7 @@ import net.crystalixs.core.paper.command.util.InventorySeeService;
 import net.crystalixs.core.paper.command.util.SitService;
 import net.crystalixs.core.paper.command.util.VanishService;
 import net.crystalixs.core.paper.listener.*;
+import net.crystalixs.core.paper.scoreboard.ScoreboardService;
 import net.crystalixs.core.paper.tablist.TablistService;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -14,7 +15,8 @@ public final class PaperListenerBootstrap {
                          SitService sitService,
                          InventorySeeService inventorySeeService,
                          VanishService vanishService,
-                         TablistService tablistService
+                         TablistService tablistService,
+                         ScoreboardService scoreboardService
     ) {
         final PluginManager pluginManager = runtime.plugin().getServer().getPluginManager();
         final JavaPlugin plugin = runtime.plugin();
@@ -24,5 +26,8 @@ public final class PaperListenerBootstrap {
         pluginManager.registerEvents(new InventorySeeListener(inventorySeeService), plugin);
         pluginManager.registerEvents(new VanishListener(plugin, vanishService), plugin);
         if (tablistService != null) pluginManager.registerEvents(new TablistListener(plugin, tablistService), plugin);
+        if (scoreboardService != null) {
+            // Listener wiring follows in CR-133
+        }
     }
 }

@@ -64,9 +64,20 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
             tablistService.refreshAll();
         }
 
-        scoreboardService = ScoreboardService.create(runtime().plugin(), runtime().componentLogger("scoreboard"), configUpdater.current());
+        scoreboardService = ScoreboardService.create(
+                runtime().plugin(),
+                runtime().componentLogger("scoreboard"),
+                configUpdater.current()
+        );
+        listeners.register(
+                runtime(),
+                commands.sitService(),
+                commands.inventorySeeService(),
+                commands.vanishService(),
+                tablistService,
+                scoreboardService
+        );
 
-        listeners.register(runtime(), commands.sitService(), commands.inventorySeeService(), commands.vanishService(), tablistService);
         commands.registerCommands(configUpdater);
 
         if (configUpdater.current().isHotReloadingEnabled()) {
