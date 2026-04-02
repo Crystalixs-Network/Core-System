@@ -14,7 +14,6 @@ import net.crystalixs.core.paper.economy.EconomyService;
 import net.crystalixs.core.paper.home.DefaultHomeService;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.ignore.DefaultPlayerIgnoreService;
-import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -30,9 +29,6 @@ import static net.kyori.adventure.text.Component.translatable;
 public final class PaperCommandBootstrap {
 
     private final PaperPluginRuntime runtime;
-    private final PersistenceContext context;
-    private final EconomyService economyService;
-
     private final TrashService trashService;
     private final SitService sitService;
     private final PrivateMessageService messageService;
@@ -41,11 +37,10 @@ public final class PaperCommandBootstrap {
     private final VanishService vanishService;
     private PaperHelpCatalogTransport helpCatalogTransport;
     private BukkitTask helpCatalogRepublishTask;
+    private EconomyService economyService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
-        this.context = ((CorePlugin) runtime.plugin()).persistence();
-        this.economyService = new DefaultEconomyService(context.players(), context.transactions(), context.audits());
         this.trashService = new TrashService(runtime.plugin());
         this.sitService = new SitService(runtime.plugin());
         this.messageService = new PrivateMessageService();
@@ -65,6 +60,9 @@ public final class PaperCommandBootstrap {
                 .registerTo(commandManager);
 
         CorePlugin plugin = (CorePlugin) runtime.plugin();
+        var context = plugin.persistence();
+        economyService = new DefaultEconomyService(context.players(), context.transactions(), context.audits());
+
         var homeService = new DefaultHomeService(context.players(), context.homes());
         var homeGuiFactory = new HomeGuiFactory(plugin, homeService);
         var ignoreService = new DefaultPlayerIgnoreService(context.ignores());
