@@ -36,6 +36,7 @@ public final class ScoreboardService {
     private final ScoreboardPlaceholderResolver rankResolver;
     private final ScoreboardPlaceholderResolver coinsResolver;
     private final ScoreboardPlaceholderResolver gemsResolver;
+    private final ScoreboardPlaceholderResolver onlineResolver;
     private EventSubscription<UserDataRecalculateEvent> subscription;
 
     private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config, EconomyService service) {
@@ -48,8 +49,11 @@ public final class ScoreboardService {
         this.rankResolver = luckPerms == null
                 ? null
                 : new ScoreboardRankScoreboardPlaceholderResolver(luckPerms);
-        this.coinsResolver = new ScoreboardCoinsPlaceholderResolver((CorePlugin) plugin, service);
-        this.gemsResolver = new ScoreboardGemsPlaceholderResolver((CorePlugin) plugin, service);
+
+        CorePlugin core = (CorePlugin) plugin;
+        this.coinsResolver = new ScoreboardCoinsPlaceholderResolver(core, service);
+        this.gemsResolver = new ScoreboardGemsPlaceholderResolver(core, service);
+        this.onlineResolver = new ScoreboardOnlineCountPlaceholderResolver(core);
     }
 
     public static ScoreboardService create(JavaPlugin plugin, StructuredLogger logger, PaperConfig config, EconomyService service) {
@@ -189,7 +193,8 @@ public final class ScoreboardService {
                           .arguments(
                                   rankResolver.resolve(player),
                                   coinsResolver.resolve(player),
-                                  gemsResolver.resolve(player)
+                                  gemsResolver.resolve(player),
+                                  onlineResolver.resolve(player)
                           )
                 )
                 .collect(Collectors.toList());
