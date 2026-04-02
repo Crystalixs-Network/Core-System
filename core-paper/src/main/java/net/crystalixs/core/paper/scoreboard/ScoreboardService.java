@@ -99,7 +99,14 @@ public final class ScoreboardService {
     }
 
     public void refreshAllActive() {
-        Bukkit.getScheduler().runTask(plugin, () -> activeBoards.keySet().forEach(this::refresh));
+        Bukkit.getScheduler().runTask(plugin, () -> activeBoards.forEach((uuid, scoreboard) -> {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player == null || !player.isOnline()) {
+                return;
+            }
+            scoreboard.updateTitle(resolveTitle());
+            scoreboard.updateLines(resolveLines());
+        }));
     }
 
     public void subscribe() {
