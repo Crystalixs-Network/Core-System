@@ -1,6 +1,8 @@
 package net.crystalixs.core.paper.bootstrap;
 
 import net.crystalixs.core.common.bootstrap.AbstractPluginBootstrap;
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.paper.config.platform.PaperConfigHotReloadWatcher;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.tablist.TablistService;
 import net.crystalixs.core.persistence.api.PersistenceContext;
@@ -16,7 +18,9 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
     private final PaperTranslationBootstrap translations;
     private final PaperCommandBootstrap commands;
     private final PaperListenerBootstrap listeners;
+
     private PaperConfigUpdater configUpdater;
+    private PaperConfigHotReloadWatcher configWatcher;
     private PersistenceContext persistenceContext;
 
     private PaperPluginBootstrap(PaperPluginRuntime runtime, PaperConfigBootstrap config, PaperPersistenceBootstrap persistence, PaperTranslationBootstrap translations, PaperCommandBootstrap commands, PaperListenerBootstrap listeners) {
@@ -61,12 +65,36 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
         listeners.register(runtime(), commands.sitService(), commands.inventorySeeService(), commands.vanishService(), tablistService);
         commands.registerCommands(configUpdater);
 
+
+        if (configUpdater.current().isHotReloadingEnabled()) {
+            configWatcher = new PaperConfigHotReloadWatcher(
+                    runtime().componentLogger("config"),
+                    runtime().scheduler(),
+                    runtime().plugin().getDataPath().resolve("config.json"),
+                    1_000L,
+                    () -> {
+                        try {
+                            configUpdater.reload();
+                        } catch (Exception exception) {
+                            runtime().componentLogger("config").warn(
+                                    "config reload failed via hot-reloading",
+                                    LogMetadata.event("config.watch.reload_failed"),
+                                    exception);
+                        }
+                    }
+            );
+            configWatcher.start();
+        }
+
         InvUI.getInstance().setPlugin(runtime().plugin());
     }
 
     @Override
     protected void disableInternal() {
         try {
+            if (configWatcher != null) {
+                configWatcher.close();
+            }
             translations.close();
             commands.shutdown();
         } finally {
