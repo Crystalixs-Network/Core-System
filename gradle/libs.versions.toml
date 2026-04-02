@@ -18,7 +18,7 @@ sadu-mariadb = { group = "de.chojo.sadu", name = "sadu-mariadb", version.ref = "
 sadu-datasource = { group = "de.chojo.sadu", name = "sadu-datasource", version.ref = "sadu" }
 sadu-queries = { group = "de.chojo.sadu", name = "sadu-queries", version.ref = "sadu" }
 sadu-updater = { group = "de.chojo.sadu", name = "sadu-updater", version.ref = "sadu" }
-luckPerms-api = {group = "net.luckperms", name = "api", version = "5.4"}
+luckPerms-api = { group = "net.luckperms", name = "api", version = "5.4" }
 
 # Configuration
 configurate-hocon = { group = "org.spongepowered", name = "configurate-hocon", version.ref = "configurate" }
@@ -38,6 +38,7 @@ adventure-text-minimessage = { group = "net.kyori", name = "adventure-text-minim
 
 # UI
 invui = { group = "xyz.xenondevs.invui", name = "invui", version = "1.49" }
+celestial = { group = "net.crystalixs", name = "celestial-api", version = "1.0.1" }
 
 # Sync
 lettuce = { group = "io.lettuce", name = "lettuce-core", version = "7.5.0.RELEASE" }

@@ -11,6 +11,12 @@ allprojects {
         maven("https://repo.papermc.io/repository/maven-public/")
         maven("https://libraries.minecraft.net")
         maven("https://repo.xenondevs.xyz/releases")
+        maven("https://maven.pkg.github.com/Crystalixs-Network/Celestial") {
+            credentials {
+                username = (findProperty("gpr.user") as String?) ?: System.getenv("GITHUB_ACTOR")
+                password = (findProperty("gpr.key") as String?) ?: System.getenv("GITHUB_TOKEN")
+            }
+        }
     }
 }
 
