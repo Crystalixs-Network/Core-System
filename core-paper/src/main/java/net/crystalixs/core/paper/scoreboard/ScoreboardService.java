@@ -2,6 +2,7 @@ package net.crystalixs.core.paper.scoreboard;
 
 import net.crystalixs.celestial.api.Scoreboard;
 import net.crystalixs.core.common.logging.StructuredLogger;
+import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.config.PaperConfig;
 import net.crystalixs.core.paper.economy.EconomyService;
 import net.kyori.adventure.text.Component;
@@ -32,7 +33,7 @@ public final class ScoreboardService {
     private final StructuredLogger logger;
     private final PaperConfig config;
     private final LuckPerms luckPerms;
-    private final ScoreboardPlaceholderResolver rankResolver;
+    private final ScoreboardPlaceholderResolver rankResolver, coinsResolver;
     private EventSubscription<UserDataRecalculateEvent> subscription;
 
     private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config, EconomyService service) {
@@ -45,6 +46,7 @@ public final class ScoreboardService {
         this.rankResolver = luckPerms == null
                 ? null
                 : new ScoreboardRankScoreboardPlaceholderResolver(luckPerms);
+        this.coinsResolver = new ScoreboardCoinsPlaceholderResolver((CorePlugin) plugin, service);
     }
 
     public static ScoreboardService create(JavaPlugin plugin, StructuredLogger logger, PaperConfig config, EconomyService service) {
@@ -182,7 +184,8 @@ public final class ScoreboardService {
                         ? empty()
                         : translatable(line)
                           .arguments(
-                                  rankResolver.resolve(player)
+                                  rankResolver.resolve(player),
+                                  coinsResolver.resolve(player)
                           )
                 )
                 .collect(Collectors.toList());
