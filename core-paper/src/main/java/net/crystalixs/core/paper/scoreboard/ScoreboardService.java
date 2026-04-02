@@ -25,6 +25,7 @@ import static net.kyori.adventure.text.Component.translatable;
 public final class ScoreboardService {
 
     private final Map<UUID, Scoreboard> activeBoards = new ConcurrentHashMap<>();
+    private final Map<UUID, Integer> lastRefresh = new ConcurrentHashMap<>();
 
     private final JavaPlugin plugin;
     private final StructuredLogger logger;
@@ -73,6 +74,7 @@ public final class ScoreboardService {
         if (scoreboard != null) {
             scoreboard.destroy();
         }
+        lastRefresh.remove(player.getUniqueId());
     }
 
     public void shutdown() {
@@ -81,6 +83,7 @@ public final class ScoreboardService {
         }
         activeBoards.values().forEach(Scoreboard::destroy);
         activeBoards.clear();
+        lastRefresh.clear();
     }
 
     public void subscribe() {
@@ -88,9 +91,22 @@ public final class ScoreboardService {
             return;
         }
 
-        subscription = luckPerms.getEventBus().subscribe(
-                UserDataRecalculateEvent.class,
-                event -> Bukkit.getScheduler().runTask(plugin, () -> refresh(event.getUser().getUniqueId())));
+        subscription = luckPerms.getEventBus().subscribe(UserDataRecalculateEvent.class,
+                event -> {
+                    UUID uuid = event.getUser().getUniqueId();
+                    if (!activeBoards.containsKey(uuid)) {
+                        return;
+                    }
+
+                    int currentTick = plugin.getServer().getCurrentTick();
+                    Integer previousTick = lastRefresh.put(uuid, currentTick);
+                    if (previousTick != null && previousTick == currentTick) {
+                        return;
+                    }
+
+                    Bukkit.getScheduler().runTask(plugin, () -> refresh(uuid));
+                }
+        );
     }
 
     private void refresh(UUID uuid) {
