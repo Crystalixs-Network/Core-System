@@ -49,8 +49,10 @@ public final class ScoreboardService {
     }
 
     public void display(Player player) {
-        remove(player); // Destroy previous scoreboard
-
+        if (!player.isOnline()) {
+            return;
+        }
+        remove(player);
         activeBoards.computeIfAbsent(player.getUniqueId(), ignored -> {
             Component title = resolveTitle();
             List<Component> lines = resolveLines();
