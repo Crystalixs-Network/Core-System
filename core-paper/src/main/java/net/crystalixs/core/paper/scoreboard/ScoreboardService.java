@@ -59,19 +59,10 @@ public final class ScoreboardService {
 
         Scoreboard scoreboard = activeBoards.get(player.getUniqueId());
         if (scoreboard != null) {
-            scoreboard.updateTitle(title);
-            scoreboard.updateLines(lines);
+            updateScoreboard(scoreboard, title, lines);
             return;
         }
-
-        scoreboard = Scoreboard.sidebar()
-                .withPlayer(player)
-                .title(title)
-                .lines(lines)
-                .build();
-
-        scoreboard.display();
-        activeBoards.put(player.getUniqueId(), scoreboard);
+        createAndDisplay(player, title, lines);
     }
 
     public void remove(Player player) {
@@ -108,7 +99,7 @@ public final class ScoreboardService {
                 if (player == null || !player.isOnline()) {
                     return;
                 }
-                applyLayout(scoreboard, title, lines);
+                updateScoreboard(scoreboard, title, lines);
             });
         });
     }
@@ -146,10 +137,21 @@ public final class ScoreboardService {
         if (scoreboard == null) {
             return;
         }
-        applyLayout(scoreboard, resolveTitle(), resolveLines());
+        updateScoreboard(scoreboard, resolveTitle(), resolveLines());
     }
 
-    private void applyLayout(Scoreboard scoreboard, Component title, List<Component> lines) {
+    private void createAndDisplay(Player player, Component title, List<Component> lines) {
+        Scoreboard scoreboard = Scoreboard.sidebar()
+                .withPlayer(player)
+                .title(title)
+                .lines(lines)
+                .build();
+
+        scoreboard.display();
+        activeBoards.put(player.getUniqueId(), scoreboard);
+    }
+
+    private void updateScoreboard(Scoreboard scoreboard, Component title, List<Component> lines) {
         scoreboard.updateTitle(title);
         scoreboard.updateLines(lines);
     }
