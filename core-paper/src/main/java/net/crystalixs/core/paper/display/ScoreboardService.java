@@ -104,22 +104,20 @@ public final class ScoreboardService {
     }
 
     public void refreshAllActive() {
-        Bukkit.getScheduler().runTask(plugin, () -> {
-            activeBoards.forEach((uuid, scoreboard) -> {
-                Player player = Bukkit.getPlayer(uuid);
+        Bukkit.getScheduler().runTask(plugin, () -> activeBoards.forEach((uuid, scoreboard) -> {
+            Player player = Bukkit.getPlayer(uuid);
 
-                if (player == null || !player.isOnline()) {
-                    scoreboard.destroy();
-                    activeBoards.remove(uuid);
-                    lastRefresh.remove(uuid);
-                    return;
-                }
+            if (player == null || !player.isOnline()) {
+                scoreboard.destroy();
+                activeBoards.remove(uuid);
+                lastRefresh.remove(uuid);
+                return;
+            }
 
-                Component title = resolveTitle();
-                List<Component> lines = resolveLines(player);
-                updateScoreboard(scoreboard, title, lines);
-            });
-        });
+            Component title = resolveTitle();
+            List<Component> lines = resolveLines(player);
+            updateScoreboard(scoreboard, title, lines);
+        }));
     }
 
     public void subscribe() {
