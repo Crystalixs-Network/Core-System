@@ -19,11 +19,15 @@ public final class ScoreboardListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> service.display(event.getPlayer()), 1L);
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            service.display(event.getPlayer());
+            service.refreshAllActive();
+        }, 1L);
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         service.remove(event.getPlayer());
+        service.refreshAllActive();
     }
 }
