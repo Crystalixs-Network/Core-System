@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.configurate.hocon)
     implementation(libs.invui)
     implementation(libs.lettuce)
+    implementation(libs.celestial)
 }
 
 tasks {
@@ -28,6 +29,7 @@ tasks {
             libs.configurate.hocon to "configurate.hocon",
             libs.invui to "invui",
             libs.lettuce to "lettuce",
+            libs.celestial to "celestial",
         )
 
         val base = "$group.$artifact.paper.libs"
