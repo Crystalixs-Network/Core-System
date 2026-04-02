@@ -33,7 +33,9 @@ public final class ScoreboardService {
     private final StructuredLogger logger;
     private final PaperConfig config;
     private final LuckPerms luckPerms;
-    private final ScoreboardPlaceholderResolver rankResolver, coinsResolver, gemsResolver;
+    private final ScoreboardPlaceholderResolver rankResolver;
+    private final ScoreboardPlaceholderResolver coinsResolver;
+    private final ScoreboardPlaceholderResolver gemsResolver;
     private EventSubscription<UserDataRecalculateEvent> subscription;
 
     private ScoreboardService(JavaPlugin plugin, StructuredLogger logger, PaperConfig config, EconomyService service) {

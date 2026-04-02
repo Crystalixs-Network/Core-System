@@ -21,6 +21,10 @@ public final class ScoreboardRankScoreboardPlaceholderResolver implements Scoreb
 
     @Override
     public ComponentLike resolve(Player player) {
+        if (player == null || !player.isOnline()) {
+            return empty();
+        }
+
         User user = luckPerms.getPlayerAdapter(Player.class).getUser(player);
         QueryOptions options = user.getQueryOptions();
         CachedMetaData metaData = user.getCachedData().getMetaData(options);
