@@ -6,6 +6,7 @@ import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.config.PaperConfig;
 import net.crystalixs.core.paper.economy.EconomyService;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.event.EventSubscription;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static net.kyori.adventure.text.Component.empty;
@@ -26,6 +28,7 @@ import static net.kyori.adventure.text.Component.translatable;
 
 public final class ScoreboardService {
 
+    private static final Pattern UNRESOLVED_PLACEHOLDER_PATTERN = Pattern.compile("<[a-zA-Z0-9_]+>");
     private final Map<UUID, Scoreboard> activeBoards = new ConcurrentHashMap<>();
     private final Map<UUID, Integer> lastRefresh = new ConcurrentHashMap<>();
 
@@ -197,6 +200,21 @@ public final class ScoreboardService {
                                   onlineResolver.resolve(player)
                           )
                 )
+                .map(this::stripUnresolvedPlaceholders)
                 .collect(Collectors.toList());
+    }
+
+    private Component stripUnresolvedPlaceholders(Component component) {
+        Component cleaned = component;
+        if (component instanceof TextComponent textComponent) {
+            String sanitized = UNRESOLVED_PLACEHOLDER_PATTERN.matcher(textComponent.content()).replaceAll("");
+            cleaned = textComponent.content(sanitized);
+        }
+        if (!cleaned.children().isEmpty()) {
+            cleaned = cleaned.children(cleaned.children().stream()
+                    .map(this::stripUnresolvedPlaceholders)
+                    .collect(Collectors.toList()));
+        }
+        return cleaned;
     }
 }
