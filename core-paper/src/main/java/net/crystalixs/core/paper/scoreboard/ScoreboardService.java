@@ -1,8 +1,8 @@
 package net.crystalixs.core.paper.scoreboard;
 
+import net.crystalixs.celestial.api.Scoreboard;
 import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.config.PaperConfig;
-import net.crystalixy.celestial.api.Scoreboard;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
