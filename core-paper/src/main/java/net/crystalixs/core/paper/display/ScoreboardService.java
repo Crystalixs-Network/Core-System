@@ -1,7 +1,6 @@
 package net.crystalixs.core.paper.display;
 
 import net.crystalixs.celestial.api.Scoreboard;
-import net.crystalixs.core.common.logging.StructuredLogger;
 import net.crystalixs.core.paper.CorePlugin;
 import net.crystalixs.core.paper.config.PaperConfig;
 import net.crystalixs.core.paper.economy.EconomyService;
@@ -57,7 +56,7 @@ public final class ScoreboardService {
         this.onlineResolver = new ScoreboardOnlineCountPlaceholderResolver(core);
     }
 
-    public static ScoreboardService create(JavaPlugin plugin, StructuredLogger logger, PaperConfig config, EconomyService service) {
+    public static ScoreboardService create(JavaPlugin plugin, PaperConfig config, EconomyService service) {
         if (config == null || config.scoreboard() == null) {
             return null;
         }

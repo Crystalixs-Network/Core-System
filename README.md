@@ -18,6 +18,7 @@
 | Home-System           | Backend        | Verwaltet Homes inklusive GUI, Umbenennen per Amboss und Icon-Auswahl mit Persistenz.                            |
 | Ignore-System         | Backend        | Verwaltet Ignore-Beziehungen zwischen Spielern und blockiert direkte Interaktionen inkl. `unignore`-Vorschlägen. |
 | Utility Commands      | Backend        | Stellt QoL-Commands wie Hat, Enderchest, Trash, Sit, Sign, Skull, Invsee, Vanish und Teleport bereit.            |
+| Displays              | Backend        | Zeigt einen Rang-Prefix und ein Scoreboard mit den wichtigsten Informationen für den Spieler an.                 |
 
 ---
 <br>
@@ -72,7 +73,7 @@ Unterstützt werden Reloads für:
 
 Wenn Hot-Reloading in der Config aktiv ist, können Sprachdateien zusätzlich automatisch neu eingelesen werden.
 
-### Unified Help (Proxy + Backend)
+### Unified Help
 
 Das Help-Menü aggregiert Befehle aus Velocity und den angebundenen Paper-Backends. Der Funktionsumfang umfasst:
 
@@ -88,7 +89,7 @@ Wichtige Voraussetzung:
 
 - `core-paper/config.json` → `redis-sync.backend-id` muss exakt dem Velocity-Servernamen entsprechen (z. B. `lobby-1`), sonst werden Backend-Befehle nicht dem richtigen Server zugeordnet.
 
-### Economy (Paper)
+### Economy
 
 Das Paper-Modul enthält ein Economy-System für Coins und Gems inklusive Transaktionen und Audit-Logging.
 
@@ -100,7 +101,7 @@ Enthalten sind:
 - Zahlendarstellung basierend auf der aufgelösten Translation-Locale
 - Silent logging
 
-### Home-System (Paper)
+### Home-System
 
 Das Paper-Modul enthält ein Home-System mit Command- und GUI-Flow.
 
@@ -112,7 +113,7 @@ Enthalten sind:
 - Icon-Auswahl pro Home mit persistenter Speicherung
 - Strukturierte Logs für Home-Operationen
 
-### Ignore-System (Paper)
+### Ignore-System
 
 Das Paper-Modul enthält ein Ignore-System auf Basis von Spieler-zu-Spieler-Beziehungen.
 
@@ -125,6 +126,19 @@ Enthalten sind:
 - Blockieren eingehender Interaktionen für ignorierende Spieler bei privaten Nachrichten (`/message`, `/reply`)
 - Blockieren eingehender Interaktionen für ignorierende Spieler bei Coin-Transfers (`/pay`)
 - Blockieren eingehender Interaktionen für ignorierende Spieler bei Teleport-Requests (`/tpa`, `/tpahere`)
+
+### Displays
+
+Das Display-Feature rendert Rang- und Wirtschaftsinformationen in Tablist und Sidebar-Scoreboard. Das Layout ist über die `config.json`-Datei konfigurierbar.
+In dieser sind Leerzeilen als leere Texte dargestellt. Zeilen mit Inhalt haben ihren Translation-Key als Wert, welcher wiederum in dem Message-Bundle registriert
+und konfiguriert werden kann.
+
+Voraussetzung: LuckPerms
+
+- LuckPerms muss auf dem Backend-Server installiert, aktiv und mittels einer Datenbank mit LuckPerms auf dem Proxy synchronisiert sein.
+- Gruppen müssen folgende zwei Attribute besitzen:
+- `prefix`: Wird für die Darstellung in der Tablist bzw. im Overhead benötigt.
+- Metadaten-Attribut `displayname`: Wird für die Anzeige in der Sidebar verwendet. Kann abweichend zum Prefix sein.
 
 ### Logging im Hintergrund
 

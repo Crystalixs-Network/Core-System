@@ -62,18 +62,21 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
         if (tablistService != null) {
             tablistService.subscribe();
             tablistService.refreshAll();
+        } else {
+            runtime().componentLogger("display").warn(
+                    "tablist service disabled due to missing dependency or setup",
+                    LogMetadata.event("display.tablist.disabled"));
         }
 
         commands.registerCommands(configUpdater);
+        scoreboardService = ScoreboardService.create(runtime().plugin(), configUpdater.current(), commands.economyService());
 
-        scoreboardService = ScoreboardService.create(
-                runtime().plugin(),
-                runtime().componentLogger("scoreboard"),
-                configUpdater.current(),
-                commands.economyService()
-        );
         if (scoreboardService != null) {
             scoreboardService.subscribe();
+        } else {
+            runtime().componentLogger("display").warn(
+                    "scoreboard service disabled because scoreboard config is missing",
+                    LogMetadata.event("display.scoreboard.disabled"));
         }
 
         listeners.register(
