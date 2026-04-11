@@ -70,16 +70,13 @@ public final class VelocityPluginBootstrap extends AbstractPluginBootstrap<Veloc
     protected void disableInternal() {
         VelocityPluginRuntime runtime = runtime();
         try {
-            if (translationBootstrap != null) {
-                translationBootstrap.close();
-            }
+            if (translationBootstrap != null) translationBootstrap.close();
+            if (persistenceContext != null) persistenceContext.playerSettings().resetAllVanishFlags();
         } finally {
             try {
                 listenerBootstrap.close();
             } finally {
-                if (persistenceContext != null) {
-                    persistenceContext.close();
-                }
+                if (persistenceContext != null) persistenceContext.close();
                 configBootstrap.save(runtime, configUpdater);
             }
         }
