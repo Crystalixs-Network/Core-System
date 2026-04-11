@@ -36,7 +36,7 @@ public final class PaperCommandBootstrap {
     private final PrivateMessageService messageService;
     private final TeleportRequestService teleportService;
     private final InventorySeeService inventorySeeService;
-    private final VanishService vanishService;
+    private VanishService vanishService;
     private PaperHelpCatalogTransport helpCatalogTransport;
     private BukkitTask helpCatalogRepublishTask;
     private EconomyService economyService;
@@ -49,7 +49,6 @@ public final class PaperCommandBootstrap {
         this.messageService = new PrivateMessageService();
         this.teleportService = new TeleportRequestService(runtime.plugin());
         this.inventorySeeService = new InventorySeeService(runtime.componentLogger("commands").child("invsee"));
-        this.vanishService = new VanishService(runtime.plugin());
     }
 
     public void registerCommands(PaperConfigUpdater configUpdater) {
@@ -64,8 +63,10 @@ public final class PaperCommandBootstrap {
 
         var plugin = (CorePlugin) runtime.plugin();
         var context = plugin.persistence();
+
         economyService = new DefaultEconomyService(context.players(), context.transactions(), context.audits());
         settingService = new DefaultSettingService(context.playerSettings());
+        vanishService = new VanishService(runtime.plugin(), settingService);
 
         var homeService = new DefaultHomeService(context.players(), context.homes());
         var homeGuiFactory = new HomeGuiFactory(plugin, homeService);
