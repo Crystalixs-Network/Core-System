@@ -11,4 +11,6 @@ public interface PlayerSettingStore {
 
     void updateVanishFlag(UUID playerId, boolean isVanished);
 
+    void resetAllVanishFlags();
+
 }
