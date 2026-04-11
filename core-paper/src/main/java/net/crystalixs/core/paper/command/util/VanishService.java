@@ -1,5 +1,6 @@
 package net.crystalixs.core.paper.command.util;
 
+import net.crystalixs.core.paper.setting.PlayerSettingService;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -11,10 +12,12 @@ import java.util.UUID;
 public final class VanishService {
 
     private final Plugin plugin;
+    private final PlayerSettingService service;
     private final Set<UUID> vanishedPlayers = new HashSet<>();
 
-    public VanishService(Plugin plugin) {
+    public VanishService(Plugin plugin, PlayerSettingService service) {
         this.plugin = plugin;
+        this.service = service;
     }
 
     public boolean isVanished(Player player) {
@@ -34,6 +37,7 @@ public final class VanishService {
         if (isVanished(target)) return;
 
         vanishedPlayers.add(target.getUniqueId());
+        service.updateVanishSetting(target.getUniqueId(), true);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (online.equals(target)) continue;
@@ -53,6 +57,7 @@ public final class VanishService {
         if (!isVanished(target)) return;
 
         vanishedPlayers.remove(target.getUniqueId());
+        service.updateVanishSetting(target.getUniqueId(), false);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.showPlayer(plugin, target);
