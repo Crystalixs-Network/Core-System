@@ -322,6 +322,7 @@ Danach ergänzt `prepare-commit-msg` Commit-Messages automatisch um:
 
 - `Refers to: CR-<id>` (id aus Branchname zb. feature/CR-123)
 - `Time-Spent: <time>` (z.B. 1h 20m)
+- Die Zeit basiert auf dem Bearbeitungsfenster der gestagten Dateien (früheste bis späteste Änderung) und reduziert dadurch Idle-Zeit zwischen letzter Aktivität und Commit.
 
 `post-commit` setzt den Startzeitpunkt für den nächsten Commit.
 
