@@ -3,6 +3,7 @@ package net.crystalixs.core.velocity.bootstrap;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.crystalixs.core.common.bootstrap.AbstractPluginBootstrap;
+import net.crystalixs.core.common.logging.LogMetadata;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import net.crystalixs.core.persistence.api.PersistenceContextFactory;
 import net.crystalixs.core.persistence.config.DatabaseCredentials;
@@ -71,7 +72,15 @@ public final class VelocityPluginBootstrap extends AbstractPluginBootstrap<Veloc
         VelocityPluginRuntime runtime = runtime();
         try {
             if (translationBootstrap != null) translationBootstrap.close();
-            if (persistenceContext != null) persistenceContext.playerSettings().resetAllVanishFlags();
+            if (persistenceContext != null) {
+                try {
+                    persistenceContext.playerSettings().resetAllVanishFlags();
+                } catch (RuntimeException exception) {
+                    runtime.componentLogger("shutdown").warn(
+                            "failed to reset persisted vanish flags during proxy shutdown",
+                            LogMetadata.event("velocity.shutdown.vanish_reset.failed"), exception);
+                }
+            }
         } finally {
             try {
                 listenerBootstrap.close();
