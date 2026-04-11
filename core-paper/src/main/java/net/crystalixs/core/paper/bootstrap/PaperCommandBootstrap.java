@@ -66,7 +66,7 @@ public final class PaperCommandBootstrap {
 
         economyService = new DefaultEconomyService(context.players(), context.transactions(), context.audits());
         settingService = new DefaultSettingService(context.playerSettings());
-        vanishService = new VanishService(runtime.plugin(), settingService);
+        vanishService = new VanishService(runtime.plugin(), settingService, runtime.componentLogger("vanish"));
 
         var homeService = new DefaultHomeService(context.players(), context.homes());
         var homeGuiFactory = new HomeGuiFactory(plugin, homeService);
