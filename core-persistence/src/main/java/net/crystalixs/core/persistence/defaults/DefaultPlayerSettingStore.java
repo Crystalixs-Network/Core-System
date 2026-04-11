@@ -63,6 +63,24 @@ public final class DefaultPlayerSettingStore implements PlayerSettingStore {
         }
     }
 
+    @Override
+    public void resetAllVanishFlags() {
+        try {
+            int changed = config.query("UPDATE player_setting SET is_vanished = FALSE WHERE is_vanished = TRUE;")
+                    .single()
+                    .update()
+                    .rows();
+
+            logger.info("persistence.player_setting.reset_all_vanish.success", LogMetadata
+                    .event("persistence.player_setting.reset_all_vanish.success")
+                    .and(LogMetadata.Key.STATE, "disabled")
+                    .and(LogMetadata.Key.ENTRIES, changed));
+
+        } catch (RuntimeException exception) {
+            throw failure("persistence.player_setting.reset_all_vanish.failed", null, "Could not reset vanish flags", exception);
+        }
+    }
+
     private PersistenceException failure(String event, UUID playerId, String message, RuntimeException exception) {
         logger.warn(event, LogMetadata
                 .event(event)

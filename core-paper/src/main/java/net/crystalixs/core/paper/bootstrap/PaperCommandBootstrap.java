@@ -14,6 +14,8 @@ import net.crystalixs.core.paper.economy.EconomyService;
 import net.crystalixs.core.paper.home.DefaultHomeService;
 import net.crystalixs.core.paper.home.HomeGuiFactory;
 import net.crystalixs.core.paper.ignore.DefaultPlayerIgnoreService;
+import net.crystalixs.core.paper.setting.DefaultSettingService;
+import net.crystalixs.core.paper.setting.PlayerSettingService;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
@@ -34,10 +36,11 @@ public final class PaperCommandBootstrap {
     private final PrivateMessageService messageService;
     private final TeleportRequestService teleportService;
     private final InventorySeeService inventorySeeService;
-    private final VanishService vanishService;
+    private VanishService vanishService;
     private PaperHelpCatalogTransport helpCatalogTransport;
     private BukkitTask helpCatalogRepublishTask;
     private EconomyService economyService;
+    private PlayerSettingService settingService;
 
     public PaperCommandBootstrap(PaperPluginRuntime runtime) {
         this.runtime = runtime;
@@ -46,7 +49,6 @@ public final class PaperCommandBootstrap {
         this.messageService = new PrivateMessageService();
         this.teleportService = new TeleportRequestService(runtime.plugin());
         this.inventorySeeService = new InventorySeeService(runtime.componentLogger("commands").child("invsee"));
-        this.vanishService = new VanishService(runtime.plugin());
     }
 
     public void registerCommands(PaperConfigUpdater configUpdater) {
@@ -59,9 +61,12 @@ public final class PaperCommandBootstrap {
                 .defaultHandlers()
                 .registerTo(commandManager);
 
-        CorePlugin plugin = (CorePlugin) runtime.plugin();
+        var plugin = (CorePlugin) runtime.plugin();
         var context = plugin.persistence();
+
         economyService = new DefaultEconomyService(context.players(), context.transactions(), context.audits());
+        settingService = new DefaultSettingService(context.playerSettings());
+        vanishService = new VanishService(runtime.plugin(), settingService, runtime.componentLogger("vanish"));
 
         var homeService = new DefaultHomeService(context.players(), context.homes());
         var homeGuiFactory = new HomeGuiFactory(plugin, homeService);
@@ -132,6 +137,10 @@ public final class PaperCommandBootstrap {
 
     public EconomyService economyService() {
         return economyService;
+    }
+
+    public PlayerSettingService settingService() {
+        return settingService;
     }
 
     public SitService sitService() {

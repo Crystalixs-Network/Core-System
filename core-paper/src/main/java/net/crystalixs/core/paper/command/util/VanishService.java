@@ -1,5 +1,8 @@
 package net.crystalixs.core.paper.command.util;
 
+import net.crystalixs.core.common.logging.LogMetadata;
+import net.crystalixs.core.common.logging.StructuredLogger;
+import net.crystalixs.core.paper.setting.PlayerSettingService;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -10,11 +13,16 @@ import java.util.UUID;
 
 public final class VanishService {
 
-    private final Plugin plugin;
     private final Set<UUID> vanishedPlayers = new HashSet<>();
 
-    public VanishService(Plugin plugin) {
+    private final Plugin plugin;
+    private final PlayerSettingService service;
+    private final StructuredLogger logger;
+
+    public VanishService(Plugin plugin, PlayerSettingService service, StructuredLogger logger) {
         this.plugin = plugin;
+        this.service = service;
+        this.logger = logger;
     }
 
     public boolean isVanished(Player player) {
@@ -34,6 +42,10 @@ public final class VanishService {
         if (isVanished(target)) return;
 
         vanishedPlayers.add(target.getUniqueId());
+        service.updateVanishSetting(target.getUniqueId(), true);
+        logger.info("vanish.status.enabled", LogMetadata
+                .event("vanish.status.enabled")
+                .and(LogMetadata.Key.SUBJECT, target.getUniqueId()));
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (online.equals(target)) continue;
@@ -53,6 +65,10 @@ public final class VanishService {
         if (!isVanished(target)) return;
 
         vanishedPlayers.remove(target.getUniqueId());
+        service.updateVanishSetting(target.getUniqueId(), false);
+        logger.info("vanish.status.disabled", LogMetadata
+                .event("vanish.status.disabled")
+                .and(LogMetadata.Key.SUBJECT, target.getUniqueId()));
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.showPlayer(plugin, target);

@@ -140,6 +140,11 @@ Voraussetzung: LuckPerms
 - `prefix`: Wird für die Darstellung in der Tablist bzw. im Overhead benötigt.
 - Metadaten-Attribut `displayname`: Wird für die Anzeige in der Sidebar verwendet. Kann abweichend zum Prefix sein.
 
+### Vanish-Lifecycle (Rejoin / Restart / Serverwechsel)
+
+Die Vanish-Flag für einen Spieler bleibt über einen Serverwechsel und Rejoin hinweg erhalten. Wird der Proxy gestoppt, so werden alle Vanish-Flags zurückgesetzt, sodass
+über einen Restart hinweg kein Spieler im Vanish-Modus verbleiben kann.
+
 ### Logging im Hintergrund
 
 Das Projekt bringt strukturiertes Logging mit, damit wichtige Admin-Aktionen und Fehler nachvollziehbar bleiben. Die Details dazu stehen in `LOGGING.md`.
