@@ -13,6 +13,7 @@ dependencies {
     compileOnly(libs.brigadier)
 
     implementation(project(":core-common"))
+    implementation(project(":core-persistence"))
     implementation(libs.bundles.cloudVelocity)
     implementation(libs.lettuce)
 }
