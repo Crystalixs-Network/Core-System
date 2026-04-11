@@ -37,6 +37,7 @@ public final class VanishService {
         if (isVanished(target)) return;
 
         vanishedPlayers.add(target.getUniqueId());
+        service.updateVanishSetting(target.getUniqueId(), true);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             if (online.equals(target)) continue;
@@ -56,6 +57,7 @@ public final class VanishService {
         if (!isVanished(target)) return;
 
         vanishedPlayers.remove(target.getUniqueId());
+        service.updateVanishSetting(target.getUniqueId(), false);
 
         for (Player online : Bukkit.getOnlinePlayers()) {
             online.showPlayer(plugin, target);
