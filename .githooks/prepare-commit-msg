@@ -26,6 +26,25 @@ fi
 state_file="${git_dir}/.time-tracker-start-epoch"
 now_epoch="$(date +%s)"
 
+get_file_mtime_epoch() {
+  local file_path="$1"
+  local value=""
+
+  value="$(stat -c %Y "${file_path}" 2>/dev/null || true)"
+  if [[ "${value}" =~ ^[0-9]+$ ]]; then
+    printf '%s\n' "${value}"
+    return 0
+  fi
+
+  value="$(stat -f %m "${file_path}" 2>/dev/null || true)"
+  if [[ "${value}" =~ ^[0-9]+$ ]]; then
+    printf '%s\n' "${value}"
+    return 0
+  fi
+
+  return 1
+}
+
 start_epoch=""
 if [[ -f "${state_file}" ]]; then
   start_epoch="$(tr -d '\r\n' < "${state_file}")"
@@ -43,7 +62,44 @@ if (( start_epoch > now_epoch )); then
   start_epoch="${now_epoch}"
 fi
 
-delta_seconds=$(( now_epoch - start_epoch ))
+activity_start_epoch=""
+activity_end_epoch=""
+while IFS= read -r staged_path; do
+  if [[ -z "${staged_path}" || ! -e "${staged_path}" ]]; then
+    continue
+  fi
+
+  file_mtime_epoch="$(get_file_mtime_epoch "${staged_path}" || true)"
+  if [[ ! "${file_mtime_epoch}" =~ ^[0-9]+$ ]]; then
+    continue
+  fi
+
+  if [[ -z "${activity_start_epoch}" || file_mtime_epoch -lt activity_start_epoch ]]; then
+    activity_start_epoch="${file_mtime_epoch}"
+  fi
+  if [[ -z "${activity_end_epoch}" || file_mtime_epoch -gt activity_end_epoch ]]; then
+    activity_end_epoch="${file_mtime_epoch}"
+  fi
+done < <(git diff --cached --name-only --diff-filter=ACMR)
+
+if [[ "${activity_start_epoch}" =~ ^[0-9]+$ ]]; then
+  if (( activity_start_epoch > start_epoch )); then
+    start_epoch="${activity_start_epoch}"
+  fi
+fi
+
+end_epoch="${now_epoch}"
+if [[ "${activity_end_epoch}" =~ ^[0-9]+$ ]]; then
+  if (( activity_end_epoch < end_epoch )); then
+    end_epoch="${activity_end_epoch}"
+  fi
+fi
+
+if (( end_epoch < start_epoch )); then
+  end_epoch="${start_epoch}"
+fi
+
+delta_seconds=$(( end_epoch - start_epoch ))
 minutes=$(( (delta_seconds + 59) / 60 ))
 
 if (( minutes < 1 )); then
