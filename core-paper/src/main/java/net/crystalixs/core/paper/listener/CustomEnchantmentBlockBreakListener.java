@@ -15,12 +15,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class CustomEnchantmentBlockBreakListener implements Listener {
 
-    private final JavaPlugin plugin;
     private final CustomEnchantmentRegistry registry;
     private final CustomEnchantmentKeys keys;
 
     public CustomEnchantmentBlockBreakListener(JavaPlugin plugin, CustomEnchantmentRegistry registry) {
-        this.plugin = plugin;
         this.registry = registry;
         this.keys = new CustomEnchantmentKeys(plugin);
     }
