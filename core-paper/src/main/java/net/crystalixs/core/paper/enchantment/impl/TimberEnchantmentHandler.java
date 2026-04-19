@@ -22,15 +22,13 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler 
     @Override
     public void handle(BreakingBlocksEnchantmentContext context, int level) {
         Block origin = context.block();
-        if (!Tag.LOGS.isTagged(origin.getType())) {
-            return;
-        }
+
+        if (!Tag.ITEMS_AXES.isTagged(context.tool().getType())) return;
+        if (!Tag.LOGS.isTagged(origin.getType())) return;
 
         Set<Block> connectedLogs = connectedLogs(origin);
         int requiredLevel = requiredLevel(origin, connectedLogs);
-        if (level < requiredLevel) {
-            return;
-        }
+        if (level < requiredLevel) return;
 
         for (Block block : connectedLogs) {
             if (block.equals(origin)) continue;
