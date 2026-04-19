@@ -13,8 +13,6 @@ import java.util.Set;
 
 public final class LeafMiningEnchantmentHandler implements CustomEnchantmentHandler {
 
-    private static final int MAX_BLOCKS = 1024;
-
     @Override
     public String enchantment() {
         return "leaf_miner";
@@ -49,7 +47,7 @@ public final class LeafMiningEnchantmentHandler implements CustomEnchantmentHand
         visited.add(origin);
         queue.add(origin);
 
-        while (!queue.isEmpty() && visited.size() < Math.min(cap, MAX_BLOCKS)) {
+        while (!queue.isEmpty() && visited.size() < cap) {
             Block current = queue.poll();
             for (int dx = -1; dx <= 1; dx++) {
                 for (int dy = -1; dy <= 1; dy++) {
