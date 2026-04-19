@@ -2,6 +2,7 @@ package net.crystalixs.core.paper.enchantment;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class CustomEnchantmentRegistry {
@@ -15,5 +16,9 @@ public final class CustomEnchantmentRegistry {
     public CustomEnchantmentHandler find(String enchantment) {
         if (enchantment == null) return null;
         return handlers.get(enchantment.toLowerCase());
+    }
+
+    public Collection<CustomEnchantmentHandler> handlers() {
+        return List.copyOf(handlers.values());
     }
 }
