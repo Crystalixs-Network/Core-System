@@ -6,6 +6,7 @@ import net.crystalixs.core.paper.enchantment.CustomEnchantmentRegistry;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
@@ -23,7 +24,7 @@ public class CustomEnchantmentBlockBreakListener implements Listener {
         this.keys = new CustomEnchantmentKeys(plugin);
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Player player = event.getPlayer();
         ItemStack tool = player.getInventory().getItemInMainHand();
