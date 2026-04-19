@@ -5,6 +5,7 @@ import net.crystalixs.core.paper.command.util.SitService;
 import net.crystalixs.core.paper.command.util.VanishService;
 import net.crystalixs.core.paper.display.ScoreboardService;
 import net.crystalixs.core.paper.display.TablistService;
+import net.crystalixs.core.paper.enchantment.CustomEnchantmentRegistry;
 import net.crystalixs.core.paper.listener.*;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -15,6 +16,7 @@ public final class PaperListenerBootstrap {
                          SitService sitService,
                          InventorySeeService inventorySeeService,
                          VanishService vanishService,
+                         CustomEnchantmentRegistry enchantmentRegistry,
                          TablistService tablistService,
                          ScoreboardService scoreboardService
     ) {
