@@ -1,6 +1,7 @@
 package net.crystalixs.core.paper.listener;
 
 import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
+import net.crystalixs.core.paper.enchantment.CustomEnchantmentKeys;
 import net.crystalixs.core.paper.enchantment.CustomEnchantmentRegistry;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
@@ -16,10 +17,12 @@ public class CustomEnchantmentBlockBreakListener implements Listener {
 
     private final JavaPlugin plugin;
     private final CustomEnchantmentRegistry registry;
+    private final CustomEnchantmentKeys keys;
 
     public CustomEnchantmentBlockBreakListener(JavaPlugin plugin, CustomEnchantmentRegistry registry) {
         this.plugin = plugin;
         this.registry = registry;
+        this.keys = new CustomEnchantmentKeys(plugin);
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -32,7 +35,7 @@ public class CustomEnchantmentBlockBreakListener implements Listener {
         if (itemMeta == null) return;
 
         registry.handlers().forEach(handler -> {
-            NamespacedKey key = new NamespacedKey(plugin, "enchantment_" + handler.enchantment() + "_level");
+            NamespacedKey key = keys.levelKey(handler.enchantment());
             Integer level = itemMeta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
             if (level == null || level < 1) return;
 
