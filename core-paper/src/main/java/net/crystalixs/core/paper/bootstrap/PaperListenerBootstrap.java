@@ -27,6 +27,7 @@ public final class PaperListenerBootstrap {
         pluginManager.registerEvents(new HomeRenameAnvilListener(plugin), plugin);
         pluginManager.registerEvents(new InventorySeeListener(inventorySeeService), plugin);
         pluginManager.registerEvents(new VanishListener(plugin, vanishService), plugin);
+        pluginManager.registerEvents(new CustomEnchantmentBlockBreakListener(plugin, enchantmentRegistry), plugin);
         if (tablistService != null) pluginManager.registerEvents(new TablistListener(plugin, tablistService), plugin);
         if (scoreboardService != null) pluginManager.registerEvents(new ScoreboardListener(plugin, scoreboardService), plugin);
     }
