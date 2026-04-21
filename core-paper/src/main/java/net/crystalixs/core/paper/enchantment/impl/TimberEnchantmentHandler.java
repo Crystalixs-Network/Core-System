@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
-import net.crystalixs.core.paper.enchantment.CustomEnchantmentHandler;
+import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
 import net.crystalixs.core.paper.util.BlockFloodFill;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -9,17 +9,17 @@ import org.bukkit.block.Block;
 
 import java.util.Set;
 
-public final class TimberEnchantmentHandler implements CustomEnchantmentHandler, BlockFloodFill {
+public final class TimberEnchantmentHandler implements CustomEnchantment, BlockFloodFill {
 
     private static final int MAX_TREE_BLOCKS = 512;
 
     @Override
-    public String enchantment() {
+    public String id() {
         return "timber";
     }
 
     @Override
-    public void handle(BreakingBlocksEnchantmentContext context, int level) {
+    public void onBlockBreak(BreakingBlocksEnchantmentContext context, int level) {
         Block origin = context.block();
 
         if (!Tag.ITEMS_AXES.isTagged(context.tool().getType())) return;

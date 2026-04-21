@@ -1,22 +1,22 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
-import net.crystalixs.core.paper.enchantment.CustomEnchantmentHandler;
+import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 
-public final class WoodWhisperEnchantmentHandler implements CustomEnchantmentHandler {
+public final class WoodWhisperEnchantmentHandler implements CustomEnchantment {
 
     @Override
-    public String enchantment() {
+    public String id() {
         return "wood_whisper";
     }
 
     @Override
-    public void handle(BreakingBlocksEnchantmentContext context, int level) {
+    public void onBlockBreak(BreakingBlocksEnchantmentContext context, int level) {
         Block block = context.block();
 
         if (!Tag.ITEMS_AXES.isTagged(context.tool().getType())) return;

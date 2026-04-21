@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
-import net.crystalixs.core.paper.enchantment.CustomEnchantmentHandler;
+import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
 import net.crystalixs.core.paper.util.BlockFloodFill;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -10,16 +10,15 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Set;
 
-public final class LeafMiningEnchantmentHandler implements CustomEnchantmentHandler, BlockFloodFill {
-
+public final class LeafMiningEnchantmentHandler implements CustomEnchantment, BlockFloodFill {
 
     @Override
-    public String enchantment() {
+    public String id() {
         return "leaf_mining";
     }
 
     @Override
-    public void handle(BreakingBlocksEnchantmentContext context, int level) {
+    public void onBlockBreak(BreakingBlocksEnchantmentContext context, int level) {
         Block origin = context.block();
         if (!isShears(context.tool())) return;
         if (!matches(origin)) return;
