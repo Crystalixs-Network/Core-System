@@ -2,6 +2,7 @@ import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     alias(libs.plugins.bukkitConvention)
+    alias(libs.plugins.paperConvention)
     alias(libs.plugins.runPaper)
     alias(libs.plugins.shadow)
 }
@@ -55,6 +56,17 @@ tasks {
         name = rootProject.property("plugin-name") as String
         authors = project.pluginAuthors()
         apiVersion = "1.21"
+    }
+
+    paperPluginYaml {
+        val mainClass = project.minecraftPluginMainClass()
+        val bootstrapperClass = project.minecraftPluginBootstrapperClass()
+
+        main = "$group.$artifact.paper.$mainClass"
+        name = rootProject.property("plugin-name") as String
+        authors = project.pluginAuthors()
+        apiVersion = "1.21.11"
+        bootstrapper = "$group.$artifact.paper.$bootstrapperClass"
     }
 
 
