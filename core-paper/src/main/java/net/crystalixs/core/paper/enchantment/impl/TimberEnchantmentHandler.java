@@ -30,6 +30,11 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler 
         int requiredLevel = requiredLevel(origin, connectedLogs);
         if (level < requiredLevel) return;
 
+        // Natürlichen Drop ignorieren.
+        // Mehr Informationen dazu sind in WoodWhisperEnchantmentHandler
+        // beim Multiplikator zu finden.
+        context.block().getDrops().clear();
+
         for (Block block : connectedLogs) {
             if (block.equals(origin)) continue;
             block.breakNaturally(context.tool(), true);

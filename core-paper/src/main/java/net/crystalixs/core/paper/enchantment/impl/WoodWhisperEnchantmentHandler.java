@@ -26,7 +26,10 @@ public final class WoodWhisperEnchantmentHandler implements CustomEnchantmentHan
         int multiplier = multiplier(level);
         Collection<ItemStack> drops = block.getDrops(context.tool(), context.player());
 
-        for (int i = 0; i < multiplier; i++) {
+        // Der Multiplikator wird durch die Funktion f(x) ↦ 2x+1 berechnet.
+        // Damit die Anzahl an finalen Drops korrekt ist, muss ein Drop entfernt
+        // werden, da der natürlich auftretende Drop berücksichtigt werden muss.
+        for (int i = 0; i < multiplier - 1; i++) {
             for (ItemStack drop : drops) {
                 block.getWorld().dropItemNaturally(block.getLocation(), drop.clone());
             }
