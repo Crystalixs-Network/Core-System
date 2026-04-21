@@ -1,6 +1,4 @@
-package net.crystalixs.core.paper.enchantment.model;
-
-import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
+package net.crystalixs.core.paper.enchantment;
 
 public interface CustomEnchantment {
 

@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
-import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
+import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;

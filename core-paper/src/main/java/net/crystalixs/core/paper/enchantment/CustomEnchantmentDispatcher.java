@@ -1,8 +1,5 @@
 package net.crystalixs.core.paper.enchantment;
 
-import net.crystalixs.core.paper.enchantment.model.ActiveCustomEnchantment;
-import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
-
 import java.util.List;
 
 public final class CustomEnchantmentDispatcher {

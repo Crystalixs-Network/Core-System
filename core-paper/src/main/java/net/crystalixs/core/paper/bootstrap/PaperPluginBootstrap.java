@@ -6,7 +6,7 @@ import net.crystalixs.core.paper.config.platform.PaperConfigHotReloadWatcher;
 import net.crystalixs.core.paper.config.platform.PaperConfigUpdater;
 import net.crystalixs.core.paper.display.ScoreboardService;
 import net.crystalixs.core.paper.display.TablistService;
-import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
+import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.invui.InvUI;

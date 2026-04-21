@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
-import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
+import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import net.crystalixs.core.paper.util.BlockFloodFill;
 import org.bukkit.Material;
 import org.bukkit.Tag;

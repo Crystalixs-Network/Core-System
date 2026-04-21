@@ -1,10 +1,6 @@
 package net.crystalixs.core.paper.listener;
 
-import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
-import net.crystalixs.core.paper.enchantment.CustomEnchantmentCatalog;
-import net.crystalixs.core.paper.enchantment.CustomEnchantmentDispatcher;
-import net.crystalixs.core.paper.enchantment.CustomEnchantmentResolver;
-import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
+import net.crystalixs.core.paper.enchantment.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

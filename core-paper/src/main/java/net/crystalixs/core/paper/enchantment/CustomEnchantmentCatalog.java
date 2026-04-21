@@ -1,6 +1,5 @@
 package net.crystalixs.core.paper.enchantment;
 
-import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;

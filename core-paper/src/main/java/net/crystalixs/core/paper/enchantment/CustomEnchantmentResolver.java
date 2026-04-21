@@ -1,6 +1,5 @@
 package net.crystalixs.core.paper.enchantment;
 
-import net.crystalixs.core.paper.enchantment.model.ActiveCustomEnchantment;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
