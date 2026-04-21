@@ -35,6 +35,14 @@ public final class PaperCustomEnchantmentBootstrap {
             new Registration("leaf_mining", text("Leaf Mining"), 3, event -> RegistrySet.keySet(RegistryKey.ITEM, ItemTypeKeys.SHEARS))
     );
 
+    public Collection<CustomEnchantment> createEnchantments() {
+        return List.of(
+                new TimberEnchantment(),
+                new WoodWhisperEnchantment(),
+                new LeafMiningEnchantment()
+        );
+    }
+
     public void registerEnchantments(BootstrapContext context) {
         context.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.compose().newHandler(event -> {
             for (Registration registration : REGISTRATIONS) {
@@ -48,19 +56,11 @@ public final class PaperCustomEnchantmentBootstrap {
                                 .maxLevel(registration.maxLevel())
                                 .minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(1, 10))
                                 .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(30, 10))
-                                .primaryItems(RegistrySet.keySet(RegistryKey.ITEM))
                                 .activeSlots(EquipmentSlotGroup.HAND)
+                                .primaryItems(null)
                 );
             }
         }));
-    }
-
-    public Collection<CustomEnchantment> createEnchantments() {
-        return List.of(
-                new TimberEnchantment(),
-                new WoodWhisperEnchantment(),
-                new LeafMiningEnchantment()
-        );
     }
 
     private record Registration(String id, Component displayName, int maxLevel, Function<RegistryComposeEvent<Enchantment, EnchantmentRegistryEntry.Builder>, RegistryKeySet<ItemType>> supportedItems) {
