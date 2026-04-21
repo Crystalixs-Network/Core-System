@@ -21,7 +21,7 @@ public final class WoodWhisperEnchantmentHandler implements CustomEnchantmentHan
 
         if (!Tag.ITEMS_AXES.isTagged(context.tool().getType())) return;
         if (!Tag.LOGS.isTagged(block.getType())) return;
-        if (!block.getType().name().startsWith("STRIPPED_")) return;
+        if (block.getType().name().startsWith("STRIPPED_")) return;
 
         int multiplier = multiplier(level);
         Collection<ItemStack> drops = block.getDrops(context.tool(), context.player());
