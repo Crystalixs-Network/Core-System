@@ -23,7 +23,7 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler,
         Block origin = context.block();
 
         if (!Tag.ITEMS_AXES.isTagged(context.tool().getType())) return;
-        if (!Tag.LOGS.isTagged(origin.getType())) return;
+        if (!matches(origin)) return;
 
         Set<Block> connectedLogs = connectedLogs(origin);
         int requiredLevel = requiredLevel(origin, connectedLogs);
@@ -38,6 +38,11 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler,
             if (block.equals(origin)) continue;
             block.breakNaturally(context.tool(), true);
         }
+    }
+
+    @Override
+    public boolean matches(Block block) {
+        return Tag.LOGS.isTagged(block.getType());
     }
 
     private Set<Block> connectedLogs(Block origin) {
@@ -66,10 +71,5 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler,
 
     private boolean isLargeTree(Set<Block> logs) {
         return logs.size() > 24;
-    }
-
-    @Override
-    public boolean matches(Block block) {
-        return Tag.LOGS.isTagged(block.getType());
     }
 }

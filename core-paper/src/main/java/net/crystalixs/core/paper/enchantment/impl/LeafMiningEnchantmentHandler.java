@@ -20,8 +20,9 @@ public final class LeafMiningEnchantmentHandler implements CustomEnchantmentHand
 
     @Override
     public void handle(BreakingBlocksEnchantmentContext context, int level) {
+        Block origin = context.block();
         if (!isShears(context.tool())) return;
-        if (!Tag.LEAVES.isTagged(context.block().getType())) return;
+        if (!matches(origin)) return;
 
         int cap = cap(level);
         Set<Block> leafs = fill(context.block(), cap);
@@ -37,6 +38,11 @@ public final class LeafMiningEnchantmentHandler implements CustomEnchantmentHand
         });
     }
 
+    @Override
+    public boolean matches(Block block) {
+        return Tag.LEAVES.isTagged(block.getType());
+    }
+
     private int cap(int level) {
         return switch (Math.clamp(level, 1, 3)) {
             case 1 -> 32;
@@ -47,10 +53,5 @@ public final class LeafMiningEnchantmentHandler implements CustomEnchantmentHand
 
     private boolean isShears(ItemStack tool) {
         return tool != null && tool.getType() == Material.SHEARS;
-    }
-
-    @Override
-    public boolean matches(Block block) {
-        return Tag.LEAVES.isTagged(block.getType());
     }
 }
