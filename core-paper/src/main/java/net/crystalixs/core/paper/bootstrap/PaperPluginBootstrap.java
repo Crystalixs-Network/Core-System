@@ -11,7 +11,7 @@ import net.crystalixs.core.persistence.api.PersistenceContext;
 import org.bukkit.plugin.java.JavaPlugin;
 import xyz.xenondevs.invui.InvUI;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Locale;
 
 public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPluginRuntime> {
@@ -91,7 +91,7 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
                     LogMetadata.event("display.scoreboard.disabled"));
         }
 
-        List<CustomEnchantment> customEnchantments = enchantments.createHandlers();
+        Collection<CustomEnchantment> customEnchantments = enchantments.createEnchantments();
         listeners.register(
                 runtime(),
                 commands.sitService(),

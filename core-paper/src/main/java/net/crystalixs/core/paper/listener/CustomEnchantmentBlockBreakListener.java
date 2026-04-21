@@ -8,14 +8,14 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.List;
+import java.util.Collection;
 
 public class CustomEnchantmentBlockBreakListener implements Listener {
 
     private final CustomEnchantmentResolver resolver;
     private final CustomEnchantmentDispatcher dispatcher;
 
-    public CustomEnchantmentBlockBreakListener(List<CustomEnchantment> enchantments) {
+    public CustomEnchantmentBlockBreakListener(Collection<CustomEnchantment> enchantments) {
         CustomEnchantmentCatalog catalog = new CustomEnchantmentCatalog(enchantments);
         this.resolver = new CustomEnchantmentResolver(catalog);
         this.dispatcher = new CustomEnchantmentDispatcher(catalog);

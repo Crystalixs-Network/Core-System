@@ -10,7 +10,7 @@ import net.crystalixs.core.paper.listener.*;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
+import java.util.Collection;
 
 public final class PaperListenerBootstrap {
 
@@ -18,7 +18,7 @@ public final class PaperListenerBootstrap {
                          SitService sitService,
                          InventorySeeService inventorySeeService,
                          VanishService vanishService,
-                         List<CustomEnchantment> customEnchantments,
+                         Collection<CustomEnchantment> customEnchantments,
                          TablistService tablistService,
                          ScoreboardService scoreboardService
     ) {
