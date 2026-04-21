@@ -27,11 +27,6 @@ public final class LeafMiningEnchantmentHandler implements CustomEnchantmentHand
         int cap = cap(level);
         Set<Block> leafs = fill(context.block(), cap);
 
-        // Natürlichen Drop ignorieren.
-        // Mehr Informationen dazu sind in WoodWhisperEnchantmentHandler
-        // beim Multiplikator zu finden.
-        context.block().getDrops().clear();
-
         leafs.forEach(block -> {
             if (block.equals(context.block())) return;
             block.breakNaturally(context.tool(), true);

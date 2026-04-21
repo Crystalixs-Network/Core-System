@@ -25,14 +25,9 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler,
         if (!Tag.ITEMS_AXES.isTagged(context.tool().getType())) return;
         if (!matches(origin)) return;
 
-        Set<Block> connectedLogs = connectedLogs(origin);
+        Set<Block> connectedLogs = fill(origin, MAX_TREE_BLOCKS);
         int requiredLevel = requiredLevel(origin, connectedLogs);
         if (level < requiredLevel) return;
-
-        // Natürlichen Drop ignorieren.
-        // Mehr Informationen dazu sind in WoodWhisperEnchantmentHandler
-        // beim Multiplikator zu finden.
-        context.block().getDrops().clear();
 
         for (Block block : connectedLogs) {
             if (block.equals(origin)) continue;
@@ -45,10 +40,6 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler,
         return Tag.LOGS.isTagged(block.getType());
     }
 
-    private Set<Block> connectedLogs(Block origin) {
-        return fill(origin, MAX_TREE_BLOCKS);
-    }
-
     private int requiredLevel(Block origin, Set<Block> logs) {
         if (isJungleTree(origin) || isMegaTrunk(origin)) return 3;
         if (isLargeTree(logs)) return 2;
@@ -57,7 +48,7 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler,
 
     private boolean isMegaTrunk(Block origin) {
         Material type = origin.getType();
-        if (!Tag.LOGS.isTagged(type)) return false;
+        if (!matches(origin)) return false;
 
         Block east = origin.getRelative(1, 0, 0);
         Block south = origin.getRelative(0, 0, 1);
