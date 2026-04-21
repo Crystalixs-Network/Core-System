@@ -2,15 +2,14 @@ package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
 import net.crystalixs.core.paper.enchantment.CustomEnchantmentHandler;
+import net.crystalixs.core.paper.util.BlockFloodFill;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 
-import java.util.ArrayDeque;
-import java.util.HashSet;
 import java.util.Set;
 
-public final class TimberEnchantmentHandler implements CustomEnchantmentHandler {
+public final class TimberEnchantmentHandler implements CustomEnchantmentHandler, BlockFloodFill {
 
     private static final int MAX_TREE_BLOCKS = 512;
 
@@ -42,29 +41,7 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler 
     }
 
     private Set<Block> connectedLogs(Block origin) {
-        Set<Block> visited = new HashSet<>();
-        ArrayDeque<Block> queue = new ArrayDeque<>();
-
-        visited.add(origin);
-        queue.add(origin);
-
-        while (!queue.isEmpty() && visited.size() < MAX_TREE_BLOCKS) {
-            Block current = queue.poll();
-
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dy = -1; dy <= 1; dy++) {
-                    for (int dz = -1; dz <= 1; dz++) {
-                        if (dx == 0 && dy == 0 && dz == 0) continue;
-
-                        Block neighbor = current.getRelative(dx, dy, dz);
-                        if (!Tag.LOGS.isTagged(neighbor.getType())) continue;
-                        if (visited.add(neighbor)) queue.add(neighbor);
-                    }
-                }
-            }
-        }
-
-        return visited;
+        return fill(origin, MAX_TREE_BLOCKS);
     }
 
     private int requiredLevel(Block origin, Set<Block> logs) {
@@ -89,5 +66,10 @@ public final class TimberEnchantmentHandler implements CustomEnchantmentHandler 
 
     private boolean isLargeTree(Set<Block> logs) {
         return logs.size() > 24;
+    }
+
+    @Override
+    public boolean matches(Block block) {
+        return Tag.LOGS.isTagged(block.getType());
     }
 }
