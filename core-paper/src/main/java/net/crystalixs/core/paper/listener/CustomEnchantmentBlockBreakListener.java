@@ -1,9 +1,14 @@
 package net.crystalixs.core.paper.listener;
 
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
+import io.papermc.paper.registry.keys.EnchantmentKeys;
 import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
-import net.crystalixs.core.paper.enchantment.CustomEnchantmentKeys;
+import net.crystalixs.core.paper.enchantment.CustomEnchantmentHandler;
 import net.crystalixs.core.paper.enchantment.CustomEnchantmentRegistry;
-import org.bukkit.NamespacedKey;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.key.KeyPattern;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -11,17 +16,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("all")
 public class CustomEnchantmentBlockBreakListener implements Listener {
 
     private final CustomEnchantmentRegistry registry;
-    private final CustomEnchantmentKeys keys;
 
     public CustomEnchantmentBlockBreakListener(JavaPlugin plugin, CustomEnchantmentRegistry registry) {
         this.registry = registry;
-        this.keys = new CustomEnchantmentKeys(plugin);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -33,13 +37,22 @@ public class CustomEnchantmentBlockBreakListener implements Listener {
         ItemMeta itemMeta = tool.getItemMeta();
         if (itemMeta == null) return;
 
-        registry.handlers().forEach(handler -> {
-            NamespacedKey key = keys.levelKey(handler.enchantment());
-            Integer level = itemMeta.getPersistentDataContainer().get(key, PersistentDataType.INTEGER);
-            if (level == null || level < 1) return;
+        BreakingBlocksEnchantmentContext context = new BreakingBlocksEnchantmentContext(player, event.getBlock(), tool);
+        for (CustomEnchantmentHandler handler : registry.handlers()) {
+            Enchantment enchantment = resolveEnchantment(handler.enchantment());
+            if (enchantment == null) continue;
 
-            BreakingBlocksEnchantmentContext context = new BreakingBlocksEnchantmentContext(player, event.getBlock(), tool);
+            int level = itemMeta.getEnchantLevel(enchantment);
+            if (level < 1) continue;
+
             handler.handle(context, level);
-        });
+        }
+    }
+
+    private Enchantment resolveEnchantment(@NotNull @KeyPattern String enchantment) {
+        return RegistryAccess.registryAccess()
+                .getRegistry(RegistryKey.ENCHANTMENT)
+                .get(EnchantmentKeys.create(Key.key("core:" + enchantment)));
     }
 }
+
