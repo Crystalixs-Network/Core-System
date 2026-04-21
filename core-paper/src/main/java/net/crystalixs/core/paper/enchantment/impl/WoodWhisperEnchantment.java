@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 
-public final class WoodWhisperEnchantmentHandler implements CustomEnchantment {
+public final class WoodWhisperEnchantment implements CustomEnchantment {
 
     @Override
     public String id() {

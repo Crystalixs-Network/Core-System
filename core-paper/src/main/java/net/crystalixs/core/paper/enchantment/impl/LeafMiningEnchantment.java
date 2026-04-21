@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Set;
 
-public final class LeafMiningEnchantmentHandler implements CustomEnchantment, BlockFloodFill {
+public final class LeafMiningEnchantment implements CustomEnchantment, BlockFloodFill {
 
     @Override
     public String id() {

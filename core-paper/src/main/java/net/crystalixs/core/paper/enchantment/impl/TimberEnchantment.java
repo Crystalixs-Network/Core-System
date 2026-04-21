@@ -9,7 +9,7 @@ import org.bukkit.block.Block;
 
 import java.util.Set;
 
-public final class TimberEnchantmentHandler implements CustomEnchantment, BlockFloodFill {
+public final class TimberEnchantment implements CustomEnchantment, BlockFloodFill {
 
     private static final int MAX_TREE_BLOCKS = 512;
 
