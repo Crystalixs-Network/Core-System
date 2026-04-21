@@ -5,9 +5,12 @@ import net.crystalixs.core.paper.command.util.SitService;
 import net.crystalixs.core.paper.command.util.VanishService;
 import net.crystalixs.core.paper.display.ScoreboardService;
 import net.crystalixs.core.paper.display.TablistService;
+import net.crystalixs.core.paper.enchantment.model.CustomEnchantment;
 import net.crystalixs.core.paper.listener.*;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 public final class PaperListenerBootstrap {
 
@@ -15,6 +18,7 @@ public final class PaperListenerBootstrap {
                          SitService sitService,
                          InventorySeeService inventorySeeService,
                          VanishService vanishService,
+                         List<CustomEnchantment> customEnchantments,
                          TablistService tablistService,
                          ScoreboardService scoreboardService
     ) {
@@ -25,7 +29,7 @@ public final class PaperListenerBootstrap {
         pluginManager.registerEvents(new HomeRenameAnvilListener(plugin), plugin);
         pluginManager.registerEvents(new InventorySeeListener(inventorySeeService), plugin);
         pluginManager.registerEvents(new VanishListener(plugin, vanishService), plugin);
-        pluginManager.registerEvents(new CustomEnchantmentBlockBreakListener(), plugin);
+        pluginManager.registerEvents(new CustomEnchantmentBlockBreakListener(customEnchantments), plugin);
         if (tablistService != null) pluginManager.registerEvents(new TablistListener(plugin, tablistService), plugin);
         if (scoreboardService != null) pluginManager.registerEvents(new ScoreboardListener(plugin, scoreboardService), plugin);
     }
