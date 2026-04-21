@@ -15,7 +15,7 @@ public final class LeafMiningEnchantmentHandler implements CustomEnchantmentHand
 
     @Override
     public String enchantment() {
-        return "leaf_miner";
+        return "leaf_mining";
     }
 
     @Override
