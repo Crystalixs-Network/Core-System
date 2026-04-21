@@ -23,13 +23,7 @@ fun Project.minecraftPluginMainClass(): String {
 }
 
 fun Project.minecraftPluginBootstrapperClass(): String {
-    val rawName = property("plugin-name") as String
-    val name = rawName
-        .split(Regex("[\\s_-]+"))
-        .filter { it.isNotBlank() }
-        .joinToString("") { it.replaceFirstChar { c -> c.uppercaseChar() } }
-
-    return "${name}Bootstrap"
+    return "${minecraftPluginMainClass()}Bootstrap"
 }
 
 fun Project.pluginAuthors(defaultAuthors: List<String> = listOf("Unknown")): List<String> {

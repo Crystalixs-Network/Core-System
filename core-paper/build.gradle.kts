@@ -1,3 +1,4 @@
+import xyz.jpenilla.resourcefactory.paper.PaperPluginYaml
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
@@ -67,8 +68,10 @@ tasks {
         authors = project.pluginAuthors()
         apiVersion = "1.21.11"
         bootstrapper = "$group.$artifact.paper.$bootstrapperClass"
+        dependencies {
+            server("LuckPerms", PaperPluginYaml.Load.BEFORE, required = true, joinClasspath = true)
+        }
     }
-
 
     registerBackendServer("runLobby", "run-lobby", DevEnvironment.LOBBY_PORT)
     registerBackendServer("runGame", "run-game", DevEnvironment.GAME_PORT)
