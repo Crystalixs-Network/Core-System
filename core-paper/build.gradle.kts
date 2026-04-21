@@ -2,7 +2,6 @@ import xyz.jpenilla.resourcefactory.paper.PaperPluginYaml
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
-    alias(libs.plugins.bukkitConvention)
     alias(libs.plugins.paperConvention)
     alias(libs.plugins.runPaper)
     alias(libs.plugins.shadow)
@@ -48,15 +47,6 @@ tasks {
 
     jar {
         archiveBaseName.set("$artifact-paper")
-    }
-
-    bukkitPluginYaml {
-        val mainClass = project.minecraftPluginMainClass()
-
-        main = "$group.$artifact.paper.$mainClass"
-        name = rootProject.property("plugin-name") as String
-        authors = project.pluginAuthors()
-        apiVersion = "1.21"
     }
 
     paperPluginYaml {
