@@ -22,6 +22,10 @@ fun Project.minecraftPluginMainClass(): String {
     return "${name}Plugin"
 }
 
+fun Project.minecraftPluginBootstrapperClass(): String {
+    return "${minecraftPluginMainClass()}Bootstrap"
+}
+
 fun Project.pluginAuthors(defaultAuthors: List<String> = listOf("Unknown")): List<String> {
     val rawList = property("authors") as? String? ?: return defaultAuthors
 

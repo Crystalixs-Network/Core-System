@@ -44,7 +44,7 @@ celestial = { group = "net.crystalixs", name = "celestial-api", version = "1.0.1
 lettuce = { group = "io.lettuce", name = "lettuce-core", version = "7.5.0.RELEASE" }
 
 [plugins]
-bukkitConvention = { id = "xyz.jpenilla.resource-factory-bukkit-convention", version.ref = "resourceFactory" }
+paperConvention = { id = "xyz.jpenilla.resource-factory-paper-convention", version.ref = "resourceFactory" }
 velocityConvention = { id = "xyz.jpenilla.resource-factory-velocity-convention", version.ref = "resourceFactory" }
 runPaper = { id = "xyz.jpenilla.run-paper", version.ref = "runServer" }
 runVelocity = { id = "xyz.jpenilla.run-velocity", version.ref = "runServer" }

@@ -1,7 +1,8 @@
+import xyz.jpenilla.resourcefactory.paper.PaperPluginYaml
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
-    alias(libs.plugins.bukkitConvention)
+    alias(libs.plugins.paperConvention)
     alias(libs.plugins.runPaper)
     alias(libs.plugins.shadow)
 }
@@ -48,15 +49,19 @@ tasks {
         archiveBaseName.set("$artifact-paper")
     }
 
-    bukkitPluginYaml {
+    paperPluginYaml {
         val mainClass = project.minecraftPluginMainClass()
+        val bootstrapperClass = project.minecraftPluginBootstrapperClass()
 
         main = "$group.$artifact.paper.$mainClass"
         name = rootProject.property("plugin-name") as String
         authors = project.pluginAuthors()
-        apiVersion = "1.21"
+        apiVersion = "1.21.11"
+        bootstrapper = "$group.$artifact.paper.$bootstrapperClass"
+        dependencies {
+            server("LuckPerms", PaperPluginYaml.Load.BEFORE, required = true, joinClasspath = true)
+        }
     }
-
 
     registerBackendServer("runLobby", "run-lobby", DevEnvironment.LOBBY_PORT)
     registerBackendServer("runGame", "run-game", DevEnvironment.GAME_PORT)
