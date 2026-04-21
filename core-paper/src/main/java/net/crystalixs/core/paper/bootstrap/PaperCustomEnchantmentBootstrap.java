@@ -11,9 +11,7 @@ import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
 import io.papermc.paper.registry.set.RegistryKeySet;
 import io.papermc.paper.registry.set.RegistrySet;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
-import net.crystalixs.core.paper.enchantment.impl.LeafMiningEnchantment;
-import net.crystalixs.core.paper.enchantment.impl.TimberEnchantment;
-import net.crystalixs.core.paper.enchantment.impl.WoodWhisperEnchantment;
+import net.crystalixs.core.paper.enchantment.impl.*;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.enchantments.Enchantment;
@@ -32,14 +30,20 @@ public final class PaperCustomEnchantmentBootstrap {
     private static final Collection<Registration> REGISTRATIONS = List.of(
             new Registration("timber", text("Timber"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.AXES)),
             new Registration("wood_whisper", text("Wood Whisper"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.AXES)),
-            new Registration("leaf_mining", text("Leaf Mining"), 3, event -> RegistrySet.keySet(RegistryKey.ITEM, ItemTypeKeys.SHEARS))
+            new Registration("leaf_mining", text("Leaf Mining"), 3, event -> RegistrySet.keySet(RegistryKey.ITEM, ItemTypeKeys.SHEARS)),
+            new Registration("vein_mining", text("Vein Mining"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
+            new Registration("stone_mining", text("Stone Mining"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
+            new Registration("drill", text("Drill"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES))
     );
 
     public Collection<CustomEnchantment> createEnchantments() {
         return List.of(
                 new TimberEnchantment(),
                 new WoodWhisperEnchantment(),
-                new LeafMiningEnchantment()
+                new LeafMiningEnchantment(),
+                new VeinMiningEnchantment(),
+                new StoneMiningEnchantment(),
+                new DrillEnchantment()
         );
     }
 
