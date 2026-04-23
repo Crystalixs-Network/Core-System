@@ -1,6 +1,7 @@
 package net.crystalixs.core.paper.bootstrap;
 
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import io.papermc.paper.registry.RegistryKey;
 import io.papermc.paper.registry.data.EnchantmentRegistryEntry;
 import io.papermc.paper.registry.event.RegistryComposeEvent;
@@ -12,7 +13,6 @@ import io.papermc.paper.registry.set.RegistryKeySet;
 import io.papermc.paper.registry.set.RegistrySet;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import net.crystalixs.core.paper.enchantment.impl.*;
-import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlotGroup;
@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
+import static net.kyori.adventure.key.Key.key;
 import static net.kyori.adventure.text.Component.text;
 
 @SuppressWarnings("all")
@@ -47,15 +48,27 @@ public final class PaperCustomEnchantmentBootstrap {
                 new StoneMiningEnchantment(),
                 new DrillEnchantment(backendId),
                 new EarthWhisperEnchantment(),
-                new PlowEnchantment()
+                new PlowEnchantment(),
+                new StorageEnchantment(),
+                new PurseEnchantment(),
+                new ResourceCollectorEnchantment(),
+                new GlassBreakerEnchantment(),
+                new SmeltingTouchEnchantment()
         );
     }
 
     public void registerEnchantments(BootstrapContext context) {
+        context.getLifecycleManager().registerEventHandler(LifecycleEvents.DATAPACK_DISCOVERY.newHandler(event -> {
+            try {
+                event.registrar().discoverPack(PaperCustomEnchantmentBootstrap.class.getResource("/core_datapack").toURI(), "core-tags");
+            } catch (Exception exception) {
+                throw new RuntimeException(exception);
+            }
+        }));
         context.getLifecycleManager().registerEventHandler(RegistryEvents.ENCHANTMENT.compose().newHandler(event -> {
             for (Registration registration : REGISTRATIONS) {
                 event.registry().register(
-                        EnchantmentKeys.create(Key.key("core:" + registration.id())),
+                        EnchantmentKeys.create(key("core:" + registration.id())),
                         builder -> builder
                                 .description(registration.displayName())
                                 .supportedItems(registration.supportedItems().apply(event))
