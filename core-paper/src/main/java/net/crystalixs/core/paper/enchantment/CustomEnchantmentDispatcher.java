@@ -20,4 +20,13 @@ public final class CustomEnchantmentDispatcher {
             enchantment.onBlockBreak(context, entry.level());
         }
     }
+
+    public void dispatchInteract(EnchantmentContext.InteractContext context, List<ActiveCustomEnchantment> enchantments) {
+        for (ActiveCustomEnchantment entry : enchantments) {
+            CustomEnchantment enchantment = catalog.find(entry.enchantmentId());
+            if (enchantment == null) continue;
+
+            enchantment.onInteract(context, entry.level());
+        }
+    }
 }

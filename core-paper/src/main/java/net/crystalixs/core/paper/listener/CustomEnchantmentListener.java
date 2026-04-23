@@ -5,11 +5,14 @@ import net.crystalixs.core.paper.enchantment.CustomEnchantmentCatalog;
 import net.crystalixs.core.paper.enchantment.CustomEnchantmentDispatcher;
 import net.crystalixs.core.paper.enchantment.CustomEnchantmentResolver;
 import net.crystalixs.core.paper.enchantment.EnchantmentContext.BreakingBlocksContext;
+import net.crystalixs.core.paper.enchantment.EnchantmentContext.InteractContext;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
@@ -36,5 +39,20 @@ public class CustomEnchantmentListener implements Listener {
 
         BreakingBlocksContext context = new BreakingBlocksContext(player, event.getBlock(), tool);
         dispatcher.dispatchBlockBreak(context, activeEnchantments);
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
+
+        Player player = event.getPlayer();
+        ItemStack tool = player.getInventory().getItemInMainHand();
+        if (tool.getType().isAir()) return;
+
+        var activeEnchantments = resolver.resolve(tool);
+        if (activeEnchantments.isEmpty()) return;
+
+        InteractContext context = new InteractContext(player, tool, event.getAction(), event.getClickedBlock());
+        dispatcher.dispatchInteract(context, activeEnchantments);
     }
 }
