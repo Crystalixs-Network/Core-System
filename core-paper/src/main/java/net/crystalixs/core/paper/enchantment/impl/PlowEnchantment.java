@@ -28,16 +28,21 @@ public final class PlowEnchantment implements CustomEnchantment {
         for (int x = -radius; x <= radius; x++) {
             for (int z = -radius; z <= radius; z++) {
                 Block target = origin.getRelative(x, 0, z);
-                harvest(context, target);
-                plant(context, target);
+                harvestAndReplant(context, target);
             }
         }
     }
 
-    private void harvest(InteractContext context, Block block) {
-        if (!(block.getBlockData() instanceof Ageable ageable)) return;
-        if (ageable.getAge() < ageable.getMaximumAge()) return;
+    private void harvestAndReplant(InteractContext context, Block block) {
+        Material crop = harvest(context, block);
+        plant(context, block, crop);
+    }
 
+    private Material harvest(InteractContext context, Block block) {
+        if (!(block.getBlockData() instanceof Ageable ageable)) return null;
+        if (ageable.getAge() < ageable.getMaximumAge()) return null;
+
+        Material crop = block.getType();
         World world = block.getWorld();
         var drops = block.getDrops(context.tool(), context.player());
 
@@ -46,10 +51,13 @@ public final class PlowEnchantment implements CustomEnchantment {
 
         Location location = block.getLocation().add(0.5D, 0.5D, 0.5D);
         block.getWorld().spawnParticle(Particle.HAPPY_VILLAGER, location, 8, 0.2D, 0.2D, 0.2D, 0D);
+
+        return crop;
     }
 
-    private void plant(InteractContext context, Block block) {
-        Material crop = block.getType();
+    private void plant(InteractContext context, Block block, Material crop) {
+        if (crop == null) return;
+
         Material seed = seed(crop);
         if (seed == null) return;
 
