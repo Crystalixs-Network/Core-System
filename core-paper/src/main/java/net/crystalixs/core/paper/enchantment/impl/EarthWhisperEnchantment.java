@@ -20,7 +20,7 @@ public final class EarthWhisperEnchantment implements CustomEnchantment {
         Block block = context.block();
 
         if (!Tag.ITEMS_SHOVELS.isTagged(context.tool().getType())) return;
-        if (!Tag.DIRT.isTagged(block.getType())) return;
+        if (!isShovable(block)) return;
 
         int multiplier = multiplier(level);
         Collection<ItemStack> drops = block.getDrops(context.tool(), context.player());
@@ -41,5 +41,9 @@ public final class EarthWhisperEnchantment implements CustomEnchantment {
             case 2 -> 5;
             default -> 7;
         };
+    }
+
+    private boolean isShovable(Block block) {
+       return Tag.MINEABLE_SHOVEL.isTagged(block.getType());
     }
 }
