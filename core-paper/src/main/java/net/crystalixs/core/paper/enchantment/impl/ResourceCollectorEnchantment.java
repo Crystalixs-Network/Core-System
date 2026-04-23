@@ -20,7 +20,7 @@ public final class ResourceCollectorEnchantment implements CustomEnchantment {
 
     @Override
     public void onBlockBreak(EnchantmentContext.BreakingBlocksContext context, int level) {
-        if (!isSupportedTool(context.tool())) return;
+        if (isNotSupportedTool(context.tool())) return;
 
         Collection<ItemStack> drops = context.block().getDrops(context.tool(), context.player());
         if (drops.isEmpty()) return;
@@ -31,7 +31,7 @@ public final class ResourceCollectorEnchantment implements CustomEnchantment {
 
     @Override
     public void onCombat(EnchantmentContext.CombatContext context, int level) {
-        if (!isSupportedTool(context.tool())) return;
+        if (isNotSupportedTool(context.tool())) return;
         if (context.event().getDrops().isEmpty()) return;
 
         Collection<ItemStack> drops = context.event().getDrops();
@@ -47,12 +47,12 @@ public final class ResourceCollectorEnchantment implements CustomEnchantment {
         });
     }
 
-    private boolean isSupportedTool(ItemStack tool) {
-        return tool.getType() == Material.SHEARS
-               || Tag.ITEMS_PICKAXES.isTagged(tool.getType())
-               || Tag.ITEMS_AXES.isTagged(tool.getType())
-               || Tag.ITEMS_SHOVELS.isTagged(tool.getType())
-               || Tag.ITEMS_HOES.isTagged(tool.getType())
-               || Tag.ITEMS_ENCHANTABLE_WEAPON.isTagged(tool.getType());
+    private boolean isNotSupportedTool(ItemStack tool) {
+        return tool.getType() != Material.SHEARS
+               && !Tag.ITEMS_PICKAXES.isTagged(tool.getType())
+               && !Tag.ITEMS_AXES.isTagged(tool.getType())
+               && !Tag.ITEMS_SHOVELS.isTagged(tool.getType())
+               && !Tag.ITEMS_HOES.isTagged(tool.getType())
+               && !Tag.ITEMS_ENCHANTABLE_WEAPON.isTagged(tool.getType());
     }
 }
