@@ -33,7 +33,9 @@ public final class PaperCustomEnchantmentBootstrap {
             new Registration("leaf_mining", text("Leaf Mining"), 3, event -> RegistrySet.keySet(RegistryKey.ITEM, ItemTypeKeys.SHEARS)),
             new Registration("vein_mining", text("Vein Mining"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
             new Registration("stone_mining", text("Stone Mining"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
-            new Registration("drill", text("Drill"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES))
+            new Registration("drill", text("Drill"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
+            new Registration("earth_whisper", text("Earth Whisper"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.SHOVELS)),
+            new Registration("plow", text("Pflug"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.HOES))
     );
 
     public Collection<CustomEnchantment> createEnchantments(String backendId) {
@@ -43,7 +45,9 @@ public final class PaperCustomEnchantmentBootstrap {
                 new LeafMiningEnchantment(),
                 new VeinMiningEnchantment(),
                 new StoneMiningEnchantment(),
-                new DrillEnchantment(backendId)
+                new DrillEnchantment(backendId),
+                new EarthWhisperEnchantment(),
+                new PlowEnchantment()
         );
     }
 

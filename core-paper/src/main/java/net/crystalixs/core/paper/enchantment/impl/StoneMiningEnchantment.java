@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
-import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
+import net.crystalixs.core.paper.enchantment.EnchantmentContext.BreakingBlocksContext;
 import net.crystalixs.core.paper.util.BlockFloodFill;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -16,7 +16,7 @@ public final class StoneMiningEnchantment implements CustomEnchantment, BlockFlo
     }
 
     @Override
-    public void onBlockBreak(BreakingBlocksEnchantmentContext context, int level) {
+    public void onBlockBreak(BreakingBlocksContext context, int level) {
         Block origin = context.block();
         if (!Tag.ITEMS_PICKAXES.isTagged(context.tool().getType())) return;
         if (!matches(origin)) return;

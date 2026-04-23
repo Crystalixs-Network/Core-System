@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
-import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
+import net.crystalixs.core.paper.enchantment.EnchantmentContext.BreakingBlocksContext;
 import org.bukkit.Axis;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
@@ -22,7 +22,7 @@ public final class DrillEnchantment implements CustomEnchantment {
     }
 
     @Override
-    public void onBlockBreak(BreakingBlocksEnchantmentContext context, int level) {
+    public void onBlockBreak(BreakingBlocksContext context, int level) {
         if (!Tag.ITEMS_PICKAXES.isTagged(context.tool().getType())) return;
         if (isNotMinable(context.block())) return;
 

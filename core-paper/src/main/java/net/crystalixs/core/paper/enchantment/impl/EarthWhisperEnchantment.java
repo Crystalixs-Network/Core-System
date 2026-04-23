@@ -1,27 +1,26 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
-import net.crystalixs.core.paper.enchantment.EnchantmentContext.BreakingBlocksContext;
+import net.crystalixs.core.paper.enchantment.EnchantmentContext;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 
-public final class WoodWhisperEnchantment implements CustomEnchantment {
+public final class EarthWhisperEnchantment implements CustomEnchantment {
 
     @Override
     public String id() {
-        return "wood_whisper";
+        return "earth_whisper";
     }
 
     @Override
-    public void onBlockBreak(BreakingBlocksContext context, int level) {
+    public void onBlockBreak(EnchantmentContext.BreakingBlocksContext context, int level) {
         Block block = context.block();
 
-        if (!Tag.ITEMS_AXES.isTagged(context.tool().getType())) return;
-        if (!Tag.LOGS.isTagged(block.getType())) return;
-        if (block.getType().name().startsWith("STRIPPED_")) return;
+        if (!Tag.ITEMS_SHOVELS.isTagged(context.tool().getType())) return;
+        if (!isShovable(block)) return;
 
         int multiplier = multiplier(level);
         Collection<ItemStack> drops = block.getDrops(context.tool(), context.player());
@@ -42,5 +41,9 @@ public final class WoodWhisperEnchantment implements CustomEnchantment {
             case 2 -> 5;
             default -> 7;
         };
+    }
+
+    private boolean isShovable(Block block) {
+       return Tag.MINEABLE_SHOVEL.isTagged(block.getType());
     }
 }
