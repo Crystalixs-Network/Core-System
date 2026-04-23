@@ -8,6 +8,7 @@ import org.bukkit.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ public final class ResourceCollectorEnchantment implements CustomEnchantment {
         if (isNotSupportedTool(context.tool())) return;
         if (context.event().getDrops().isEmpty()) return;
 
-        Collection<ItemStack> drops = context.event().getDrops();
+        Collection<ItemStack> drops = new ArrayList<>(context.event().getDrops());
         context.event().getDrops().clear();
         giveOrDropNaturally(context.player(), context.target().getLocation(), drops);
     }
