@@ -37,7 +37,7 @@ public class CustomEnchantmentListener implements Listener {
         var activeEnchantments = resolver.resolve(tool);
         if (activeEnchantments.isEmpty()) return;
 
-        BreakingBlocksContext context = new BreakingBlocksContext(player, event.getBlock(), tool);
+        BreakingBlocksContext context = new BreakingBlocksContext(event, player, event.getBlock(), tool);
         dispatcher.dispatchBlockBreak(context, activeEnchantments);
     }
 
