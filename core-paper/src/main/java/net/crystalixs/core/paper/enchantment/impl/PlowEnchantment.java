@@ -93,7 +93,6 @@ public final class PlowEnchantment implements CustomEnchantment {
             case CARROTS -> Material.CARROT;
             case POTATOES -> Material.POTATO;
             case NETHER_WART -> Material.NETHER_WART;
-            case TORCHFLOWER_CROP -> Material.TORCHFLOWER_SEEDS;
             default -> null;
         };
     }
