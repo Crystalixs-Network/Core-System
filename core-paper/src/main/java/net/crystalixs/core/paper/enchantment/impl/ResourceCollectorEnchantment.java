@@ -5,7 +5,9 @@ import net.crystalixs.core.paper.enchantment.EnchantmentContext;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Tag;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
@@ -28,6 +30,26 @@ public final class ResourceCollectorEnchantment implements CustomEnchantment {
 
         context.event().setDropItems(false);
         giveOrDropNaturally(context.player(), context.block().getLocation(), drops);
+    }
+
+    @Override
+    public void onInteract(EnchantmentContext.InteractContext context, int level) {
+        if (context.action() != Action.RIGHT_CLICK_BLOCK) return;
+        if (context.block() == null) return;
+        if (isNotSupportedTool(context.tool())) return;
+
+        context.block().getWorld()
+                .getNearbyEntities(context.block().getLocation().toCenterLocation(), 2.5D, 2.5D, 2.5D, entity -> entity instanceof Item)
+                .stream()
+                .map(entity -> (Item) entity)
+                .forEach(item -> {
+                    Map<Integer, ItemStack> leftovers = context.player().getInventory().addItem(item.getItemStack());
+                    if (leftovers.isEmpty()) {
+                        item.remove();
+                        return;
+                    }
+                    item.setItemStack(leftovers.values().iterator().next());
+                });
     }
 
     @Override
