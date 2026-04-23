@@ -19,9 +19,7 @@ public final class DrillEnchantment implements CustomEnchantment {
         if (!Tag.ITEMS_PICKAXES.isTagged(context.tool().getType())) return;
         if (isNotMinable(context.block())) return;
 
-        int radius = Math.clamp(level, 1, 3) - 1;
-        if (radius <= 0) return;
-
+        int radius = Math.clamp(level, 1, 3);
         Block origin = context.block();
         Axis axis = axis(context.player().getEyeLocation().getDirection());
 
