@@ -28,7 +28,7 @@ public final class GlassBreakerEnchantment implements CustomEnchantment {
                 new ItemStack(context.block().getType())
         );
         context.block().setType(Material.AIR);
-        context.player().playSound(context.block().getLocation(), Sound.BLOCK_GLASS_BREAK, 1F, 1F);
+        context.player().playSound(context.block().getLocation(), Sound.BLOCK_GLASS_BREAK, 0.75F, 0.8F);
     }
 
     private boolean isGlass(Block block) {
