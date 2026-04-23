@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
-import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
+import net.crystalixs.core.paper.enchantment.EnchantmentContext.BreakingBlocksContext;
 import net.crystalixs.core.paper.util.BlockFloodFill;
 import org.bukkit.Material;
 import org.bukkit.Tag;
@@ -19,7 +19,7 @@ public final class TimberEnchantment implements CustomEnchantment, BlockFloodFil
     }
 
     @Override
-    public void onBlockBreak(BreakingBlocksEnchantmentContext context, int level) {
+    public void onBlockBreak(BreakingBlocksContext context, int level) {
         Block origin = context.block();
 
         if (!Tag.ITEMS_AXES.isTagged(context.tool().getType())) return;

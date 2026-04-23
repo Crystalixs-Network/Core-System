@@ -1,7 +1,7 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
-import net.crystalixs.core.paper.enchantment.BreakingBlocksEnchantmentContext;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
+import net.crystalixs.core.paper.enchantment.EnchantmentContext.BreakingBlocksContext;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +16,7 @@ public final class WoodWhisperEnchantment implements CustomEnchantment {
     }
 
     @Override
-    public void onBlockBreak(BreakingBlocksEnchantmentContext context, int level) {
+    public void onBlockBreak(BreakingBlocksContext context, int level) {
         Block block = context.block();
 
         if (!Tag.ITEMS_AXES.isTagged(context.tool().getType())) return;

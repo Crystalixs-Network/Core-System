@@ -1,6 +1,10 @@
 package net.crystalixs.core.paper.listener;
 
-import net.crystalixs.core.paper.enchantment.*;
+import net.crystalixs.core.paper.enchantment.CustomEnchantment;
+import net.crystalixs.core.paper.enchantment.CustomEnchantmentCatalog;
+import net.crystalixs.core.paper.enchantment.CustomEnchantmentDispatcher;
+import net.crystalixs.core.paper.enchantment.CustomEnchantmentResolver;
+import net.crystalixs.core.paper.enchantment.EnchantmentContext.BreakingBlocksContext;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,7 +34,7 @@ public class CustomEnchantmentBlockBreakListener implements Listener {
         var activeEnchantments = resolver.resolve(tool);
         if (activeEnchantments.isEmpty()) return;
 
-        BreakingBlocksEnchantmentContext context = new BreakingBlocksEnchantmentContext(player, event.getBlock(), tool);
+        BreakingBlocksContext context = new BreakingBlocksContext(player, event.getBlock(), tool);
         dispatcher.dispatchBlockBreak(context, activeEnchantments);
     }
 }
