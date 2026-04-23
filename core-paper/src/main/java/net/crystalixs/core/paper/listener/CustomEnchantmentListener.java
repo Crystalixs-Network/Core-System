@@ -14,12 +14,12 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.Collection;
 
-public class CustomEnchantmentBlockBreakListener implements Listener {
+public class CustomEnchantmentListener implements Listener {
 
     private final CustomEnchantmentResolver resolver;
     private final CustomEnchantmentDispatcher dispatcher;
 
-    public CustomEnchantmentBlockBreakListener(Collection<CustomEnchantment> enchantments) {
+    public CustomEnchantmentListener(Collection<CustomEnchantment> enchantments) {
         CustomEnchantmentCatalog catalog = new CustomEnchantmentCatalog(enchantments);
         this.resolver = new CustomEnchantmentResolver(catalog);
         this.dispatcher = new CustomEnchantmentDispatcher(catalog);
