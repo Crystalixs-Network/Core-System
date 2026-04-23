@@ -18,7 +18,7 @@ public final class PlowEnchantment implements CustomEnchantment {
 
     @Override
     public void onInteract(EnchantmentContext.InteractContext context, int level) {
-        if (context.action() == Action.RIGHT_CLICK_BLOCK) return;
+        if (context.action() != Action.RIGHT_CLICK_BLOCK) return;
         if (context.block() == null) return;
         if (!isHoe(context.tool())) return;
 
