@@ -11,6 +11,7 @@ import io.papermc.paper.registry.keys.ItemTypeKeys;
 import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
 import io.papermc.paper.registry.set.RegistryKeySet;
 import io.papermc.paper.registry.set.RegistrySet;
+import io.papermc.paper.registry.tag.TagKey;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import net.crystalixs.core.paper.enchantment.impl.*;
 import net.kyori.adventure.text.Component;
@@ -28,6 +29,8 @@ import static net.kyori.adventure.text.Component.text;
 @SuppressWarnings("all")
 public final class PaperCustomEnchantmentBootstrap {
 
+    private static final TagKey<ItemType> GENERIC_TOOLS = ItemTypeTagKeys.create(key("core:generic_tools"));
+
     private static final Collection<Registration> REGISTRATIONS = List.of(
             new Registration("timber", text("Timber"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.AXES)),
             new Registration("wood_whisper", text("Wood Whisper"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.AXES)),
@@ -37,6 +40,7 @@ public final class PaperCustomEnchantmentBootstrap {
             new Registration("drill", text("Drill"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
             new Registration("earth_whisper", text("Earth Whisper"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.SHOVELS)),
             new Registration("plow", text("Pflug"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.HOES)),
+            new Registration("resource_collector", text("Resource Collector"), 1, event -> event.getOrCreateTag(GENERIC_TOOLS)),
             new Registration("glass_breaker", text("Glass Breaker"), 1, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
             new Registration("smelting_touch", text("Smelting Touch"), 1, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES))
     );
