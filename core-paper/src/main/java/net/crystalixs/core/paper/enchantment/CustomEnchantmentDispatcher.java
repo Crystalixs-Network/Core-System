@@ -14,30 +14,16 @@ public final class CustomEnchantmentDispatcher {
         this.catalog = catalog;
     }
 
-    public void dispatchBlockBreak(BreakingBlocksContext context, List<ActiveCustomEnchantment> enchantments) {
+    public void dispatch(EnchantmentContext enchantmentContext, List<ActiveCustomEnchantment> enchantments) {
         for (ActiveCustomEnchantment entry : enchantments) {
             CustomEnchantment enchantment = catalog.find(entry.enchantmentId());
             if (enchantment == null) continue;
 
-            enchantment.onBlockBreak(context, entry.level());
-        }
-    }
-
-    public void dispatchInteract(InteractContext context, List<ActiveCustomEnchantment> enchantments) {
-        for (ActiveCustomEnchantment entry : enchantments) {
-            CustomEnchantment enchantment = catalog.find(entry.enchantmentId());
-            if (enchantment == null) continue;
-
-            enchantment.onInteract(context, entry.level());
-        }
-    }
-
-    public void dispatchCombat(CombatContext context, List<ActiveCustomEnchantment> enchantments) {
-        for (ActiveCustomEnchantment entry : enchantments) {
-            CustomEnchantment enchantment = catalog.find(entry.enchantmentId());
-            if (enchantment == null) continue;
-
-            enchantment.onCombat(context, entry.level());
+            switch (enchantmentContext) {
+                case BreakingBlocksContext context -> enchantment.onBlockBreak(context, entry.level());
+                case InteractContext context -> enchantment.onInteract(context, entry.level());
+                case CombatContext context -> enchantment.onCombat(context, entry.level());
+            }
         }
     }
 }
