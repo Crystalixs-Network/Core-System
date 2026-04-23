@@ -24,7 +24,9 @@ public final class GlassBreakerEnchantment implements CustomEnchantment {
 
         context.block().getWorld().dropItemNaturally(
                 context.block().getLocation(),
-                new ItemStack(context.block().getType()));
+                new ItemStack(context.block().getType())
+        );
+        context.block().setType(Material.AIR);
     }
 
     private boolean isGlass(Block block) {
