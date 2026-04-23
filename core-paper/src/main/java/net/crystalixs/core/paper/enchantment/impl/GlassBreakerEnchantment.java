@@ -3,6 +3,7 @@ package net.crystalixs.core.paper.enchantment.impl;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import net.crystalixs.core.paper.enchantment.EnchantmentContext.InteractContext;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.Action;
@@ -27,6 +28,7 @@ public final class GlassBreakerEnchantment implements CustomEnchantment {
                 new ItemStack(context.block().getType())
         );
         context.block().setType(Material.AIR);
+        context.player().playSound(context.block().getLocation(), Sound.BLOCK_GLASS_BREAK, 1F, 1F);
     }
 
     private boolean isGlass(Block block) {
