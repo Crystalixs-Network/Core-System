@@ -36,7 +36,9 @@ public final class PaperCustomEnchantmentBootstrap {
             new Registration("stone_mining", text("Stone Mining"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
             new Registration("drill", text("Drill"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
             new Registration("earth_whisper", text("Earth Whisper"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.SHOVELS)),
-            new Registration("plow", text("Pflug"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.HOES))
+            new Registration("plow", text("Pflug"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.HOES)),
+            new Registration("glass_breaker", text("Glass Breaker"), 1, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
+            new Registration("smelting_touch", text("Smelting Touch"), 1, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES))
     );
 
     public Collection<CustomEnchantment> createEnchantments(String backendId) {
