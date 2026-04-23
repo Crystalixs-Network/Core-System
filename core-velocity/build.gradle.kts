@@ -52,7 +52,7 @@ tasks {
             configureVelocityProxy(
                 mapOf(
                     "lobby" to DevEnvironment.LOBBY_PORT,
-                    "game" to DevEnvironment.GAME_PORT
+                    "farmwelt" to DevEnvironment.GAME_PORT
                 )
             )
         }
