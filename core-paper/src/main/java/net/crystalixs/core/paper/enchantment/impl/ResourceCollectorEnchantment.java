@@ -29,6 +29,16 @@ public final class ResourceCollectorEnchantment implements CustomEnchantment {
         giveOrDropNaturally(context.player(), context.block().getLocation(), drops);
     }
 
+    @Override
+    public void onCombat(EnchantmentContext.CombatContext context, int level) {
+        if (!isSupportedTool(context.tool())) return;
+        if (context.event().getDrops().isEmpty()) return;
+
+        Collection<ItemStack> drops = context.event().getDrops();
+        context.event().getDrops().clear();
+        giveOrDropNaturally(context.player(), context.target().getLocation(), drops);
+    }
+
     private void giveOrDropNaturally(Player player, Location location, Collection<ItemStack> drops) {
         Map<Integer, ItemStack> leftovers = player.getInventory().addItem(drops.toArray(ItemStack[]::new));
         leftovers.values().forEach(itemStack -> {
