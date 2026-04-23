@@ -6,8 +6,16 @@ import org.bukkit.Axis;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 public final class DrillEnchantment implements CustomEnchantment {
+
+    private static final String FARMWORLD_BACKEND_ID = "farmwelt";
+    private final boolean isFarmworldServer;
+
+    public DrillEnchantment(@NotNull String backendId) {
+        this.isFarmworldServer = isFarmworldServer(backendId);
+    }
 
     @Override
     public String id() {
@@ -16,6 +24,7 @@ public final class DrillEnchantment implements CustomEnchantment {
 
     @Override
     public void onBlockBreak(BreakingBlocksEnchantmentContext context, int level) {
+        if (isFarmworldServer) return;
         if (!Tag.ITEMS_PICKAXES.isTagged(context.tool().getType())) return;
         if (isNotMinable(context.block())) return;
 
@@ -51,5 +60,10 @@ public final class DrillEnchantment implements CustomEnchantment {
 
     private boolean isNotMinable(Block block) {
         return !Tag.MINEABLE_PICKAXE.isTagged(block.getType());
+    }
+
+    private boolean isFarmworldServer(String backendId) {
+        if (backendId == null || backendId.isBlank()) return false;
+        return backendId.equalsIgnoreCase(FARMWORLD_BACKEND_ID);
     }
 }
