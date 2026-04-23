@@ -1,9 +1,11 @@
 package net.crystalixs.core.paper.enchantment;
 
 import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,5 +15,8 @@ public sealed interface EnchantmentContext {
     }
 
     record InteractContext(Player player, ItemStack tool, Action action, @Nullable Block block) implements EnchantmentContext {
+    }
+
+    record CombatContext(EntityDeathEvent event, Player player, ItemStack tool, Entity target) implements EnchantmentContext {
     }
 }

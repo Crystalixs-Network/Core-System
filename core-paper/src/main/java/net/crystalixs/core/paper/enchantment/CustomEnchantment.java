@@ -14,4 +14,8 @@ public interface CustomEnchantment {
     default void onInteract(InteractContext context, int level) {
         // Hook für Custom Enchantments, welche Interaktionen (u.a. Links-/Rechtsklick) haben
     }
+
+    default void onCombat(EnchantmentContext.CombatContext context, int level) {
+        // Hook für Custom Enchantments, welche Kampf-Events beeinflussen
+    }
 }
