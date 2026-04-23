@@ -3,6 +3,8 @@ package net.crystalixs.core.paper.enchantment.impl;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import net.crystalixs.core.paper.enchantment.EnchantmentContext;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -18,6 +20,8 @@ public final class ResourceCollectorEnchantment implements CustomEnchantment {
 
     @Override
     public void onBlockBreak(EnchantmentContext.BreakingBlocksContext context, int level) {
+        if (!isSupportedTool(context.tool())) return;
+
         Collection<ItemStack> drops = context.block().getDrops(context.tool(), context.player());
         if (drops.isEmpty()) return;
 
@@ -31,5 +35,14 @@ public final class ResourceCollectorEnchantment implements CustomEnchantment {
             if (itemStack == null || itemStack.getType().isAir()) return;
             location.getWorld().dropItemNaturally(location, itemStack);
         });
+    }
+
+    private boolean isSupportedTool(ItemStack tool) {
+        return tool.getType() == Material.SHEARS
+               || Tag.ITEMS_PICKAXES.isTagged(tool.getType())
+               || Tag.ITEMS_AXES.isTagged(tool.getType())
+               || Tag.ITEMS_SHOVELS.isTagged(tool.getType())
+               || Tag.ITEMS_HOES.isTagged(tool.getType())
+               || Tag.ITEMS_ENCHANTABLE_WEAPON.isTagged(tool.getType());
     }
 }
