@@ -6,14 +6,13 @@ import org.bukkit.Axis;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 
 public final class DrillEnchantment implements CustomEnchantment {
 
     private static final String FARMWORLD_BACKEND_ID = "farmwelt";
     private final boolean isFarmworldServer;
 
-    public DrillEnchantment(@NotNull String backendId) {
+    public DrillEnchantment(String backendId) {
         this.isFarmworldServer = isFarmworldServer(backendId);
     }
 

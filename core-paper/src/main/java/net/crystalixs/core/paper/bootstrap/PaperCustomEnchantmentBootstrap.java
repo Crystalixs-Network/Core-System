@@ -36,14 +36,14 @@ public final class PaperCustomEnchantmentBootstrap {
             new Registration("drill", text("Drill"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES))
     );
 
-    public Collection<CustomEnchantment> createEnchantments() {
+    public Collection<CustomEnchantment> createEnchantments(String backendId) {
         return List.of(
                 new TimberEnchantment(),
                 new WoodWhisperEnchantment(),
                 new LeafMiningEnchantment(),
                 new VeinMiningEnchantment(),
                 new StoneMiningEnchantment(),
-                new DrillEnchantment()
+                new DrillEnchantment(backendId)
         );
     }
 

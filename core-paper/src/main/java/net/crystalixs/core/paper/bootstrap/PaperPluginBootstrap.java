@@ -91,7 +91,11 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
                     LogMetadata.event("display.scoreboard.disabled"));
         }
 
-        Collection<CustomEnchantment> customEnchantments = enchantments.createEnchantments();
+        String backendId = configUpdater.current().redisSync() == null
+                ? null
+                : configUpdater.current().redisSync().backendId();
+
+        Collection<CustomEnchantment> customEnchantments = enchantments.createEnchantments(backendId);
         listeners.register(
                 runtime(),
                 commands.sitService(),
