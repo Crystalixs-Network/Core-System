@@ -1,10 +1,11 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
-import net.crystalixs.core.paper.enchantment.EnchantmentContext;
+import net.crystalixs.core.paper.enchantment.EnchantmentContext.InteractContext;
 import org.bukkit.Material;
 import org.bukkit.Tag;
 import org.bukkit.block.Block;
+import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
 public final class GlassBreakerEnchantment implements CustomEnchantment {
@@ -15,9 +16,11 @@ public final class GlassBreakerEnchantment implements CustomEnchantment {
     }
 
     @Override
-    public void onBlockBreak(EnchantmentContext.BreakingBlocksContext context, int level) {
-        if (!Tag.ITEMS_PICKAXES.isTagged(context.tool().getType())) return;
+    public void onInteract(InteractContext context, int level) {
+        if (context.action() != Action.LEFT_CLICK_BLOCK) return;
+        if (context.block() == null) return;
         if (!isGlass(context.block())) return;
+        if (!isSupportedTool(context.tool())) return;
 
         context.block().getWorld().dropItemNaturally(
                 context.block().getLocation(),
@@ -28,5 +31,13 @@ public final class GlassBreakerEnchantment implements CustomEnchantment {
         return block.getType().name().contains("GLASS")
                && block.getType() != Material.SPYGLASS
                && block.getType() != Material.GLASS_BOTTLE;
+    }
+
+    private boolean isSupportedTool(ItemStack tool) {
+        return tool.getType() == Material.SHEARS
+               || Tag.ITEMS_PICKAXES.isTagged(tool.getType())
+               || Tag.ITEMS_AXES.isTagged(tool.getType())
+               || Tag.ITEMS_SHOVELS.isTagged(tool.getType())
+               || Tag.ITEMS_HOES.isTagged(tool.getType());
     }
 }
