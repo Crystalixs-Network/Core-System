@@ -23,11 +23,11 @@ public final class DrillEnchantment implements CustomEnchantment {
 
     @Override
     public void onBlockBreak(BreakingBlocksEnchantmentContext context, int level) {
-        if (isFarmworldServer) return;
         if (!Tag.ITEMS_PICKAXES.isTagged(context.tool().getType())) return;
         if (isNotMinable(context.block())) return;
 
-        int radius = Math.clamp(level, 1, 3);
+        int effectiveLevel = isFarmworldServer ? 1 : level;
+        int radius = Math.clamp(effectiveLevel, 1, 3);
         Block origin = context.block();
         Axis axis = axis(context.player().getEyeLocation().getDirection());
 
