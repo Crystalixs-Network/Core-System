@@ -3,10 +3,10 @@ package net.crystalixs.core.paper.enchantment.util;
 import net.crystalixs.core.paper.util.ItemSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
-import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
@@ -23,10 +23,10 @@ public final class StorageSession {
     private static final NamespacedKey SESSION_KEY = new NamespacedKey("core", "storage_session");
 
     private final Player player;
-    private final ShulkerBox shulker;
+    private final ItemStack shulker;
     private final int level;
 
-    public StorageSession(Player player, ShulkerBox shulker, int level) {
+    public StorageSession(Player player, ItemStack shulker, int level) {
         this.player = player;
         this.shulker = shulker;
         this.level = level;
@@ -57,7 +57,10 @@ public final class StorageSession {
     }
 
     private void loadContent(Inventory inventory) {
-        PersistentDataContainer container = shulker.getPersistentDataContainer();
+        ItemMeta itemMeta = shulker.getItemMeta();
+        if (itemMeta == null) return;
+
+        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         byte[] payload = container.get(SESSION_KEY, PersistentDataType.BYTE_ARRAY);
         if (payload == null || payload.length == 0) return;
 
@@ -70,8 +73,13 @@ public final class StorageSession {
     }
 
     private void saveContent(Inventory inventory) {
-        PersistentDataContainer container = shulker.getPersistentDataContainer();
+        ItemMeta itemMeta = shulker.getItemMeta();
+        if (itemMeta == null) return;
+
+        PersistentDataContainer container = itemMeta.getPersistentDataContainer();
         byte[] payload = ItemSerializer.serialize(inventory.getContents());
         container.set(SESSION_KEY, PersistentDataType.BYTE_ARRAY, payload);
+
+        shulker.setItemMeta(itemMeta);
     }
 }
