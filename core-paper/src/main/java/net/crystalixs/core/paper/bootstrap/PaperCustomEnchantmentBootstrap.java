@@ -41,7 +41,7 @@ public final class PaperCustomEnchantmentBootstrap {
             new Registration("drill", text("Drill"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES)),
             new Registration("earth_whisper", text("Earth Whisper"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.SHOVELS)),
             new Registration("plow", text("Pflug"), 3, event -> event.getOrCreateTag(ItemTypeTagKeys.HOES)),
-            new Registration("storage", text("Storage"), 5, event -> event.getOrCreateTag(SHULKER_BOXES)),
+            new Registration("storage", text("Storage"), 3, event -> event.getOrCreateTag(SHULKER_BOXES)),
             new Registration("purse", text("Purse"), 2, event -> event.getOrCreateTag(SHULKER_BOXES)),
             new Registration("resource_collector", text("Resource Collector"), 1, event -> event.getOrCreateTag(GENERIC_TOOLS)),
             new Registration("glass_breaker", text("Glass Breaker"), 1, event -> event.getOrCreateTag(GENERIC_TOOLS)),
