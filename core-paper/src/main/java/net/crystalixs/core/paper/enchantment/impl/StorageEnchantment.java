@@ -39,7 +39,7 @@ public final class StorageEnchantment implements CustomEnchantment, Listener {
     @EventHandler
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
         if (event.getClickedBlock() == null) return;
         if (!(event.getClickedBlock().getState() instanceof ShulkerBox shulker)) return;
 
