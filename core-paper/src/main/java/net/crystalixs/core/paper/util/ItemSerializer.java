@@ -14,7 +14,7 @@ public final class ItemSerializer {
             data.writeInt(content.length);
 
             for (ItemStack itemStack : content) {
-                if (itemStack.getType().isAir()) {
+                if (itemStack == null || itemStack.getType().isAir()) {
                     data.writeInt(-1);
                     continue;
                 }

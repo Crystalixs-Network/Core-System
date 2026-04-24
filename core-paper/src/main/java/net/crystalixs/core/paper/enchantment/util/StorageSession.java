@@ -70,8 +70,6 @@ public final class StorageSession {
     }
 
     private void saveContent(Inventory inventory) {
-        if (inventory.getContents().length == 0) return;
-
         PersistentDataContainer container = shulker.getPersistentDataContainer();
         byte[] payload = ItemSerializer.serialize(inventory.getContents());
         container.set(SESSION_KEY, PersistentDataType.BYTE_ARRAY, payload);
