@@ -23,7 +23,7 @@ public final class StorageSession {
     }
 
     public void open() {
-        int rows = Math.clamp(level, 3, 6);
+        int rows = Math.clamp(level, 1, 3) + 3;
         Inventory backing = Bukkit.createInventory(null, rows * 9);
         ReferencingInventory inventory = ReferencingInventory.fromContents(backing);
 
