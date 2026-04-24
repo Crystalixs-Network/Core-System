@@ -2,10 +2,13 @@ package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import net.crystalixs.core.paper.enchantment.EnchantmentContext.PlacingBlocksContext;
-import net.crystalixs.core.paper.enchantment.util.StorageSession;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.persistence.PersistentDataType;
 
 public final class StorageEnchantment implements CustomEnchantment {
+
+    public static final NamespacedKey STORAGE_LEVEL_KEY = new NamespacedKey("core", "storage_level");
 
     @Override
     public String id() {
@@ -14,10 +17,9 @@ public final class StorageEnchantment implements CustomEnchantment {
 
     @Override
     public void onBlockPlace(PlacingBlocksContext context, int level) {
-        if (!(context.block().getState() instanceof ShulkerBox)) return;
-        context.event().setCancelled(true);
+        if (!(context.block().getState() instanceof ShulkerBox shulker)) return;
 
-        StorageSession session = new StorageSession(context.player(), context.tool(), level);
-        session.open();
+        shulker.getPersistentDataContainer().set(STORAGE_LEVEL_KEY, PersistentDataType.INTEGER, level);
+        shulker.update(true, false);
     }
 }
