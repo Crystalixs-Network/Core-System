@@ -11,8 +11,7 @@ import org.bukkit.inventory.RecipeChoice;
 import org.bukkit.inventory.RecipeChoice.ExactChoice;
 import org.bukkit.inventory.RecipeChoice.MaterialChoice;
 
-import java.util.EnumMap;
-import java.util.Map;
+import java.util.*;
 
 public final class SmeltingTouchEnchantment implements CustomEnchantment {
 
@@ -29,7 +28,29 @@ public final class SmeltingTouchEnchantment implements CustomEnchantment {
         if (!Tag.ITEMS_PICKAXES.isTagged(context.tool().getType())) return;
         if (context.block().getDrops(context.tool(), context.player()).isEmpty()) return;
 
+        Collection<ItemStack> drops = context.block().getDrops(context.tool(), context.player());
+        if (drops.isEmpty()) return;
+
         ensureRecipeCache();
+
+        List<ItemStack> convertedDrops = new ArrayList<>();
+        boolean changed = false;
+
+        for (ItemStack drop : drops) {
+            ItemStack smelted = smelt(drop);
+            if (smelted == null) {
+                convertedDrops.add(drop);
+                continue;
+            }
+
+            changed = true;
+            appendStacked(convertedDrops, smelted, drop.getAmount());
+        }
+
+        if (!changed) return;
+
+        context.event().setDropItems(false);
+        convertedDrops.forEach(drop -> context.block().getWorld().dropItemNaturally(context.block().getLocation(), drop));
     }
 
     private ItemStack smelt(ItemStack itemStack) {
@@ -63,6 +84,19 @@ public final class SmeltingTouchEnchantment implements CustomEnchantment {
                 }
             });
             isCacheInitialized = true;
+        }
+    }
+
+    private void appendStacked(Collection<ItemStack> drops, ItemStack template, int multiplier) {
+        int totalAmount = template.getAmount() * Math.max(multiplier, 1);
+        int maxSize = template.getMaxStackSize();
+
+        while (totalAmount > 0) {
+            int amount = Math.min(maxSize, totalAmount);
+            ItemStack itemStack = template.clone();
+            itemStack.setAmount(amount);
+            drops.add(itemStack);
+            totalAmount -= amount;
         }
     }
 }
