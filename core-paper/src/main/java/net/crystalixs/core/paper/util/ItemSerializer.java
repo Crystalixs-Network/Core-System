@@ -1,7 +1,6 @@
 package net.crystalixs.core.paper.util;
 
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 
@@ -10,7 +9,7 @@ public final class ItemSerializer {
     private ItemSerializer() {
     }
 
-    public static byte[] serialize(@NotNull ItemStack[] content) {
+    public static byte[] serialize(ItemStack[] content) {
         try (var stream = new ByteArrayOutputStream(); var data = new DataOutputStream(stream)) {
             data.writeInt(content.length);
 
