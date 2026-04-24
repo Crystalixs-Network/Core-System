@@ -50,6 +50,7 @@ public final class StorageEnchantment implements CustomEnchantment, Listener {
         if (level == null || level <= 0) return;
 
         event.setCancelled(true);
+        shulker.open();
 
         StorageSession session = new StorageSession(event.getPlayer(), shulker, level);
         session.open();
