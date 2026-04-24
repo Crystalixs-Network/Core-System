@@ -3,6 +3,7 @@ package net.crystalixs.core.paper.enchantment.util;
 import net.crystalixs.core.paper.util.ItemSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -24,12 +25,12 @@ public final class StorageSession {
     private static final int BASE_SHULKER_SLOTS = 27;
 
     private final Player player;
-    private final ShulkerBox shulker;
+    private final Block block;
     private final int level;
 
     public StorageSession(Player player, ShulkerBox shulker, int level) {
         this.player = player;
-        this.shulker = shulker;
+        this.block = shulker.getBlock();
         this.level = level;
     }
 
@@ -48,7 +49,7 @@ public final class StorageSession {
                 .setTitle(new AdventureComponentWrapper(translatable("container.shulkerBox")))
                 .addCloseHandler(() -> {
                     saveContent(backing);
-                    shulker.close();
+                    ((ShulkerBox) block.getBlockData()).close();
                 })
                 .setGui(gui)
                 .open(player);
@@ -61,6 +62,7 @@ public final class StorageSession {
     }
 
     private void loadContent(Inventory inventory) {
+        if (!(block.getBlockData() instanceof ShulkerBox shulker)) return;
         ItemStack[] baseContent = shulker.getInventory().getContents();
         for (int slot = 0; slot < BASE_SHULKER_SLOTS; slot++) {
             inventory.setItem(slot, baseContent[slot]);
@@ -81,6 +83,7 @@ public final class StorageSession {
     }
 
     private void saveContent(Inventory inventory) {
+        if (!(block.getState() instanceof ShulkerBox shulker)) return;
         ItemStack[] current = inventory.getContents();
         ItemStack[] baseContent = new ItemStack[BASE_SHULKER_SLOTS];
         System.arraycopy(current, 0, baseContent, 0, Math.min(BASE_SHULKER_SLOTS, current.length));
