@@ -50,7 +50,7 @@ public final class SmeltingTouchEnchantment implements CustomEnchantment {
         if (!changed) return;
 
         context.event().setDropItems(false);
-        convertedDrops.forEach(drop -> context.block().getWorld().dropItemNaturally(context.block().getLocation(), drop));
+        convertedDrops.forEach(drop -> context.block().getWorld().dropItemNaturally(context.block().getLocation().toCenterLocation(), drop));
     }
 
     private ItemStack smelt(ItemStack itemStack) {
