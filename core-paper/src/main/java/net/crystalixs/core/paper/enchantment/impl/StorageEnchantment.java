@@ -2,13 +2,20 @@ package net.crystalixs.core.paper.enchantment.impl;
 
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import net.crystalixs.core.paper.enchantment.EnchantmentContext.PlacingBlocksContext;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.event.Listener;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public final class StorageEnchantment implements CustomEnchantment {
+public final class StorageEnchantment implements CustomEnchantment, Listener {
 
     public static final NamespacedKey STORAGE_LEVEL_KEY = new NamespacedKey("core", "storage_level");
+
+    public StorageEnchantment(JavaPlugin plugin) {
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
 
     @Override
     public String id() {

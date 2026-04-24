@@ -95,7 +95,7 @@ public final class PaperPluginBootstrap extends AbstractPluginBootstrap<PaperPlu
                 ? null
                 : configUpdater.current().redisSync().backendId();
 
-        Collection<CustomEnchantment> customEnchantments = enchantments.createEnchantments(backendId);
+        Collection<CustomEnchantment> customEnchantments = enchantments.createEnchantments(runtime().plugin(), backendId);
         listeners.register(
                 runtime(),
                 commands.sitService(),
