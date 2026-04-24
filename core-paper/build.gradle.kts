@@ -11,12 +11,12 @@ dependencies {
     compileOnly(libs.paper)
     compileOnly(libs.brigadier)
     compileOnly(libs.luckPerms.api)
+    compileOnly(libs.invui)
 
     implementation(project(":core-common"))
     implementation(project(":core-persistence"))
     implementation(libs.bundles.cloudPaper)
     implementation(libs.configurate.hocon)
-    implementation(libs.invui)
     implementation(libs.lettuce)
     implementation(libs.celestial)
 }
@@ -28,7 +28,6 @@ tasks {
         val mapping = mapOf(
             "org.incendo" to "cloud",
             "org.spongepowered.configurate" to "configurate",
-            "xyz.xenondevs.invui" to "invui",
             "io.lettuce" to "lettuce",
             "net.crystalixs.celestial" to "celestial"
         )
@@ -52,12 +51,14 @@ tasks {
     paperPluginYaml {
         val mainClass = project.minecraftPluginMainClass()
         val bootstrapperClass = project.minecraftPluginBootstrapperClass()
+        val loaderClass = project.minecraftPluginLoaderClass()
 
         main = "$group.$artifact.paper.$mainClass"
         name = rootProject.property("plugin-name") as String
         authors = project.pluginAuthors()
         apiVersion = "1.21.11"
         bootstrapper = "$group.$artifact.paper.$bootstrapperClass"
+        loader = "$group.$artifact.paper.$loaderClass"
         dependencies {
             server("LuckPerms", PaperPluginYaml.Load.BEFORE, required = true, joinClasspath = true)
         }
