@@ -14,10 +14,10 @@ public final class StorageEnchantment implements CustomEnchantment {
 
     @Override
     public void onBlockPlace(PlacingBlocksContext context, int level) {
-        if (!(context.block().getState() instanceof ShulkerBox)) return;
+        if (!(context.block().getState() instanceof ShulkerBox shulker)) return;
         context.event().setCancelled(true);
 
-        StorageSession session = new StorageSession(context.player(), level);
+        StorageSession session = new StorageSession(context.player(), shulker, level);
         session.open();
     }
 }
