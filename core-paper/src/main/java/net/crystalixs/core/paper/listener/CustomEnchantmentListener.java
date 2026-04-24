@@ -54,7 +54,7 @@ public class CustomEnchantmentListener implements Listener {
         var activeEnchantments = resolver.resolve(tool);
         if (activeEnchantments.isEmpty()) return;
 
-        InteractContext context = new InteractContext(player, tool, event.getAction(), event.getClickedBlock());
+        InteractContext context = new InteractContext(event, player, tool, event.getAction(), event.getClickedBlock());
         dispatcher.dispatch(context, activeEnchantments);
     }
 

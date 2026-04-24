@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +15,7 @@ public sealed interface EnchantmentContext {
     record BreakingBlocksContext(BlockBreakEvent event, Player player, Block block, ItemStack tool) implements EnchantmentContext {
     }
 
-    record InteractContext(Player player, ItemStack tool, Action action, @Nullable Block block) implements EnchantmentContext {
+    record InteractContext(PlayerInteractEvent event, Player player, ItemStack tool, Action action, @Nullable Block block) implements EnchantmentContext {
     }
 
     record CombatContext(EntityDeathEvent event, Player player, ItemStack tool, Entity target) implements EnchantmentContext {
