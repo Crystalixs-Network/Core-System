@@ -49,7 +49,9 @@ public final class StorageSession {
                 .setTitle(new AdventureComponentWrapper(translatable("container.shulkerBox")))
                 .addCloseHandler(() -> {
                     saveContent(backing);
-                    ((ShulkerBox) block.getBlockData()).close();
+
+                    if (!(block.getState() instanceof ShulkerBox shulker)) return;
+                    shulker.close();
                 })
                 .setGui(gui)
                 .open(player);
