@@ -72,7 +72,7 @@ public final class StorageEnchantment implements CustomEnchantment, Listener {
         block.getWorld().dropItemNaturally(block.getLocation().toCenterLocation(), drop);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onInteract(PlayerInteractEvent event) {
         if (event.getHand() != EquipmentSlot.HAND) return;
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
