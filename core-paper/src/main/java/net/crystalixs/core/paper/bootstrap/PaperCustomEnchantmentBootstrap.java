@@ -18,6 +18,7 @@ import net.kyori.adventure.text.Component;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,7 +49,7 @@ public final class PaperCustomEnchantmentBootstrap {
             new Registration("smelting_touch", text("Smelting Touch"), 1, event -> event.getOrCreateTag(ItemTypeTagKeys.PICKAXES))
     );
 
-    public Collection<CustomEnchantment> createEnchantments(String backendId) {
+    public Collection<CustomEnchantment> createEnchantments(JavaPlugin plugin, String backendId) {
         return List.of(
                 new TimberEnchantment(),
                 new WoodWhisperEnchantment(),
@@ -58,7 +59,7 @@ public final class PaperCustomEnchantmentBootstrap {
                 new DrillEnchantment(backendId),
                 new EarthWhisperEnchantment(),
                 new PlowEnchantment(),
-                new StorageEnchantment(),
+                new StorageEnchantment(plugin),
                 new PurseEnchantment(),
                 new ResourceCollectorEnchantment(),
                 new GlassBreakerEnchantment(),

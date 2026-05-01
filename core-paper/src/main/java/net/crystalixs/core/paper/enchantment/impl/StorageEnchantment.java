@@ -1,11 +1,37 @@
 package net.crystalixs.core.paper.enchantment.impl;
 
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import net.crystalixs.core.paper.enchantment.CustomEnchantment;
 import net.crystalixs.core.paper.enchantment.EnchantmentContext.PlacingBlocksContext;
 import net.crystalixs.core.paper.enchantment.util.StorageSession;
+import net.kyori.adventure.key.Key;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.block.Block;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockStateMeta;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
-public final class StorageEnchantment implements CustomEnchantment {
+public final class StorageEnchantment implements CustomEnchantment, Listener {
+
+    public static final NamespacedKey STORAGE_LEVEL_KEY = new NamespacedKey("core", "storage_level");
+
+    public StorageEnchantment(JavaPlugin plugin) {
+        Bukkit.getPluginManager().registerEvents(this, plugin);
+    }
 
     @Override
     public String id() {
@@ -14,10 +40,55 @@ public final class StorageEnchantment implements CustomEnchantment {
 
     @Override
     public void onBlockPlace(PlacingBlocksContext context, int level) {
-        if (!(context.block().getState() instanceof ShulkerBox)) return;
-        context.event().setCancelled(true);
+        if (!(context.block().getState() instanceof ShulkerBox shulker)) return;
 
-        StorageSession session = new StorageSession(context.player(), context.tool(), level);
+        shulker.getPersistentDataContainer().set(STORAGE_LEVEL_KEY, PersistentDataType.INTEGER, level);
+        shulker.update(true, false);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+        if (!(block.getState() instanceof ShulkerBox shulker)) return;
+
+        Integer storedLevel = shulker.getPersistentDataContainer().get(STORAGE_LEVEL_KEY, PersistentDataType.INTEGER);
+        if (storedLevel == null || storedLevel <= 0) return;
+
+        Enchantment enchantment = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(Key.key("core", "storage"));
+        if (enchantment == null) return;
+
+        ItemStack drop = new ItemStack(block.getType());
+        if (drop.getItemMeta() instanceof BlockStateMeta meta) {
+            meta.setBlockState(shulker);
+            meta.addEnchant(enchantment, storedLevel, true);
+            drop.setItemMeta(meta);
+
+        } else {
+            drop.addUnsafeEnchantment(enchantment, storedLevel);
+        }
+
+        event.setDropItems(false);
+        block.setType(Material.AIR);
+        block.getWorld().dropItemNaturally(block.getLocation().toCenterLocation(), drop);
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onInteract(PlayerInteractEvent event) {
+        if (event.getHand() != EquipmentSlot.HAND) return;
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if (event.getClickedBlock() == null) return;
+        if (!(event.getClickedBlock().getState() instanceof ShulkerBox shulker)) return;
+
+        PersistentDataContainer container = shulker.getPersistentDataContainer();
+        if (!container.has(STORAGE_LEVEL_KEY, PersistentDataType.INTEGER)) return;
+
+        Integer level = container.get(STORAGE_LEVEL_KEY, PersistentDataType.INTEGER);
+        if (level == null || level <= 0) return;
+
+        event.setCancelled(true);
+        shulker.open();
+
+        StorageSession session = new StorageSession(event.getPlayer(), shulker, level);
         session.open();
     }
 }
