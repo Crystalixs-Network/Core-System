@@ -50,7 +50,7 @@ public final class StorageSession {
                 .addCloseHandler(() -> {
                     saveContent(backing);
 
-                    if (!(block.getState() instanceof ShulkerBox shulker)) return;
+                    if (!(block.getState(false) instanceof ShulkerBox shulker)) return;
                     shulker.close();
                 })
                 .setGui(gui)
@@ -64,7 +64,7 @@ public final class StorageSession {
     }
 
     private void loadContent(Inventory inventory) {
-        if (!(block.getBlockData() instanceof ShulkerBox shulker)) return;
+        if (!(block.getState(false) instanceof ShulkerBox shulker)) return;
         ItemStack[] baseContent = shulker.getInventory().getContents();
         for (int slot = 0; slot < BASE_SHULKER_SLOTS; slot++) {
             inventory.setItem(slot, baseContent[slot]);
@@ -85,7 +85,7 @@ public final class StorageSession {
     }
 
     private void saveContent(Inventory inventory) {
-        if (!(block.getState() instanceof ShulkerBox shulker)) return;
+        if (!(block.getState(false) instanceof ShulkerBox shulker)) return;
         ItemStack[] current = inventory.getContents();
         ItemStack[] baseContent = new ItemStack[BASE_SHULKER_SLOTS];
         System.arraycopy(current, 0, baseContent, 0, Math.min(BASE_SHULKER_SLOTS, current.length));
